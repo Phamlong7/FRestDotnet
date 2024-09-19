@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Repository;
+using Microsoft.AspNetCore.Identity;
+using Restaurant.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 // Connection Database
@@ -7,6 +9,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectedDb"));
 });
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<RestaurantContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -24,8 +28,17 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
+#pragma warning disable
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapAreaControllerRoute(
+        name: "Admin",
+        areaName: "Admin",
+        pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.Run();

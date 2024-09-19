@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main id="content" class="content-area">
+
+    <div class="pagetitle">
+        <h1>Dish Management</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Tables</li>
+                <li class="breadcrumb-item active">Data</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Datatables</h5>
+                        <!-- Table with stripped rows -->
+                        <table class="table datatable">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <b>Id</b>
+                                    </th>
+                                    <th>Title</th>
+                                    <th>Content</th>
+                                    <th>Price</th>
+                                    <th>Banner</th>
+                                    <th data-type="date" data-format="YYYY/DD/MM">CreatedDate</th>
+                                    <th data-type="date" data-format="YYYY/DD/MM">UpdatedDate</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Banh Mi</td>
+                                    <td>This is the food for morning</td>
+                                    <td>100$</td>
+                                    <td>13.jpg</td>
+                                    <td>2012/03/03</td>
+                                    <td>2012/03/03</td>
+                                    <td>Active</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
