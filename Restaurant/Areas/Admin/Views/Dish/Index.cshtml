@@ -1,6 +1,7 @@
-﻿
+﻿@using Restaurant.Models
+@model IEnumerable<DishModel>;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Dish Management";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -32,6 +33,7 @@
                                         <b>Id</b>
                                     </th>
                                     <th>Title</th>
+                                    <th>Category</th>
                                     <th>Content</th>
                                     <th>Price</th>
                                     <th>Banner</th>
@@ -41,16 +43,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Banh Mi</td>
-                                    <td>This is the food for morning</td>
-                                    <td>100$</td>
-                                    <td>13.jpg</td>
-                                    <td>2012/03/03</td>
-                                    <td>2012/03/03</td>
-                                    <td>Active</td>
-                                </tr>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.id</td>
+                                        <td>@item.title</td>
+                                        <td>@item.category</td>
+                                        <td>@item.content</td>
+                                        <td>@item.price</td>
+                                        <td>@item.banner</td>
+                                        <td>@item.createdDate</td>
+                                        <td>@item.updatedDate</td>
+                                        <td>@item.status</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->

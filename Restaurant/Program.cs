@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Connection Database
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectedDb"));
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
 });
 
 // Add services to the container.
@@ -25,6 +25,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Route Controller
 #pragma warning disable
 app.UseEndpoints(endpoints =>
 {
@@ -37,5 +38,12 @@ app.UseEndpoints(endpoints =>
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+
+// Seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    SeedData.SeedingData(context);
+}
 
 app.Run();

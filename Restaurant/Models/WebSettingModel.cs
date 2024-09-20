@@ -2,22 +2,13 @@
 
 namespace Restaurant.Models
 {
-    public class UserModel
+    public class WebSettingModel
     {
         [Key]
         public long id { get; set; }
 
-        [Required, MaxLength(255)]
-        public string username { get; set; }
-
-        [Required, MaxLength(255)]
-        public string password { get; set; }
-
-        [MaxLength(10)]
-        public string role { get; set; } = "USER";
-
-        [Required, MaxLength(255)]
-        public string email { get; set; }
+        [Required]
+        public string content { get; set; }
         public DateTime createdDate { get; set; } = DateTime.Now;
 
         public DateTime? updatedDate { get; set; }
@@ -29,6 +20,7 @@ namespace Restaurant.Models
         [MaxLength(10)]
         public string status { get; set; } = "ACTIVE";
 
-        public ICollection<OrderModel> order { get; set; }
+        public string type { get; set; }
+        public string image { get; set; }
     }
 }

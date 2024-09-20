@@ -5,18 +5,23 @@ namespace Restaurant.Models
     public class AdsModel
     {
         [Key]
-        public int Id { get; set; }
-        [Required]
-        public string Images { get; set; }
-        [Required]
-        public int Width { get; set; }
-        [Required]
-        public int Height { get; set; }
-        [Required]
-        public string Position { get; set; }
-        [Required]
-        public string Url { get; set; }
-        public string Status { get; set; }
+        public long id { get; set; }
 
+        public string images { get; set; }
+
+        [MaxLength(10)]
+        public string status { get; set; } = "ACTIVE";
+        public DateTime createdDate { get; set; } = DateTime.Now;
+
+        public DateTime? updatedDate { get; set; }
+
+        public string createdBy { get; set; }
+
+        public string updatedBy { get; set; }
+
+        public int? width { get; set; }
+        public int? height { get; set; }
+        public string position { get; set; }
+        public string url { get; set; }
     }
 }

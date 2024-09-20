@@ -1,21 +1,37 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Restaurant.Models
 {
     public class DishModel
     {
         [Key]
-        public int Id { get; set; }
+        public long id { get; set; }
+
+        [Required, MaxLength(255)]
+        public string title { get; set; }
+
         [Required]
-        public string Title { get; set; }
-        [Required]
-        public string Content { get; set; }
-        public string Status { get; set; }
-        [Required]
-        public string Banner { get; set; }
-        [Required]
-        public decimal Price { get; set; }
-        public int Categoryid { get; set; }
-        public CategoryModel Category { get; set; }
+        public string content { get; set; }
+
+        [MaxLength(10)]
+        public string status { get; set; } = "ACTIVE";
+        public DateTime createdDate { get; set; } = DateTime.Now;
+
+        public DateTime? updatedDate { get; set; }
+
+        public string createdBy { get; set; }
+
+        public string updatedBy { get; set; }
+
+        public string banner { get; set; }
+
+        [ForeignKey("category")]
+        public long? categoryId { get; set; }
+        public decimal? price { get; set; }
+
+        public CategoryModel category { get; set; }
+        public ICollection<OrderDetailModel> order_detail { get; set; }
     }
 }

@@ -1,6 +1,7 @@
-﻿
+﻿@using Restaurant.Models
+@model IEnumerable<CategoryModel>;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Category Management";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -31,7 +32,7 @@
                                     <th>
                                         <b>Id</b>
                                     </th>
-                                    <th>title</th>
+                                    <th>name</th>
                                     <th>description</th>
                                     <th data-type="date" data-format="YYYY/DD/MM">createdDate</th>
                                     <th data-type="date" data-format="YYYY/DD/MM">updatedDate</th>
@@ -39,14 +40,17 @@
                                 </tr>
                             </thead>
                             <tbody>                               
-                                <tr>
-                                    <td>1</td>
-                                    <td>Breakfast</td>
-                                    <td>This is the food for morning</td>
-                                    <td>2012/03/03</td>
-                                    <td>2012/03/03</td>
-                                    <td>Active</td>                                   
-                                </tr>
+                                @foreach(var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.id</td>
+                                        <td>@item.name</td>
+                                        <td>@item.description</td>
+                                        <td>@item.createdDate</td>
+                                        <td>@item.updatedDate</td>
+                                        <td>@item.status</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->
