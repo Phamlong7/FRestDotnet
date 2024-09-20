@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
-using Restaurant.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 // Connection Database
@@ -9,8 +8,6 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectedDb"));
 });
-
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<RestaurantContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
