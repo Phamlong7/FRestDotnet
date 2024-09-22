@@ -14,7 +14,7 @@ namespace Restaurant.Models
 
         [MaxLength(10)]
         public string status { get; set; } = "ACTIVE";
-        public DateTime createdDate { get; set; } = DateTime.Now;
+        public DateTime? createdDate { get; set; } = DateTime.Now;
 
         public DateTime? updatedDate { get; set; }
 

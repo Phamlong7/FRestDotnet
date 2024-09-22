@@ -9,7 +9,7 @@ namespace Restaurant.Models
 
         [Required]
         public string content { get; set; }
-        public DateTime createdDate { get; set; } = DateTime.Now;
+        public DateTime? createdDate { get; set; } = DateTime.Now;
 
         public DateTime? updatedDate { get; set; }
 

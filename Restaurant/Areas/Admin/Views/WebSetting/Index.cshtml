@@ -1,6 +1,7 @@
-﻿
+﻿@using Restaurant.Models
+@model IEnumerable<WebSettingModel>;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Web Setting Management";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -23,36 +24,89 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Datatables</h5>
-                        <!-- Table with stripped rows -->
-                        <table class="table datatable">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <b>Id</b>
-                                    </th>
-                                    <th>Content</th>
-                                    <th>Type</th>
-                                    <th>Image</th>
-                                    <th data-type="date" data-format="YYYY/DD/MM">createdDate</th>
-                                    <th data-type="date" data-format="YYYY/DD/MM">updatedDate</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Ads place</td>
-                                    <td>Ads</td>
-                                    <td>132.jpg</td>
-                                    <td>2012/03/03</td>
-                                    <td>2012/03/03</td>
-                                    <td>Active</td>                               
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- End Table with stripped rows -->
+                         <!-- Flex container for title and Add button -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Datatables</h5>
+                            <a href="@Url.Action("Create", "WebSetting")" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Add New WebSetting
+                            </a>
+                        </div>
+                        
+                        @if (Model == null || !Model.Any())
+                        {
+                            <!-- Display a message if there is no data -->
+                            <div class="alert alert-warning" role="alert">
+                                No Web Setting found.
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Table with stripped rows -->
+                            <table class="table datatable">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <b>Id</b>
+                                        </th>
+                                        <th>Content</th>
+                                        <th>Type</th>
+                                        <th>Image</th>
+                                        <th data-type="date" data-format="YYYY/DD/MM">createdDate</th>
+                                        <th data-type="date" data-format="YYYY/DD/MM">updatedDate</th>
+                                        <th>Status</th>
+                                        <th>Actions</th> <!-- New column for action buttons -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        if (item != null)
+                                        {
+                                            <tr>
+                                                <td>@item.id</td>
+                                                <td>@item.content</td>
+                                                <td>@item.type</td>
+                                                <td>@item.image</td>
+                                                <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
+                                                <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
+                                                <td>@item.status</td>
+                                                <td>
+                                                    <!-- Update Button -->
+                                                    <a href="@Url.Action("Edit", "WebSetting", new { id = item.id })" class="btn btn-warning btn-sm">
+                                                        <i class="bi bi-pencil"></i> Update
+                                                    </a>
+                                                    <!-- Delete Button -->
+                                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
+                                                        <i class="bi bi-trash"></i> Delete
+                                                    </a>
 
+                                                    <!-- Delete Confirmation Modal -->
+                                                    <div class="modal fade" id="deleteModal-@item.id" tabindex="-1" aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="deleteModalLabel-@item.id">Confirm Deletion</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    Are you sure you want to delete the web setting <strong>@item.type</strong>?
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <a href="@Url.Action("Delete", "WebSetting", new { id = item.id })" class="btn btn-danger">Confirm Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            <!-- End Table with stripped rows -->
+                        }
                     </div>
                 </div>
 

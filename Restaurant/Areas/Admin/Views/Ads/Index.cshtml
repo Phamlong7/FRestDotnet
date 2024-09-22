@@ -1,6 +1,7 @@
-﻿
+﻿@using Restaurant.Models
+@model IEnumerable<AdsModel>;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Ads Management";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -23,38 +24,92 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Datatables</h5>
-                        <!-- Table with stripped rows -->
-                        <table class="table datatable">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <b>Id</b>
-                                    </th>
-                                    <th>Images</th>
-                                    <th>Width</th>
-                                    <th>Height</th>
-                                    <th>Url</th>
-                                    <th data-type="date" data-format="YYYY/DD/MM">CreatedDate</th>
-                                    <th data-type="date" data-format="YYYY/DD/MM">UpdatedDate</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>1.jpg</td>
-                                    <td>800</td>
-                                    <td>550</td>
-                                    <td>2.com</td>
-                                    <td>2012/03/03</td>
-                                    <td>2012/03/03</td>
-                                    <td>Active</td>                                    
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- End Table with stripped rows -->
 
+                        <!-- Flex container for title and Add button -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Datatables</h5>
+                            <a href="@Url.Action("Create", "Ads")" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Add New Ads
+                            </a>
+                        </div>
+                        
+                        @if (Model == null || !Model.Any())
+                        {
+                            <!-- Display a message if there is no data -->
+                            <div class="alert alert-warning" role="alert">
+                                No ads found.
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Table with stripped rows -->
+                            <table class="table datatable">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <b>Id</b>
+                                        </th>
+                                        <th>Images</th>
+                                        <th>Width</th>
+                                        <th>Height</th>
+                                        <th>Url</th>
+                                        <th data-type="date" data-format="YYYY/DD/MM">CreatedDate</th>
+                                        <th data-type="date" data-format="YYYY/DD/MM">UpdatedDate</th>
+                                        <th>Status</th>
+                                        <th>Actions</th> <!-- New column for action buttons -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        if (item != null)
+                                        {
+                                            <tr>
+                                                <td>@item.id</td>
+                                                <td>@item.images</td>
+                                                <td>@item.width</td>
+                                                <td>@item.height</td>
+                                                <td>@item.url</td>
+                                                <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
+                                                <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
+                                                <td>@item.status</td>
+                                                <td>
+                                                    <!-- Update Button -->
+                                                    <a href="@Url.Action("Edit", "Ads", new { id = item.id })" class="btn btn-warning btn-sm">
+                                                        <i class="bi bi-pencil"></i> Update
+                                                    </a>
+                                                    <!-- Delete Button -->
+                                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
+                                                        <i class="bi bi-trash"></i> Delete
+                                                    </a>
+
+                                                    <!-- Delete Confirmation Modal -->
+                                                    <div class="modal fade" id="deleteModal-@item.id" tabindex="-1" aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="deleteModalLabel-@item.id">Confirm Deletion</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    Are you sure you want to delete the ads <strong>@item.images</strong>?
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <a href="@Url.Action("Delete", "Ads", new { id = item.id })" class="btn btn-danger">Confirm Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            <!-- End Table with stripped rows -->
+                        }
                     </div>
                 </div>
 

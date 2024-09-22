@@ -1,13 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Restaurant.Repository;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class WebSettingController : Controller
     {
-        public IActionResult Index()
+        private readonly DataContext _dataContext;
+
+        public WebSettingController(DataContext context)
         {
-            return View();
+            _dataContext = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            return View(await _dataContext.web_setting.OrderBy(w => w.id).ToListAsync());
         }
     }
 }

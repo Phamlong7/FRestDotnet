@@ -12,7 +12,7 @@ namespace Restaurant.Models
 
         [MaxLength(10)]
         public string status { get; set; } = "Pending";
-        public DateTime createdDate { get; set; } = DateTime.Now;
+        public DateTime? createdDate { get; set; } = DateTime.Now;
 
         public DateTime? updatedDate { get; set; }
 
@@ -20,7 +20,7 @@ namespace Restaurant.Models
 
         public string updatedBy { get; set; }
 
-        public float? total { get; set; }
+        public decimal? total { get; set; }
 
         [ForeignKey("user")]
         public long? userId { get; set; }
