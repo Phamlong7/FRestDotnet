@@ -20,7 +20,7 @@ namespace Restaurant.Areas.Admin.Controllers
         {
             // Fetch orders along with their related user data (or other related entities)
             var order = await _dataContext.order
-                .Include(o => o.user) // Assuming you want to include user info
+                //.Include(o => o.user) // Assuming you want to include user info
                 .OrderBy(o => o.id)
                 .ToListAsync();
 

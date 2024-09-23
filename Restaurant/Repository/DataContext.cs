@@ -42,7 +42,7 @@ namespace Restaurant.Repository
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Add Your Connection String
-            optionsBuilder.UseSqlServer("Data Source=LAPTOP-571RI1S9;Initial Catalog=FRest;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
+            optionsBuilder.UseSqlServer("Data Source=mad;Initial Catalog=FRest;Integrated Security=True;Trust Server Certificate=True");
         }
 
     }

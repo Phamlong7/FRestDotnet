@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
+using Restaurant.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 // Connection Database
@@ -8,6 +9,20 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
 });
+
+builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
+{
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+})
+    .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultTokenProviders();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -38,12 +53,5 @@ app.UseEndpoints(endpoints =>
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 });
-
-// Seed the database
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-    SeedData.SeedingData(context);
-}
 
 app.Run();
