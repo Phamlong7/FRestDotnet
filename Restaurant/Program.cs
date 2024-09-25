@@ -10,7 +10,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
 });
 
-builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
+builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 8;
@@ -21,8 +21,9 @@ builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
 })
-    .AddEntityFrameworkStores<DataContext>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<DataContext>()
+.AddDefaultTokenProviders();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -38,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Route Controller
@@ -50,8 +52,10 @@ app.UseEndpoints(endpoints =>
         pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}");
 
     endpoints.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
+
 app.Run();
+

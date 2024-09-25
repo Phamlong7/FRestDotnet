@@ -1,35 +1,38 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Restaurant.Models
 {
-    public class UserModel : IdentityUser
+    [Table("User")]
+    public class UserModel : IdentityUser<long> // Kế thừa từ IdentityUser<long> để sử dụng ID kiểu long
     {
         [Key]
-        public long id { get; set; }
+        public override long Id { get; set; } // Sử dụng thuộc tính Id từ IdentityUser, với kiểu long
 
-        [Required, MaxLength(255)]
-        public string username { get; set; }
-
-        [Required, MaxLength(255)]
-        public string password { get; set; }
+        [Required]
+        [MaxLength(255)]
+        public override string UserName { get; set; } // Đổi sang PascalCase, kế thừa từ IdentityUser
 
         [MaxLength(10)]
-        public string role { get; set; } = "USER";
+        public string Role { get; set; } = "USER"; // Thuộc tính role, mặc định là "USER"
 
-        [Required, MaxLength(255)]
-        public string email { get; set; }
-        public DateTime? createdDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.Now; // Ngày tạo người dùng
 
-        public DateTime? updatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; } // Ngày cập nhật, có thể để trống
 
-        public string createdBy { get; set; }
+        [MaxLength(50)]
+        public string CreatedBy { get; set; } = "USER";
 
-        public string updatedBy { get; set; }
+        [MaxLength(50)]
+        public string UpdatedBy { get; set; } = "USER";
 
         [MaxLength(10)]
-        public string status { get; set; } = "ACTIVE";
+        public string Status { get; set; } = "ACTIVE"; // Trạng thái người dùng, mặc định là "ACTIVE"
 
-        public ICollection<OrderModel> order { get; set; }
+        // Quan hệ một-nhiều với OrderModel
+        public ICollection<OrderModel> Orders { get; set; }
     }
 }

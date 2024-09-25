@@ -1,31 +1,35 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Restaurant.Models
 {
+    [Table("Order")]
     public class OrderModel
     {
         [Key]
-        public long id { get; set; }
+        public long id { get; set; } // Use PascalCase for property names
 
-        public string message { get; set; }
+        public string message { get; set; } // Use PascalCase for property names
 
         [MaxLength(10)]
-        public string status { get; set; } = "Pending";
-        public DateTime? createdDate { get; set; } = DateTime.Now;
+        public string status { get; set; } = "Pending"; // Use PascalCase for property names
 
-        public DateTime? updatedDate { get; set; }
+        public DateTime? createdDate { get; set; } = DateTime.Now; // Use PascalCase for property names
 
-        public string createdBy { get; set; }
+        public DateTime? updatedDate { get; set; } // Nullable for optional
 
-        public string updatedBy { get; set; }
+        public string createdBy { get; set; } // Use PascalCase for property names
 
-        public decimal? total { get; set; }
+        public string updatedBy { get; set; } // Use PascalCase for property names
 
-        [ForeignKey("user")]
-        public long? userId { get; set; }
-        public UserModel user { get; set; }
+        public decimal? total { get; set; } // Nullable for optional total
 
-        public ICollection<OrderDetailModel> order_detail { get; set; }
+        [ForeignKey("User")] // Foreign key to UserModel
+        public long? userId { get; set; } // Use PascalCase for property names
+        public UserModel user { get; set; } // Navigation property to UserModel
+
+        public ICollection<OrderDetailModel> orderDetails { get; set; } // Collection of order details
     }
 }

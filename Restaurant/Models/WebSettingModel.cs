@@ -1,26 +1,31 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Restaurant.Models
 {
+    [Table("WebSetting")]
     public class WebSettingModel
     {
         [Key]
-        public long id { get; set; }
+        public long id { get; set; } // Sử dụng PascalCase cho thuộc tính Id
 
         [Required]
-        public string content { get; set; }
-        public DateTime? createdDate { get; set; } = DateTime.Now;
+        public string content { get; set; } // Sử dụng PascalCase cho thuộc tính Content
 
-        public DateTime? updatedDate { get; set; }
+        public DateTime? createdDate { get; set; } = DateTime.Now; // Sử dụng PascalCase cho thuộc tính CreatedDate
 
-        public string createdBy { get; set; }
+        public DateTime? updatedDate { get; set; } // Giữ nguyên nullable cho tùy chọn
 
-        public string updatedBy { get; set; }
+        public string createdBy { get; set; } // Sử dụng PascalCase cho thuộc tính CreatedBy
+
+        public string updatedBy { get; set; } // Sử dụng PascalCase cho thuộc tính UpdatedBy
 
         [MaxLength(10)]
-        public string status { get; set; } = "ACTIVE";
+        public string status { get; set; } = "ACTIVE"; // Sử dụng PascalCase cho thuộc tính Status
 
-        public string type { get; set; }
-        public string image { get; set; }
+        public string type { get; set; } // Sử dụng PascalCase cho thuộc tính Type
+
+        public string image { get; set; } // Sử dụng PascalCase cho thuộc tính Image
     }
 }

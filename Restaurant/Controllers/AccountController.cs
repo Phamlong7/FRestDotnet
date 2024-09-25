@@ -31,16 +31,42 @@ namespace Restaurant.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    // Find the user using UserManager
+                    var user = await userManager.FindByEmailAsync(model.Email);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "User not found.");
+                        return View(model);
+                    }
+
+                    // Use the Role property from UserModel
+                    if (!string.IsNullOrEmpty(user.Role))
+                    {
+                        if (user.Role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                        }
+                        else if (user.Role.Equals("USER", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
+                    }
+
+                    // Fallback if no role matched
+                    ModelState.AddModelError("", "User role is not recognized.");
+                    return View(model);
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Email or password is incorrect.");
+                    ModelState.AddModelError("", "Wrong email or password.");
                     return View(model);
                 }
             }
+
             return View(model);
         }
+
+
 
         public IActionResult Register()
         {
@@ -54,18 +80,23 @@ namespace Restaurant.Controllers
             {
                 UserModel users = new UserModel
                 {
-                    email = model.Email,
-                    username = model.Email,
+                    Email = model.Email,
+                    UserName = model.Email,
                 };
 
+                // Create the user
                 var result = await userManager.CreateAsync(users, model.Password);
 
                 if (result.Succeeded)
                 {
+                    // Automatically assign the USER role
+                    await userManager.AddToRoleAsync(users, "USER");
+
                     return RedirectToAction("Login", "Account");
                 }
                 else
                 {
+                    // Add errors to the ModelState for any issues during user creation
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError("", error.Description);
@@ -76,6 +107,7 @@ namespace Restaurant.Controllers
             }
             return View(model);
         }
+
 
         public IActionResult VerifyEmail()
         {
@@ -96,7 +128,7 @@ namespace Restaurant.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("ChangePassword", "Account", new { username = user.username });
+                    return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
                 }
             }
             return View(model);
