@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Restaurant.Repository;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
