@@ -1,8 +1,285 @@
-﻿
+﻿@using Restaurant.Models
+@using System.Reflection.Metadata
+
 @{
-    ViewData["Title"] = "";
+    ViewData["Title"] = "Charts View";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Dashboard</h1>
+<section class="section dashboard">
+    <div class="row">
+
+        <!-- Left side columns -->
+        <div class="col-lg-8">
+            <div class="row">
+
+                <!-- Sales Card -->
+                <div class="col-xxl-4 col-md-6">
+                    <div class="card info-card sales-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Sales <span>/Last 7 Days</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-cart"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@ViewBag.Last7DaysSales</h6>
+                                    @if (ViewBag.SalesChange >= 0)
+                                    {
+                                        <span class="text-success small pt-1 fw-bold">@ViewBag.SalesChange%</span>
+                                        <span class="text-muted small pt-2 ps-1">increase</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger small pt-1 fw-bold">@(-ViewBag.SalesChange)%</span>
+                                        <span class="text-muted small pt-2 ps-1">decrease</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Sales Card -->
+                <!-- Orders Card -->
+                <div class="col-xxl-4 col-md-6">
+                    <div class="card info-card revenue-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Orders <span>/Last 7 Days</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-basket3-fill"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@ViewBag.Last7DaysOrders</h6>
+                                    @if (ViewBag.OrdersChange >= 0)
+                                    {
+                                        <span class="text-success small pt-1 fw-bold">@ViewBag.OrdersChange%</span>
+                                        <span class="text-muted small pt-2 ps-1">increase</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger small pt-1 fw-bold">@(-ViewBag.OrdersChange)%</span>
+                                        <span class="text-muted small pt-2 ps-1">decrease</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Orders Card -->
+                <!-- Customers Card -->
+                <div class="col-xxl-4 col-xl-12">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Customers <span>/Last 7 Days</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@ViewBag.Last7DaysCustomers</h6>
+                                    @if (ViewBag.CustomersChange >= 0)
+                                    {
+                                        <span class="text-success small pt-1 fw-bold">@ViewBag.CustomersChange%</span>
+                                        <span class="text-muted small pt-2 ps-1">increase</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger small pt-1 fw-bold">@(-ViewBag.CustomersChange)%</span>
+                                        <span class="text-muted small pt-2 ps-1">decrease</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Customers Card -->
+                <!-- Reports -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Reports <span>/Last 7 Days</span></h5>
+                            <!-- Line Chart -->
+                            <div id="reportsChart"></div>
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    new ApexCharts(document.querySelector("#reportsChart"), {
+                                        series: [{
+                                            name: 'Order',
+                                            data: @Html.Raw(Json.Serialize(ViewBag.Order)),
+                                        }, {
+                                            name: 'Revenue',
+                                            data: @Html.Raw(Json.Serialize(ViewBag.Revenue))
+                                                        }, {
+                                            name: 'Customers',
+                                            data: @Html.Raw(Json.Serialize(ViewBag.Customers))
+                                                        }],
+                                        chart: {
+                                            height: 350,
+                                            type: 'area',
+                                            toolbar: {
+                                                show: false
+                                            },
+                                        },
+                                        markers: {
+                                            size: 4
+                                        },
+                                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
+                                        fill: {
+                                            type: "gradient",
+                                            gradient: {
+                                                shadeIntensity: 1,
+                                                opacityFrom: 0.3,
+                                                opacityTo: 0.4,
+                                                stops: [0, 90, 100]
+                                            }
+                                        },
+                                        dataLabels: {
+                                            enabled: false
+                                        },
+                                        stroke: {
+                                            curve: 'smooth',
+                                            width: 2
+                                        },
+                                        xaxis: {
+                                            type: 'datetime',
+                                            categories: @Html.Raw(Json.Serialize(ViewBag.Dates))
+                                                        },
+                                        tooltip: {
+                                            x: {
+                                                format: 'dd/MM/yy'
+                                            },
+                                        }
+                                    }).render();
+                                });
+                            </script>
+                            <!-- End Line Chart -->
+                        </div>
+                    </div>
+                </div><!-- End Reports -->
+                <!-- Recent Sales -->
+                <div class="col-12">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h5 class="card-title">Recent Sales <span>/ Last 7 Days</span></h5>
+
+                            <table class="table table-borderless datatable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Customer</th>
+                                        <th scope="col">Dish</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.RecentSales != null)
+                                    {
+                                        foreach (var sale in ViewBag.RecentSales)
+                                        {
+                                            <tr>
+                                                <td>@sale.OrderId</td>
+                                                <td>@sale.Customer</td>
+                                                <td>@sale.Product</td>
+                                                <td>
+                                                    <span class="
+                                         @(sale.Price >= 100 ? "text-success" :
+                                           sale.Price >= 50 ? "text-danger" :
+                                           "text-warning")">
+                                                        $@sale.Price
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge
+                                         @(sale.Status == "Completed" ? "bg-success" :
+                                           sale.Status == "Pending" ? "bg-warning" :
+                                           sale.Status == "Cancelled" ? "bg-danger" :
+                                           "bg-secondary")">
+                                                        @sale.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div><!-- End Recent Sales -->
+                <!-- Top Selling -->
+                <div class="col-12">
+                    <div class="card top-selling overflow-auto">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">Top Selling <span>/ Last 7 Days</span></h5>
+
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Preview</th>
+                                        <th scope="col">Dish</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Sold</th>
+                                        <th scope="col">Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.TopSellingProducts != null)
+                                    {
+                                        foreach (var dish in ViewBag.TopSellingProducts)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@dish.DishBanner" alt="@dish.DishTitle" width="50" height="50" />
+                                                </td>
+                                                <td>@dish.DishTitle</td>
+                                                <td>$@dish.DishPrice</td>
+                                                <td>@dish.UnitsSold</td>
+                                                <td>$@dish.Revenue</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div><!-- End Top Selling -->
+
+
+            </div>
+        </div><!-- End Left side columns -->
+
+
+        <!-- Right side columns -->
+     <div class="col-lg-4">
+            <!-- News & Updates Traffic -->
+            <div class="card">
+                <div class="card-body pb-0">
+                    <h5 class="card-title">News &amp; Updates <span>| Today</span></h5>
+
+                    <div class="news">
+                        @if (ViewBag.BlogUpdates != null && ((IEnumerable<dynamic>)ViewBag.BlogUpdates).Any())
+                        {
+                            foreach (var blog in ViewBag.BlogUpdates)
+                            {
+                                <div class="post-item clearfix">
+                                    <img src="@blog.BlogBanner" alt="@blog.BlogTitle" width="50" height="50" />
+                                    <h4>@blog.BlogTitle</h4>
+                                    <p>@blog.BlogContent</p>
+                                </div>
+                            }
+                        }
+                    </div><!-- End sidebar recent posts -->
+                    @if (ViewBag.BlogUpdates == null || !((IEnumerable<dynamic>)ViewBag.BlogUpdates).Any())
+                    {
+                        <div class="alert alert-warning text-center" role="alert">
+                            <h6 class="font-weight-bold">No news updates found.</h6>
+                            <p class="mb-0">Stay tuned for the latest news and updates!</p>
+                            <p>Check back later for exciting content.</p>
+                        </div>
+                    }
+                </div>
+            </div><!-- End News & Updates -->
+      </div><!-- End Right side columns -->
+
+     </div>
+</section>
 
