@@ -16,6 +16,7 @@ namespace Restaurant.Repository
         public DbSet<WebSettingModel> web_setting { get; set; }
         public DbSet<AdsModel> ads { get; set; }
         public DbSet<BlogModel> blog { get; set; }
+        public DbSet<UserModel> user { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,7 +42,7 @@ namespace Restaurant.Repository
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=mad;Initial Catalog=FRest;Integrated Security=True;Trust Server Certificate=True");
+                optionsBuilder.UseSqlServer("Data Source=LAPTOP-571RI1S9;Initial Catalog=FRest;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
             }
         }
     }

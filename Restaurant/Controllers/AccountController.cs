@@ -2,19 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models;
 using Restaurant.ViewModels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Security.Claims;
 
 namespace Restaurant.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly SignInManager<UserModel> signInManager;
-        private readonly UserManager<UserModel> userManager;
+        private readonly SignInManager<UserModel> _signInManager;
+        private readonly UserManager<UserModel> _userManager;
 
         public AccountController(SignInManager<UserModel> signInManager, UserManager<UserModel> userManager)
         {
-            this.signInManager = signInManager;
-            this.userManager = userManager;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         public IActionResult Login()
@@ -27,46 +27,51 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "User not found.");
+                    return View(model);
+                }
 
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    // Find the user using UserManager
-                    var user = await userManager.FindByEmailAsync(model.Email);
-                    if (user == null)
+                    // Add role claim
+                    var claims = new List<Claim>
+
+                        {
+                            new Claim(ClaimTypes.Role, user.Role)
+                        };
+
+                    await _userManager.AddClaimsAsync(user, claims);
+
+                    // Sign in again to refresh the cookie with the new claims
+                    await _signInManager.RefreshSignInAsync(user);
+
+                    if (user.Role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
                     {
-                        ModelState.AddModelError("", "User not found.");
+                        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                    }
+                    else if (user.Role.Equals("USER", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "User role is not recognized.");
                         return View(model);
                     }
-
-                    // Use the Role property from UserModel
-                    if (!string.IsNullOrEmpty(user.Role))
-                    {
-                        if (user.Role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
-                        }
-                        else if (user.Role.Equals("USER", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return RedirectToAction("Index", "Home");
-                        }
-                    }
-
-                    // Fallback if no role matched
-                    ModelState.AddModelError("", "User role is not recognized.");
-                    return View(model);
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Wrong email or password.");
+                    ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
                 }
             }
 
             return View(model);
         }
-
-
 
         public IActionResult Register()
         {
@@ -78,20 +83,34 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
-                UserModel users = new UserModel
+                UserModel user = new UserModel
                 {
                     Email = model.Email,
                     UserName = model.Email,
                 };
 
                 // Create the user
-                var result = await userManager.CreateAsync(users, model.Password);
+                var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    // Automatically assign the USER role
-                    await userManager.AddToRoleAsync(users, "USER");
 
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "User not found.");
+                        return View(model);
+                    }
+                    // Automatically assign the USER role
+                    var roleResult = await _userManager.AddToRoleAsync(user, "USER");
+                    if (!roleResult.Succeeded)
+                    {
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                        return View(model);
+                    }
+                    await _userManager.AddToRoleAsync(user, "USER");
                     return RedirectToAction("Login", "Account");
                 }
                 else
@@ -108,7 +127,6 @@ namespace Restaurant.Controllers
             return View(model);
         }
 
-
         public IActionResult VerifyEmail()
         {
             return View();
@@ -119,7 +137,7 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByNameAsync(model.Email);
+                var user = await _userManager.FindByNameAsync(model.Email);
 
                 if (user == null)
                 {
@@ -148,18 +166,17 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByNameAsync(model.Email);
+                var user = await _userManager.FindByNameAsync(model.Email);
                 if (user != null)
                 {
-                    var result = await userManager.RemovePasswordAsync(user);
+                    var result = await _userManager.RemovePasswordAsync(user);
                     if (result.Succeeded)
                     {
-                        result = await userManager.AddPasswordAsync(user, model.NewPassword);
+                        result = await _userManager.AddPasswordAsync(user, model.NewPassword);
                         return RedirectToAction("Login", "Account");
                     }
                     else
                     {
-
                         foreach (var error in result.Errors)
                         {
                             ModelState.AddModelError("", error.Description);
@@ -183,7 +200,7 @@ namespace Restaurant.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

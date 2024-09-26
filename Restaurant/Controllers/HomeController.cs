@@ -20,7 +20,18 @@ namespace Restaurant.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            // Add privacy logic here
+            // Example: Check if the user is authenticated
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                // User is authenticated, show privacy content
+                return View();
+            }
+            else
+            {
+                // User is not authenticated, redirect to login page
+                return RedirectToAction("Login", "Account");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
