@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Restaurant.Models;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.ViewModels;
+using Restaurant.Areas.Admin.Views.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddScoped<RoleManager<IdentityRole<long>>>();
 
 // Add services to the container  
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<IFileService, FileService>(); //file service
 builder.Services.AddSingleton<ConstantHelper>();
 builder.Services.AddTransient<SendMail>();
 
