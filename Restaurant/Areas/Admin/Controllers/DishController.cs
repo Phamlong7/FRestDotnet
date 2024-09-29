@@ -16,7 +16,7 @@ namespace Restaurant.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             // Fetch dishes along with their related category data (if needed)
-            var dishes = await _dataContext.dish
+            var dishes = await _dataContext.Dish
                 .Include(d => d.category)  // Include the category if you want to show category info in the view
                 .OrderBy(d => d.id)
                 .ToListAsync();

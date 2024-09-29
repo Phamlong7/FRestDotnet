@@ -17,7 +17,7 @@ namespace Restaurant.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    images = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    images = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     createdDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime", nullable: true),

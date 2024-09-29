@@ -21,14 +21,14 @@ namespace Restaurant.Areas.Admin.Controllers
             var lastWeek = today.AddDays(-7);
 
             // Last 7 days data
-            var last7DaysSales = _context.orderDetails
+            var last7DaysSales = _context.OrderDetails
                 .Where(od => od.order.createdDate >= lastWeek)
                 .Sum(od => od.quantity);
 
-            var last7DaysOrders = _context.order
+            var last7DaysOrders = _context.Order
                 .Count(o => o.createdDate >= lastWeek);
 
-            var last7DaysCustomers = _context.order
+            var last7DaysCustomers = _context.Order
                 .Where(o => o.createdDate >= lastWeek)
                 .Select(o => o.userId)
                 .Distinct()
@@ -36,14 +36,14 @@ namespace Restaurant.Areas.Admin.Controllers
 
             // Previous 7 days data for comparison
             var previous7Days = lastWeek.AddDays(-7);
-            var previous7DaysSales = _context.orderDetails
+            var previous7DaysSales = _context.OrderDetails
                 .Where(od => od.order.createdDate >= previous7Days && od.order.createdDate < lastWeek)
                 .Sum(od => od.quantity);
 
-            var previous7DaysOrders = _context.order
+            var previous7DaysOrders = _context.Order
                 .Count(o => o.createdDate >= previous7Days && o.createdDate < lastWeek);
 
-            var previous7DaysCustomers = _context.order
+            var previous7DaysCustomers = _context.Order
                 .Where(o => o.createdDate >= previous7Days && o.createdDate < lastWeek)
                 .Select(o => o.userId)
                 .Distinct()
@@ -60,11 +60,11 @@ namespace Restaurant.Areas.Admin.Controllers
                 .Select(date => new
                 {
                     Date = date,
-                    Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date),
-                    Revenue = _context.orderDetails
+                    Order = _context.OrderDetails.Count(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date),
+                    Revenue = _context.OrderDetails
                         .Where(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date)
                         .Sum(od => od.quantity * od.dish.price) ?? 0,
-                    Customers = _context.order
+                    Customers = _context.Order
                         .Where(o => o.createdDate.HasValue && o.createdDate.Value.Date == date)
                         .Select(o => o.userId)
                         .Distinct()
@@ -74,7 +74,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 .ToList();
 
             // Query the orders placed 
-            var recentSales = _context.order
+            var recentSales = _context.Order
                 .Where(o => o.createdDate >= previous7Days && o.createdDate <= today)
                 .Select(o => new
                 {
@@ -93,7 +93,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 .ToList();
 
             // Query the top-selling products
-            var topSellingProducts = _context.orderDetails
+            var topSellingProducts = _context.OrderDetails
                 .Where(od => od.order.createdDate >= previous7Days && od.order.createdDate <= today)
                 .GroupBy(od => new { od.dishId, od.dish.title, od.dish.price, od.dish.banner })
                 .Select(g => new
@@ -110,7 +110,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 .ToList();
 
             // Query the Blog and Updates
-            var blogupdates = _context.blog
+            var blogupdates = _context.Blog
                 .Where(b => b.createdDate.HasValue && b.createdDate.Value.Date == today && b.status == "ACTIVE")
                 .Select(b => new
                 {

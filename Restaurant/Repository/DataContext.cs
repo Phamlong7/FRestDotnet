@@ -9,14 +9,14 @@ namespace Restaurant.Repository
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<CategoryModel> category { get; set; }
-        public DbSet<DishModel> dish { get; set; }
-        public DbSet<OrderModel> order { get; set; }
-        public DbSet<OrderDetailModel> orderDetails { get; set; }
-        public DbSet<WebSettingModel> web_setting { get; set; }
-        public DbSet<AdsModel> ads { get; set; }
-        public DbSet<BlogModel> blog { get; set; }
-        public DbSet<UserModel> user { get; set; }
+        public DbSet<CategoryModel> Category { get; set; }
+        public DbSet<DishModel> Dish { get; set; }
+        public DbSet<OrderModel> Order { get; set; }
+        public DbSet<OrderDetailModel> OrderDetails { get; set; }
+        public DbSet<WebSettingModel> Web_setting { get; set; }
+        public DbSet<AdsModel> Ads { get; set; }
+        public DbSet<BlogModel> Blog { get; set; }
+        public DbSet<UserModel> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,7 +42,7 @@ namespace Restaurant.Repository
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=LAPTOP-571RI1S9;Initial Catalog=FRest;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
+                optionsBuilder.UseSqlServer("Data Source=mad;Initial Catalog=FRest;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
             }
         }
     }

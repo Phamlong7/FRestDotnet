@@ -12,7 +12,7 @@ using Restaurant.Repository;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240924072725_dddd")]
+    [Migration("20240929120747_dddd")]
     partial class dddd
     {
         /// <inheritdoc />
@@ -179,7 +179,8 @@ namespace Restaurant.Migrations
 
                     b.Property<string>("images")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("position")
                         .IsRequired()

@@ -176,7 +176,8 @@ namespace Restaurant.Migrations
 
                     b.Property<string>("images")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("position")
                         .IsRequired()

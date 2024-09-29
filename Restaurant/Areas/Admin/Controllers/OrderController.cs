@@ -19,7 +19,7 @@ namespace Restaurant.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             // Fetch orders along with their related user data (or other related entities)
-            var order = await _dataContext.order
+            var order = await _dataContext.Order
                 //.Include(o => o.user) // Assuming you want to include user info
                 .OrderBy(o => o.id)
                 .ToListAsync();
