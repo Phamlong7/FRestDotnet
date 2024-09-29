@@ -18,6 +18,7 @@ namespace Restaurant.Repository
         public DbSet<BlogModel> blog { get; set; }
         public DbSet<UserModel> user { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

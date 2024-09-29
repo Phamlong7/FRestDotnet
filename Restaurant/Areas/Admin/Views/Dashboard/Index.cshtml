@@ -5,7 +5,17 @@
     ViewData["Title"] = "Charts View";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
-
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
 <section class="section dashboard">
     <div class="row">
 
@@ -221,9 +231,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (ViewBag.TopSellingProducts != null)
+                                    @if (ViewBag.TopSellingProducts != null && ((IEnumerable<dynamic>)ViewBag.TopSellingProducts).Any())
                                     {
-                                        foreach (var dish in ViewBag.TopSellingProducts)
+                                        foreach (var dish in (IEnumerable<dynamic>)ViewBag.TopSellingProducts)
                                         {
                                             <tr>
                                                 <td>
@@ -236,6 +246,12 @@
                                             </tr>
                                         }
                                     }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center">No top-selling products in the last 7 days.</td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
 
@@ -247,9 +263,8 @@
             </div>
         </div><!-- End Left side columns -->
 
-
         <!-- Right side columns -->
-     <div class="col-lg-4">
+        <div class="col-lg-4">
             <!-- News & Updates Traffic -->
             <div class="card">
                 <div class="card-body pb-0">
@@ -278,8 +293,21 @@
                     }
                 </div>
             </div><!-- End News & Updates -->
-      </div><!-- End Right side columns -->
+        </div><!-- End Right side columns -->
 
      </div>
 </section>
+<script>
+    // Initialize toast notification with extended display time
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds (10000 milliseconds)
+                autohide: true // Set to true for auto-hiding the toast
+            })
+        })
+        toastList.forEach(toast => toast.show());
+    });
+</script>
 

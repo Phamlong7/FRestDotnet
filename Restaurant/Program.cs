@@ -1,10 +1,14 @@
-using Microsoft.EntityFrameworkCore;
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
 using Restaurant.Models;
+using Microsoft.EntityFrameworkCore;
+using Restaurant.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
-// Connection Database
+
+// Configure services before building the app
+
+// Connection Database 
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
@@ -24,25 +28,32 @@ builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
 .AddEntityFrameworkStores<DataContext>()
 .AddDefaultTokenProviders();
 
+// Add RoleManager explicitly
+builder.Services.AddScoped<RoleManager<IdentityRole<long>>>();
 
-// Add services to the container.
+// Add services to the container  
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<ConstantHelper>();
+builder.Services.AddTransient<SendMail>();
 
+// Configure logging before building the app
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+
+// Build the app after configuring services
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline  
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
+
 app.UseStaticFiles();
-
 app.UseRouting();
+app.UseAuthentication(); // Ensures authentication is enabled  
+app.UseAuthorization();  // Ensures authorization is enabled  
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Route Controller
+// Route Controller  
 #pragma warning disable
 app.UseEndpoints(endpoints =>
 {
@@ -50,12 +61,13 @@ app.UseEndpoints(endpoints =>
         name: "Admin",
         areaName: "Admin",
         pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}");
-
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
+// Continue with the rest of the setup
+app.UseHttpsRedirection();
+app.MapControllers();
 
 app.Run();
-
