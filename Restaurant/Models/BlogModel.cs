@@ -28,11 +28,14 @@ namespace Restaurant.Models
         public DateTime? updatedDate { get; set; }
 
         [MaxLength(50)] // Giới hạn độ dài cho tên người tạo
-        public string createdBy { get; set; }
+        public string? createdBy { get; set; }
 
         [MaxLength(50)] // Giới hạn độ dài cho tên người cập nhật
-        public string updatedBy { get; set; }
+        public string? updatedBy { get; set; }
 
-        public string banner { get; set; }
+        public string? banner { get; set; }
+
+        [NotMapped] // not map to database
+        public IFormFile? BannerUpload {get; set; }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
 using Restaurant.Models;
+using Restaurant.Areas.Admin.Views.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 // Connection Database
@@ -27,6 +28,7 @@ builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<IFileService, FileService>(); //file service
 
 var app = builder.Build();
 

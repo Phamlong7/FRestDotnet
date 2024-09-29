@@ -67,7 +67,16 @@
                                                 <td>@item.id</td>
                                                 <td>@item.title</td>
                                                 <td>@item.content</td>
-                                                <td>@item.banner</td>
+                                                <td>
+                                                    @if(!string.IsNullOrWhiteSpace(item.banner))
+                                                    {
+                                                        <img alt="banner upload" style="width: 100px;height:80px" src="/Media/@item.banner"/>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>No image</span>
+                                                    }
+                                                </td>
                                                 <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.status</td>
