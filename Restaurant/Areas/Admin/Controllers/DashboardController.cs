@@ -63,7 +63,7 @@ namespace Restaurant.Areas.Admin.Controllers
                     Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date),
                     Revenue = _context.orderDetails
                         .Where(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date)
-                        .Sum(od => od.quantity * od.dish.price) ?? 0,
+                        .Sum(od => od.quantity * od.price) ?? 0,
                     Customers = _context.order
                         .Where(o => o.createdDate.HasValue && o.createdDate.Value.Date == date)
                         .Select(o => o.userId)
@@ -103,7 +103,7 @@ namespace Restaurant.Areas.Admin.Controllers
                     DishPrice = g.Key.price,
                     DishBanner = g.Key.banner,
                     UnitsSold = g.Sum(od => od.quantity), // Sum of quantities sold
-                    Revenue = g.Sum(od => od.quantity * g.Key.price) // Total revenue for the product
+                    Revenue = g.Sum(od => od.quantity * od.price) // Total revenue for the product
                 })
                 .OrderByDescending(p => p.UnitsSold) // Order by the number of units sold
                 .Take(5) // Limit to top 10 products

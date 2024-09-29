@@ -15,6 +15,7 @@ namespace Restaurant.Models
         public long dishId { get; set; }
 
         public int quantity { get; set; }
+        public decimal? price { get; set; }
 
         // Quan hệ với OrderModel
         [ForeignKey("orderId")]

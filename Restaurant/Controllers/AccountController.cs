@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models;
 using Restaurant.ViewModels;
@@ -9,16 +10,16 @@ namespace Restaurant.Controllers
     public class AccountController : Controller
     {
         private readonly SignInManager<UserModel> _signInManager;
-        private readonly UserManager<UserModel> _userManager;
-        private readonly RoleManager<IdentityRole<long>> _roleManager;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<UserModel> _userManager;
+        private readonly Microsoft.AspNetCore.Identity.RoleManager<IdentityRole<long>> _roleManager;
         private readonly ConstantHelper _constantHelper;
         private readonly SendMail _sendMail;
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(
              SignInManager<UserModel> signInManager,
-             UserManager<UserModel> userManager,
-             RoleManager<IdentityRole<long>> roleManager,
+             Microsoft.AspNetCore.Identity.UserManager<UserModel> userManager,
+             Microsoft.AspNetCore.Identity.RoleManager<IdentityRole<long>> roleManager,
              ILogger<AccountController> logger,
              ConstantHelper constantHelper,
              SendMail sendMail)
@@ -94,7 +95,6 @@ namespace Restaurant.Controllers
             return View();
         }
 
-        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -197,7 +197,7 @@ namespace Restaurant.Controllers
                 TempData["OTP"] = otp;
                 TempData["UserEmail"] = model.Email;
 
-                string subject = "Your OTP for Password Reset";
+                string subject = "Your OTP for Register";
                 string body = $"Your OTP is: {otp}. It will expire in 10 seconds.";
 
                 bool emailSent = await _sendMail.SendEmailAsync(model.Email, subject, body);
@@ -209,6 +209,54 @@ namespace Restaurant.Controllers
                 }
 
                 return RedirectToAction("VerifyOTP", "Account");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while verifying email for user {Email}", model.Email);
+                ModelState.AddModelError("", "An error occurred. Please try again later.");
+                return View(model);
+            }
+        }
+        public IActionResult VerifyEmailForChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyEmailForChangePassword(VerifyEmailViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "User not found!");
+                    return View(model);
+                }
+
+                string otp = _constantHelper.GenerateOTP();
+
+                // Store OTP (consider using a more secure method in production)
+                TempData["OTP"] = otp;
+                TempData["UserEmail"] = model.Email;
+
+                string subject = "Your OTP for Password Reset";
+                string body = $"Your OTP is: {otp}. It will expire in 10 seconds.";
+
+                bool emailSent = await _sendMail.SendEmailAsync(model.Email, subject, body);
+
+                if (!emailSent)
+                {
+                    ModelState.AddModelError("", "Failed to send OTP. Please try again.");
+                    return View(model);
+                }
+
+                return RedirectToAction("VerifyOTPForChangePassword", "Account");
             }
             catch (Exception ex)
             {
@@ -237,7 +285,6 @@ namespace Restaurant.Controllers
             return View(_constantHelper);
         }
 
-        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> VerifyOTP(string otp)
         {
@@ -278,12 +325,67 @@ namespace Restaurant.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult VerifyOTPForChangePassword()
+        {
+            return View(_constantHelper);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> VerifyOTPForChangePassword(string otp)
+        {
+            if (ModelState.IsValid)
+            {
+                string? storedOTP = TempData["OTP"] as string;
+                string? userEmail = TempData["UserEmail"] as string;
+
+                if (string.IsNullOrEmpty(storedOTP) || string.IsNullOrEmpty(userEmail))
+                {
+                    ModelState.AddModelError("", "OTP has expired. Please request a new one.");
+                    ClearOTPTempData();
+                    return View();
+                }
+
+                if (otp == storedOTP)
+                {
+                    var user = await _userManager.FindByEmailAsync(userEmail);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "User not found.");
+                        ClearOTPTempData();
+                        return View();
+                    }
+
+                    user.EmailConfirmed = true;
+                    await _userManager.UpdateAsync(user);
+
+                    ClearOTPTempData();
+                    TempData["SuccessMessage"] = "Your email has been successfully verified! You can now change your password.";
+                    return RedirectToAction("ChangePassword", "Account", new { email = userEmail });
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Invalid OTP. Please try again.");
+                    ClearOTPTempData();
+                }
+            }
+
+            return View();
+        }
+
+        private void ClearOTPTempData()
+        {
+            TempData.Remove("OTP");
+            TempData.Remove("UserEmail");
+        }
+
+        [HttpGet]
         public IActionResult ChangePassword(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
-                return RedirectToAction("VerifyEmail", "Account");
+                TempData["ErrorMessage"] = "Email is required to change password.";
+                return RedirectToAction("Login", "Account");
             }
             return View(new ChangePasswordViewModel { Email = email });
         }
@@ -296,44 +398,40 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
-            // Ensure new password and confirm password are not null or empty
-            if (string.IsNullOrEmpty(model.NewPassword) || string.IsNullOrEmpty(model.ConfirmPassword))
-            {
-                ModelState.AddModelError("", "New password and confirm password cannot be null.");
-                return View(model);
-            }
-
-            // Ensure new password and confirm password match
-            if (model.NewPassword != model.ConfirmPassword)
-            {
-                ModelState.AddModelError("", "The new password and confirm password do not match.");
-                return View(model);
-            }
-
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                // Do not reveal that the user does not exist
-                return RedirectToAction("ChangePassword", "Account");
-            }
-
-            // Directly update the user's password
-            var passwordHash = _userManager.PasswordHasher.HashPassword(user, model.NewPassword);
-            user.PasswordHash = passwordHash;
-
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
-            {
-                foreach (var error in updateResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                // Don't reveal that the user doesn't exist
+                ModelState.AddModelError("", "Unable to change password. Please try again.");
                 return View(model);
             }
 
-            // If password change is successful, redirect to login
-            return RedirectToAction("Login", "Account");
+            // Generate a password reset token
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Reset the password
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                // Refresh sign-in cookie if the user is currently signed in
+                if (User.Identity.IsAuthenticated)
+                {
+                    await _signInManager.RefreshSignInAsync(user);
+                }
+
+                TempData["SuccessMessage"] = "Your password has been changed successfully.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(model);
         }
+
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

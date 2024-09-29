@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Restaurant.Models;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.ViewModels;
-using Restaurant.Areas.Admin.Views.Shared;
+using Restaurant.Areas.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
