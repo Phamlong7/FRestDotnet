@@ -164,7 +164,6 @@ namespace Restaurant.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
 
                     b.Property<string>("createdBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -174,10 +173,8 @@ namespace Restaurant.Migrations
                     b.Property<int?>("height")
                         .HasColumnType("int");
 
-                    b.Property<string>("images")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<string>("image")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("position")
                         .IsRequired()
@@ -190,7 +187,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("updatedBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -198,7 +194,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("url")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("width")
@@ -434,7 +429,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -488,7 +482,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UpdatedBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -526,14 +519,12 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("createdBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("createdDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("status")
@@ -546,7 +537,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("updatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("updatedDate")

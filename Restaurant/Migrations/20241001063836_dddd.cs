@@ -17,16 +17,16 @@ namespace Restaurant.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    images = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     createdDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     width = table.Column<int>(type: "int", nullable: true),
                     height = table.Column<int>(type: "int", nullable: true),
                     position = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    url = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    url = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,8 +58,8 @@ namespace Restaurant.Migrations
                     Role = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -128,11 +128,11 @@ namespace Restaurant.Migrations
                     content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     createdDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    createdBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    updatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    createdBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    updatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    image = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    image = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

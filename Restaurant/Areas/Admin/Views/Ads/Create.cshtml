@@ -7,12 +7,34 @@
 }
 
 <main id="content" class="content-area">
-
+    <!-- Toast Notification -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["SuccessMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ErrorMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
     <div class="pagetitle">
         <h1>Create New Ad</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Ads")">Home</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Ads", new { area = "Admin" })">Home</a></li>
                 <li class="breadcrumb-item active">Create</li>
             </ol>
         </nav>
@@ -28,9 +50,9 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> <!-- Validation summary -->
 
                             <div class="mb-3">
-                                <label asp-for="images" class="form-label">Image</label>
-                                <input asp-for="images" class="form-control" type="file" accept="image/*" required />
-                                <span asp-validation-for="images" class="text-danger"></span>
+                                <label asp-for="imageUpload" class="form-label">Image</label>
+                                <input asp-for="imageUpload" class="form-control" type="file" accept="image/*" required />
+                                <span asp-validation-for="imageUpload" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
@@ -45,30 +67,27 @@
 
                             <div class="mb-3">
                                 <label asp-for="width" class="form-label">Width</label>
-                                <input asp-for="width" class="form-control" />
+                                <input asp-for="width" class="form-control" type="number" required />
                                 <span asp-validation-for="width" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
                                 <label asp-for="height" class="form-label">Height</label>
-                                <input asp-for="height" class="form-control" />
+                                <input asp-for="height" class="form-control" type="number" required />
                                 <span asp-validation-for="height" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
                                 <label asp-for="position" class="form-label">Position</label>
-                                <input asp-for="position" class="form-control" />
+                                <input asp-for="position" class="form-control" required />
                                 <span asp-validation-for="position" class="text-danger"></span>
                             </div>
 
-                            <div class="mb-3">
-                                <label asp-for="url" class="form-label">URL</label>
-                                <input asp-for="url" class="form-control" required />
-                                <span asp-validation-for="url" class="text-danger"></span>
-                            </div>
+                            <!-- The hidden URL field is not needed anymore -->
+                            @*<input type="hidden" asp-for="url" />*@
 
                             <button type="submit" class="btn btn-primary">Create</button>
-                            <a href="@Url.Action("Index", "Ads")" class="btn btn-secondary">Cancel</a>
+                            <a href="@Url.Action("Index", "Ads", new { area = "Admin" })" class="btn btn-secondary">Cancel</a>
                         </form>
                     </div>
                 </div>
@@ -79,7 +98,19 @@
 
 </main><!-- End #main -->
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        // Initialize toast notification with extended display time
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    delay: 4000,  // Display for 4 seconds (4000 milliseconds)
+                    autohide: true // Set to true for auto-hiding the toast
+                });
+            });
+            toastList.forEach(toast => toast.show());
+        });
+    </script>
 }

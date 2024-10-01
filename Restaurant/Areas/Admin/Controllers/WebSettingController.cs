@@ -1,117 +1,174 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.Repository;
-using System;
-using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using Restaurant.Areas.Admin.Views.Shared;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Route("admin/[controller]")]
     public class WebSettingController : Controller
     {
-        private readonly DataContext _context; // Replace with your actual DbContext
+        private readonly DataContext _dataContext;
+        private readonly UserManager<UserModel> _userManager;
+        private readonly IFileService _fileService;
 
-        public WebSettingController(DataContext context)
+        public WebSettingController(DataContext context, UserManager<UserModel> userManager, IFileService fileService)
         {
-            _context = context;
+            _dataContext = context;
+            _userManager = userManager;
+            _fileService = fileService;
         }
 
-        // GET: admin/websetting
-        [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var webSettings = _context.Web_setting.ToList();
-            return View(webSettings);
+            return View(await _dataContext.Web_setting.OrderBy(a => a.id).ToListAsync());
         }
 
-        // GET: admin/websetting/create
-        [HttpGet("create")]
+        // GET: WebSettings/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: admin/websetting/create
-        [HttpPost("create")]
+        // POST: WebSettings/Create
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WebSettingModel model)
+        public async Task<IActionResult> Create(WebSettingModel webSetting)
         {
             if (ModelState.IsValid)
             {
-                model.createdDate = DateTime.Now;
-                model.updatedDate = null; // Set to null on creation
-                _context.Web_setting.Add(model);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    if (webSetting.imageUpload != null) // Check if an image is uploaded
+                    {
+                        // Save the uploaded image and get the URL
+                        webSetting.image = await _fileService.SaveFile(webSetting.imageUpload, "Media", new string[] { ".jpg", ".jpeg", ".png" });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error uploading image: " + ex.Message);
+                    return View(webSetting);
+                }
 
+                var user = await _userManager.GetUserAsync(User);
+                
+                //Beware of createdBy
+                //webSetting.createdBy = user?.UserName; // Set the creator's username
+
+                _dataContext.Web_setting.Add(webSetting); // Add the web setting entry to the context
+                await _dataContext.SaveChangesAsync(); // Save changes to the database
+
+                // Set success message in TempData
                 TempData["SuccessMessage"] = "Web setting created successfully!";
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction("Index"); // Redirect to the index page on success
             }
-            return View(model);
+
+            return View(webSetting); // Return the form with validation errors if model state is invalid
         }
 
-        // GET: admin/websetting/edit/{id}
-        [HttpGet("edit/{id}")]
         public async Task<IActionResult> Edit(long id)
         {
-            var webSetting = await _context.Web_setting.FindAsync(id);
-            if (webSetting == null)
+            var existingSetting = await _dataContext.Web_setting.FindAsync(id);
+            if (existingSetting == null)
             {
                 return NotFound();
             }
-            return View(webSetting);
+            return View(existingSetting);
         }
 
-        // POST: admin/websetting/edit/{id}
-        [HttpPost("edit/{id}")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, WebSettingModel model)
+        public async Task<IActionResult> Edit(long id, WebSettingModel webSetting)
         {
-            if (id != model.id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                var existingWebSetting = await _context.Web_setting.FindAsync(id);
-                if (existingWebSetting == null)
+                var existingSetting = await _dataContext.Web_setting.FindAsync(id);
+                if (existingSetting == null)
                 {
                     return NotFound();
                 }
 
-                existingWebSetting.content = model.content;
-                existingWebSetting.updatedBy = model.updatedBy;
-                existingWebSetting.updatedDate = DateTime.Now;
-                existingWebSetting.status = model.status;
-                existingWebSetting.type = model.type;
-                existingWebSetting.image = model.image;
+                string? oldImage = existingSetting.image; // Store the old image URL
+                try
+                {
+                    if (webSetting.imageUpload != null) // Check if a new image is uploaded
+                    {
+                        // Save the new image and update the URL
+                        existingSetting.image = await _fileService.SaveFile(webSetting.imageUpload, "Media", new string[] { ".jpg", ".jpeg", ".png" });
 
-                await _context.SaveChangesAsync();
+                        // Delete the old image if it exists
+                        if (!string.IsNullOrWhiteSpace(oldImage))
+                        {
+                            _fileService.DeleteFile(oldImage, "Media"); // Delete the old image
+                        }
+                    }
 
-                TempData["SuccessMessage"] = "Web setting updated successfully!";
-                return RedirectToAction(nameof(Index));
+                    // Update other fields
+                    existingSetting.content = webSetting.content;
+                    existingSetting.status = webSetting.status;
+                    existingSetting.type = webSetting.type;
+
+                    var user = await _userManager.GetUserAsync(User);
+                    existingSetting.updatedBy = user?.UserName; // Set the updater's username
+                    existingSetting.updatedDate = DateTime.Now;
+
+                    await _dataContext.SaveChangesAsync(); // Save changes to the database
+
+                    // Set success message in TempData
+                    TempData["SuccessMessage"] = "Web setting edited successfully!";
+
+                    return RedirectToAction("Index"); // Redirect to the index page on success
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error uploading image: " + ex.Message);
+                    return View(webSetting);
+                }
             }
-            return View(model);
+
+            return View(webSetting); // Return the form with validation errors if model state is invalid
         }
 
-        // POST: admin/websetting/delete/{id}
-        [HttpPost("delete/{id}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(long id)
         {
-            var webSetting = await _context.Web_setting.FindAsync(id);
+            var webSetting = await _dataContext.Web_setting.FindAsync(id);
             if (webSetting == null)
             {
                 return NotFound();
             }
 
-            _context.Web_setting.Remove(webSetting);
-            await _context.SaveChangesAsync();
+            // Delete the associated image if it exists
+            if (!string.IsNullOrWhiteSpace(webSetting.image))
+            {
+                try
+                {
+                    // Attempt to delete the file from the Media folder
+                    _fileService.DeleteFile(webSetting.image, "Media");
+                }
+                catch (FileNotFoundException ex)
+                {
+                    // Handle the case where the file doesn't exist (optional)
+                    TempData["ErrorMessage"] = ex.Message;
+                }
+                catch (Exception ex)
+                {
+                    // Handle other exceptions (e.g., permission issues)
+                    TempData["ErrorMessage"] = "Error deleting the image: " + ex.Message;
+                }
+            }
 
+            // Remove the web setting from the database
+            _dataContext.Web_setting.Remove(webSetting);
+            await _dataContext.SaveChangesAsync();
+
+            // Set success message in TempData
             TempData["SuccessMessage"] = "Web setting deleted successfully!";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
     }
 }

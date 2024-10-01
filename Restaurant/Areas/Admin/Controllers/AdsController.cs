@@ -1,119 +1,176 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.Repository;
-using System;
-using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using Restaurant.Areas.Admin.Views.Shared;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Route("admin/[controller]")]
     public class AdsController : Controller
     {
-        private readonly DataContext _context; // Replace with your actual DbContext
+        private readonly DataContext _dataContext;
+        private readonly UserManager<UserModel> _userManager;
+        private readonly IFileService _fileService;
 
-        public AdsController(DataContext context)
+        public AdsController(DataContext context, UserManager<UserModel> userManager, IFileService fileService)
         {
-            _context = context;
+            _dataContext = context;
+            _userManager = userManager;
+            _fileService = fileService;
         }
 
-        // GET: admin/ads
-        [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var ads = _context.Ads.ToList();
-            return View(ads);
+            return View(await _dataContext.Ads.OrderBy(a => a.id).ToListAsync());
         }
 
-        // GET: admin/ads/create
-        [HttpGet("create")]
+        // GET: Ads/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: admin/ads/create
-        [HttpPost("create")]
+        // POST: Ads/Create
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AdsModel model)
+        public async Task<IActionResult> Create(AdsModel ad)
         {
             if (ModelState.IsValid)
             {
-                model.createdDate = DateTime.Now;
-                model.updatedDate = null; // Set to null on creation
-                _context.Ads.Add(model);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    if (ad.imageUpload != null) // Check if an image is uploaded
+                    {
+                        // Save the uploaded image and get the URL
+                        ad.url = await _fileService.SaveFile(ad.imageUpload, "Media", new string[] { ".jpg", ".jpeg", ".png" });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error uploading image: " + ex.Message);
+                    return View(ad);
+                }
 
+                var user = await _userManager.GetUserAsync(User);
+                ad.createdBy = user?.UserName; // Set the creator's username
+
+                _dataContext.Ads.Add(ad); // Add the ad entry to the context
+                await _dataContext.SaveChangesAsync(); // Save changes to the database
+
+                // Set success message in TempData
                 TempData["SuccessMessage"] = "Ad created successfully!";
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction("Index"); // Redirect to the index page on success
             }
-            return View(model);
+
+            return View(ad); // Return the form with validation errors if model state is invalid
         }
 
-        // GET: admin/ads/edit/{id}
-        [HttpGet("edit/{id}")]
         public async Task<IActionResult> Edit(long id)
         {
-            var ad = await _context.Ads.FindAsync(id);
-            if (ad == null)
+            var existingAd = await _dataContext.Ads.FindAsync(id);
+            if (existingAd == null)
             {
                 return NotFound();
             }
-            return View(ad);
+            return View(existingAd);
         }
 
-        // POST: admin/ads/edit/{id}
-        [HttpPost("edit/{id}")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, AdsModel model)
+        public async Task<IActionResult> Edit(long id, AdsModel ad)
         {
-            if (id != model.id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                var existingAd = await _context.Ads.FindAsync(id);
+                var existingAd = await _dataContext.Ads.FindAsync(id);
                 if (existingAd == null)
                 {
                     return NotFound();
                 }
 
-                existingAd.images = model.images;
-                existingAd.status = model.status;
-                existingAd.updatedBy = model.updatedBy;
-                existingAd.updatedDate = DateTime.Now;
-                existingAd.width = model.width;
-                existingAd.height = model.height;
-                existingAd.position = model.position;
-                existingAd.url = model.url;
+                string? oldUrl = existingAd.image; // Store the old URL
+                try
+                {
+                    if (ad.imageUpload != null) // Check if a new image is uploaded
+                    {
+                        // Save the new image and update the URL
+                        existingAd.image = await _fileService.SaveFile(ad.imageUpload, "Media", new string[] { ".jpg", ".jpeg", ".png" });
 
-                await _context.SaveChangesAsync();
+                        // Delete the old image if it exists
+                        if (!string.IsNullOrWhiteSpace(oldUrl))
+                        {
+                            _fileService.DeleteFile(oldUrl, "Media"); // Delete the old image
+                        }
+                    }
 
-                TempData["SuccessMessage"] = "Ad updated successfully!";
-                return RedirectToAction(nameof(Index));
+                    // If no new image is uploaded, keep the old URL
+                    existingAd.url = existingAd.image;
+
+                    // Update other fields
+                    existingAd.status = ad.status;
+                    existingAd.width = ad.width;
+                    existingAd.height = ad.height;
+                    existingAd.position = ad.position;
+
+                    var user = await _userManager.GetUserAsync(User);
+                    existingAd.updatedBy = user?.UserName; // Set the updater's username
+                    existingAd.updatedDate = DateTime.Now;
+
+                    await _dataContext.SaveChangesAsync(); // Save changes to the database
+
+                    // Set success message in TempData
+                    TempData["SuccessMessage"] = "Ad edited successfully!";
+
+                    return RedirectToAction("Index"); // Redirect to the index page on success
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error uploading image: " + ex.Message);
+                    return View(ad);
+                }
             }
-            return View(model);
+
+            return View(ad); // Return the form with validation errors if model state is invalid
         }
 
-        // POST: admin/ads/delete/{id}
-        [HttpPost("delete/{id}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(long id)
         {
-            var ad = await _context.Ads.FindAsync(id);
+            var ad = await _dataContext.Ads.FindAsync(id);
             if (ad == null)
             {
                 return NotFound();
             }
 
-            _context.Ads.Remove(ad);
-            await _context.SaveChangesAsync();
+            // Delete the associated image if it exists
+            if (!string.IsNullOrWhiteSpace(ad.url))
+            {
+                try
+                {
+                    // Attempt to delete the file from the Media folder
+                    _fileService.DeleteFile(ad.url, "Media");
+                }
+                catch (FileNotFoundException ex)
+                {
+                    // Handle the case where the file doesn't exist (optional)
+                    TempData["ErrorMessage"] = ex.Message;
+                }
+                catch (Exception ex)
+                {
+                    // Handle other exceptions (e.g., permission issues)
+                    TempData["ErrorMessage"] = "Error deleting the image: " + ex.Message;
+                }
+            }
 
-            TempData["SuccessMessage"] = "Ad deleted successfully!";
-            return RedirectToAction(nameof(Index));
+            // Remove the web setting from the database
+            _dataContext.Ads.Remove(ad);
+            await _dataContext.SaveChangesAsync();
+
+            // Set success message in TempData
+            TempData["SuccessMessage"] = "Web setting deleted successfully!";
+            return RedirectToAction("Index");
         }
     }
 }
