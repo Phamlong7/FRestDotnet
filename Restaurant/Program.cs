@@ -1,11 +1,11 @@
-    using Microsoft.EntityFrameworkCore;
-    using Restaurant.Repository;
-    using Microsoft.AspNetCore.Identity;
-    using Restaurant.Models;
-    using Microsoft.AspNetCore.Http.Features;
-    using Restaurant.Areas.Admin.Views.Shared;
+using Microsoft.EntityFrameworkCore;
+using Restaurant.Repository;
+using Microsoft.AspNetCore.Identity;
+using Restaurant.Models;
+using Microsoft.AspNetCore.Http.Features;
+using Restaurant.Areas.Admin;
 
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
     // Connection Database
     builder.Services.AddDbContext<DataContext>(options =>

@@ -1,4 +1,4 @@
-﻿namespace Restaurant.Areas.Admin.Views.Shared;
+﻿namespace Restaurant.Areas.Admin;
 
 public interface IFileService
 {

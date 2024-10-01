@@ -4,7 +4,6 @@ using Restaurant.Models;
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
-using Restaurant.Areas.Admin.Views.Shared;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
