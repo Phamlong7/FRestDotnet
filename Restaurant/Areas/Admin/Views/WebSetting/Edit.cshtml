@@ -1,0 +1,101 @@
+﻿@model Restaurant.Models.WebSettingModel
+@{
+    ViewData["Title"] = "Edit Web Setting";
+}
+
+<h2>Edit Web Setting</h2>
+
+<!-- Toast Notification -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["ErrorMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="id" />
+
+    <div class="mb-3">
+        <label asp-for="content" class="form-label">Content</label>
+        <textarea asp-for="content" class="form-control" required></textarea>
+        <span asp-validation-for="content" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="imageUpload" class="form-label">Upload New Image</label>
+        <input type="file" asp-for="imageUpload" class="form-control" />
+        <span asp-validation-for="imageUpload" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Current Image:</label><br />
+        @if (!string.IsNullOrEmpty(Model.image))
+        {
+            <img src="@Url.Content("~/Media/" + Model.image)" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
+        }
+        else
+        {
+            <span>No image uploaded.</span>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="status" class="form-label">Status</label>
+        <select asp-for="status" class="form-select" required>
+            <option value="">Select Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+        </select>
+        <span asp-validation-for="status" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="type" class="form-label">Type</label>
+        <input asp-for="type" class="form-control" required />
+        <span asp-validation-for="type" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        // Initialize toast notification with extended display time
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    delay: 4000,  // Display for 4 seconds (4000 milliseconds)
+                    autohide: true // Set to true for auto-hiding the toast
+                });
+            });
+            toastList.forEach(toast => toast.show());
+        });
+    </script>
+}

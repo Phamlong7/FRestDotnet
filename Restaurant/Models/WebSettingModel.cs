@@ -17,15 +17,19 @@ namespace Restaurant.Models
 
         public DateTime? updatedDate { get; set; } // Giữ nguyên nullable cho tùy chọn
 
-        public string createdBy { get; set; } // Sử dụng PascalCase cho thuộc tính CreatedBy
+        public string? createdBy { get; set; } // Sử dụng PascalCase cho thuộc tính CreatedBy
 
-        public string updatedBy { get; set; } // Sử dụng PascalCase cho thuộc tính UpdatedBy
+        public string? updatedBy { get; set; } // Sử dụng PascalCase cho thuộc tính UpdatedBy
 
         [MaxLength(10)]
         public string status { get; set; } = "ACTIVE"; // Sử dụng PascalCase cho thuộc tính Status
 
         public string type { get; set; } // Sử dụng PascalCase cho thuộc tính Type
 
-        public string image { get; set; } // Sử dụng PascalCase cho thuộc tính Image
+        [Url]
+        public string? image { get; set; } // Sử dụng PascalCase cho thuộc tính Image
+
+        [NotMapped] // NotMapped since we don't store the actual file in the database
+        public IFormFile? imageUpload { get; set; }
     }
 }

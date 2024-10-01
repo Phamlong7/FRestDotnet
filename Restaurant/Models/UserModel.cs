@@ -24,10 +24,10 @@ namespace Restaurant.Models
         public DateTime? UpdatedDate { get; set; } // Ngày cập nhật, có thể để trống
 
         [MaxLength(50)]
-        public string CreatedBy { get; set; } = "USER";
+        public string? CreatedBy { get; set; }
 
         [MaxLength(50)]
-        public string UpdatedBy { get; set; } = "USER";
+        public string? UpdatedBy { get; set; }
 
         [MaxLength(10)]
         public string Status { get; set; } = "ACTIVE"; // Trạng thái người dùng, mặc định là "ACTIVE"

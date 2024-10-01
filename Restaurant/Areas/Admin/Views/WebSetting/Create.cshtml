@@ -1,0 +1,107 @@
+﻿@using Restaurant.Models
+@model WebSettingModel
+
+@{
+    ViewData["Title"] = "Create New Web Setting";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main id="content" class="content-area">
+    <!-- Toast Notification -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["SuccessMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ErrorMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    <div class="pagetitle">
+        <h1>Create New Web Setting</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "WebSetting", new { area = "Admin" })">Home</a></li>
+                <li class="breadcrumb-item active">Create</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-area="Admin" asp-controller="WebSetting" asp-action="Create" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> <!-- Validation summary -->
+
+                            <div class="mb-3">
+                                <label asp-for="content" class="form-label">Content</label>
+                                <textarea asp-for="content" class="form-control" required></textarea>
+                                <span asp-validation-for="content" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="imageUpload" class="form-label">Image</label>
+                                <input asp-for="imageUpload" class="form-control" type="file" accept="image/*" required />
+                                <span asp-validation-for="imageUpload" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="status" class="form-label">Status</label>
+                                <select asp-for="status" class="form-select" required>
+                                    <option value="">Select Status</option>
+                                    <option value="ACTIVE">Active</option>
+                                    <option value="INACTIVE">Inactive</option>
+                                </select>
+                                <span asp-validation-for="status" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="type" class="form-label">Type</label>
+                                <input asp-for="type" class="form-control" required />
+                                <span asp-validation-for="type" class="text-danger"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Create</button>
+                            <a href="@Url.Action("Index", "WebSetting", new { area = "Admin" })" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        // Initialize toast notification with extended display time
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    delay: 4000,  // Display for 4 seconds (4000 milliseconds)
+                    autohide: true // Set to true for auto-hiding the toast
+                });
+            });
+            toastList.forEach(toast => toast.show());
+        });
+    </script>
+}

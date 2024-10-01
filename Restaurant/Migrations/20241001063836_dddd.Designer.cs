@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Restaurant.Repository;
 
@@ -11,9 +12,11 @@ using Restaurant.Repository;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241001063836_dddd")]
+    partial class dddd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,6 +216,7 @@ namespace Restaurant.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
 
                     b.Property<string>("banner")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("content")
@@ -220,6 +224,7 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("createdBy")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -237,6 +242,7 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("updatedBy")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -355,9 +361,6 @@ namespace Restaurant.Migrations
                     b.Property<long>("dishId")
                         .HasColumnType("bigint")
                         .HasColumnOrder(1);
-
-                    b.Property<decimal?>("price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("quantity")
                         .HasColumnType("int");
