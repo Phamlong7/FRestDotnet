@@ -9,14 +9,14 @@ namespace Restaurant.Repository
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<CategoryModel> Category { get; set; }
-        public DbSet<DishModel> Dish { get; set; }
-        public DbSet<OrderModel> Order { get; set; }
-        public DbSet<OrderDetailModel> OrderDetails { get; set; }
-        public DbSet<WebSettingModel> Web_setting { get; set; }
-        public DbSet<AdsModel> Ads { get; set; }
-        public DbSet<BlogModel> Blog { get; set; }
-        public DbSet<UserModel> User { get; set; }
+        public DbSet<CategoryModel> category { get; set; }
+        public DbSet<DishModel> dish { get; set; }
+        public DbSet<OrderModel> order { get; set; }
+        public DbSet<OrderDetailModel> orderDetails { get; set; }
+        public DbSet<WebSettingModel> web_setting { get; set; }
+        public DbSet<AdsModel> ads { get; set; }
+        public DbSet<BlogModel> blog { get; set; }
+        public DbSet<UserModel> user { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

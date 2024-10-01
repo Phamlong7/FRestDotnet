@@ -15,7 +15,7 @@ namespace Restaurant.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _dataContext.Category.OrderBy(c => c.id).ToListAsync());
+            return View(await _dataContext.category.OrderBy(c => c.id).ToListAsync());
         }
     }
 }

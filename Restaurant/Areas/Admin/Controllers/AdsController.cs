@@ -9,13 +9,13 @@ using Restaurant.Areas.Admin.Views.Shared;
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class AdsController : Controller
+    public class adsController : Controller
     {
         private readonly DataContext _dataContext;
         private readonly UserManager<UserModel> _userManager;
         private readonly IFileService _fileService;
 
-        public AdsController(DataContext context, UserManager<UserModel> userManager, IFileService fileService)
+        public adsController(DataContext context, UserManager<UserModel> userManager, IFileService fileService)
         {
             _dataContext = context;
             _userManager = userManager;
@@ -24,16 +24,16 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _dataContext.Ads.OrderBy(a => a.id).ToListAsync());
+            return View(await _dataContext.ads.OrderBy(a => a.id).ToListAsync());
         }
 
-        // GET: Ads/Create
+        // GET: ads/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Ads/Create
+        // POST: ads/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AdsModel ad)
@@ -57,7 +57,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 ad.createdBy = user?.UserName; // Set the creator's username
 
-                _dataContext.Ads.Add(ad); // Add the ad entry to the context
+                _dataContext.ads.Add(ad); // Add the ad entry to the context
                 await _dataContext.SaveChangesAsync(); // Save changes to the database
 
                 // Set success message in TempData
@@ -71,7 +71,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Edit(long id)
         {
-            var existingAd = await _dataContext.Ads.FindAsync(id);
+            var existingAd = await _dataContext.ads.FindAsync(id);
             if (existingAd == null)
             {
                 return NotFound();
@@ -85,35 +85,40 @@ namespace Restaurant.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var existingAd = await _dataContext.Ads.FindAsync(id);
+                // Find the existing ad in the database
+                var existingAd = await _dataContext.ads.FindAsync(id);
                 if (existingAd == null)
                 {
                     return NotFound();
                 }
 
-                string? oldUrl = existingAd.image; // Store the old URL
+                string? oldImage = existingAd.url; // Store the old image URL
                 try
                 {
-                    if (ad.imageUpload != null) // Check if a new image is uploaded
+                    // Check if a new image is uploaded
+                    if (ad.imageUpload != null)
                     {
                         // Save the new image and update the URL
-                        existingAd.image = await _fileService.SaveFile(ad.imageUpload, "Media", new string[] { ".jpg", ".jpeg", ".png" });
+                        existingAd.url = await _fileService.SaveFile(ad.imageUpload, "Media", new string[] { ".jpg", ".jpeg", ".png" });
 
                         // Delete the old image if it exists
-                        if (!string.IsNullOrWhiteSpace(oldUrl))
+                        if (!string.IsNullOrWhiteSpace(oldImage))
                         {
-                            _fileService.DeleteFile(oldUrl, "Media"); // Delete the old image
+                            _fileService.DeleteFile(oldImage, "Media"); // Delete the old image
                         }
                     }
-
-                    // If no new image is uploaded, keep the old URL
-                    existingAd.url = existingAd.image;
 
                     // Update other fields
                     existingAd.status = ad.status;
                     existingAd.width = ad.width;
                     existingAd.height = ad.height;
                     existingAd.position = ad.position;
+
+                    // Keep the image URL the same if no new image is uploaded
+                    if (ad.imageUpload == null)
+                    {
+                        existingAd.url = oldImage;
+                    }
 
                     var user = await _userManager.GetUserAsync(User);
                     existingAd.updatedBy = user?.UserName; // Set the updater's username
@@ -138,7 +143,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Delete(long id)
         {
-            var ad = await _dataContext.Ads.FindAsync(id);
+            var ad = await _dataContext.ads.FindAsync(id);
             if (ad == null)
             {
                 return NotFound();
@@ -165,7 +170,7 @@ namespace Restaurant.Areas.Admin.Controllers
             }
 
             // Remove the web setting from the database
-            _dataContext.Ads.Remove(ad);
+            _dataContext.ads.Remove(ad);
             await _dataContext.SaveChangesAsync();
 
             // Set success message in TempData

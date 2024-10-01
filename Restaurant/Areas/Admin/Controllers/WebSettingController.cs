@@ -24,7 +24,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _dataContext.Web_setting.OrderBy(a => a.id).ToListAsync());
+            return View(await _dataContext.web_setting.OrderBy(a => a.id).ToListAsync());
         }
 
         // GET: WebSettings/Create
@@ -59,7 +59,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 //Beware of createdBy
                 //webSetting.createdBy = user?.UserName; // Set the creator's username
 
-                _dataContext.Web_setting.Add(webSetting); // Add the web setting entry to the context
+                _dataContext.web_setting.Add(webSetting); // Add the web setting entry to the context
                 await _dataContext.SaveChangesAsync(); // Save changes to the database
 
                 // Set success message in TempData
@@ -73,7 +73,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Edit(long id)
         {
-            var existingSetting = await _dataContext.Web_setting.FindAsync(id);
+            var existingSetting = await _dataContext.web_setting.FindAsync(id);
             if (existingSetting == null)
             {
                 return NotFound();
@@ -87,7 +87,7 @@ namespace Restaurant.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var existingSetting = await _dataContext.Web_setting.FindAsync(id);
+                var existingSetting = await _dataContext.web_setting.FindAsync(id);
                 if (existingSetting == null)
                 {
                     return NotFound();
@@ -136,7 +136,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Delete(long id)
         {
-            var webSetting = await _dataContext.Web_setting.FindAsync(id);
+            var webSetting = await _dataContext.web_setting.FindAsync(id);
             if (webSetting == null)
             {
                 return NotFound();
@@ -163,7 +163,7 @@ namespace Restaurant.Areas.Admin.Controllers
             }
 
             // Remove the web setting from the database
-            _dataContext.Web_setting.Remove(webSetting);
+            _dataContext.web_setting.Remove(webSetting);
             await _dataContext.SaveChangesAsync();
 
             // Set success message in TempData

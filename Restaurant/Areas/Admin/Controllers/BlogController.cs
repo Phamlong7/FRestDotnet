@@ -15,7 +15,7 @@ namespace Restaurant.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _dataContext.Blog.OrderBy(b => b.id).ToListAsync());
+            return View(await _dataContext.blog.OrderBy(b => b.id).ToListAsync());
         }
     }
 }
