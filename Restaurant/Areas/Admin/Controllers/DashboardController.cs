@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Repository;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
@@ -28,14 +29,15 @@ namespace Restaurant.Areas.Admin.Controllers
             var last7DaysOrders = _context.order
                 .Count(o => o.createdDate >= lastWeek);
 
-            var last7DaysCustomers = _context.order
-                .Where(o => o.createdDate >= lastWeek)
-                .Select(o => o.userId)
+            var last7DaysCustomers = _context.user
+                .Where(u => u.CreatedDate >= lastWeek && u.Role == "USER")
+                .Select(u => u.Id)
                 .Distinct()
                 .Count();
 
             // Previous 7 days data for comparison
             var previous7Days = lastWeek.AddDays(-7);
+
             var previous7DaysSales = _context.orderDetails
                 .Where(od => od.order.createdDate >= previous7Days && od.order.createdDate < lastWeek)
                 .Sum(od => od.quantity);
@@ -43,11 +45,12 @@ namespace Restaurant.Areas.Admin.Controllers
             var previous7DaysOrders = _context.order
                 .Count(o => o.createdDate >= previous7Days && o.createdDate < lastWeek);
 
-            var previous7DaysCustomers = _context.order
-                .Where(o => o.createdDate >= previous7Days && o.createdDate < lastWeek)
-                .Select(o => o.userId)
+            var previous7DaysCustomers = _context.user
+                .Where(u => u.CreatedDate >= previous7Days && u.CreatedDate < lastWeek && u.Role == "USER")
+                .Select(u => u.Id)
                 .Distinct()
                 .Count();
+
 
             // Calculate percentage changes
             var salesChange = CalculatePercentageChange(previous7DaysSales, last7DaysSales);
@@ -64,9 +67,9 @@ namespace Restaurant.Areas.Admin.Controllers
                     Revenue = _context.orderDetails
                         .Where(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date)
                         .Sum(od => od.quantity * od.price) ?? 0,
-                    Customers = _context.order
-                        .Where(o => o.createdDate.HasValue && o.createdDate.Value.Date == date)
-                        .Select(o => o.userId)
+                    Customers = _context.user
+                        .Where(u => u.CreatedDate.Date == date && u.Role == "USER")
+                        .Select(u => u.Id)
                         .Distinct()
                         .Count()
                 })
@@ -111,7 +114,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
             // Query the Blog and Updates
             var blogupdates = _context.blog
-                .Where(b => b.createdDate.HasValue && b.createdDate.Value.Date == today && b.status == "ACTIVE")
+                .Where(b => b.createdDate.HasValue && b.createdDate.Value.Date == today && b.status == "ACTIVE" || b.updatedDate.HasValue && b.updatedDate.Value.Date == today && b.status == "ACTIVE")
                 .Select(b => new
                 {
                     BlogId = b.id,

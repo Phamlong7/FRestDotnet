@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>@ViewData["title"] FRest Admin Dashboard</title>
-    <meta content="Administrator Panel for Frest Restaurant" name="description">
+    <title>@ViewData["title"] FRest User Dashboard</title>
+    <meta content="User Panel for Frest Restaurant" name="description">
     <meta content="Order , Manage" name="keywords">
 
     <!-- Favicons -->
@@ -39,7 +39,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <a asp-action="Index" asp-controller="Dashboard" class="logo d-flex align-items-center">
                 <img src="~/NiceAdmin/assets/img/logo.png" alt="">
-                <span class="d-none d-lg-block">FRest System</span>
+                <span class="d-none d-lg-block">FRest Restaurant</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div><!-- End Logo -->
@@ -51,74 +51,44 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Dashboard">
-                    <i class="bi bi-grid"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li><!-- End Dashboard Nav -->         
-
-            <li class="nav-heading">Manage Board</li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Category">
-                    <i class="bi bi-archive"></i>
-                    <span>Category</span>
-                </a>
-            </li><!-- End Category Nav -->
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Dish">
-                    <i class="bi bi-card-list"></i>
-                    <span>Dishes</span>
-                </a>
-            </li><!-- End Dishes Nav -->
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Blog">
-                    <i class="bi bi-book"></i>
-                    <span>Blog</span>
-                </a>
-            </li><!-- End Blog Nav -->
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Order">
-                    <i class="bi bi-basket"></i>
-                    <span>Order</span>
-                </a>
-            </li><!-- End Order Nav -->
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Ads">
-                    <i class="bi bi-badge-ad-fill"></i>
-                    <span>Ads</span>
-                </a>
-            </li><!-- End Ads Nav -->
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="WebSetting">
-                    <i class="bi bi-sliders"></i>
-                    <span>Web Setting</span>
-                </a>
-            </li><!-- End Web Setting Nav -->
-
-            <li class="nav-heading">Account</li>
-
-            <li class="nav-item">
                 <a class="nav-link collapsed " asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-house-fill"></i>
                     <span>Back to Home</span>
                 </a>
             </li><!-- Back to Home Nav -->
 
-            <li class="nav-item">
-                <a class="nav-link collapsed " asp-area="" asp-controller="Account" asp-action="VerifyEmailForChangePassword">
-                    <i class="bi bi-person-fill-gear"></i>
-                    <span>Change Password</span>
-                </a>
-             </li><!-- Change Password Nav -->
+            <li class="nav-heading">Manage Board</li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed " asp-area="" asp-controller="Account" asp-action="Logout">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Home">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span>Home</span>
+                </a>
+            </li><!-- End Home Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="Information">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>Info</span>
+                </a>
+            </li><!-- End Info Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-action="Index" asp-controller="OrderHistory">
+                    <i class="bi bi-basket"></i>
+                    <span>Order</span>
+                </a>
+            </li><!-- End Order Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed " asp-area="" asp-action="VerifyEmailForChangePassword" asp-controller="Account">
+                    <i class="bi bi-toggles"></i>
+                    <span>Change Password</span>
+                </a>
+            </li><!-- End Change Password Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed "asp-area="" asp-controller="Account" asp-action="Logout">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Sign Out</span>
                 </a>
@@ -132,8 +102,6 @@
        @RenderBody()
 
     </main><!-- End #main -->
-
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="~/NiceAdmin/assets/vendor/apexcharts/apexcharts.min.js"></script>

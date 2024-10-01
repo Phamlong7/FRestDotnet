@@ -1,12 +1,63 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @inject SignInManager<UserModel> signInManager;
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
 
 <ul class="navbar-nav ms-auto">
     @if (signInManager.IsSignedIn(User))
     {
-        <li class="nav-item">
-            <a class="nav-link nav-item" asp-controller="Account" asp-action="Logout">Logout</a>
-        </li>
+        #pragma warning disable
+        string userName = User.Identity.Name; // Get the signed-in user's name
+
+        if (User.IsInRole("ADMIN")) // Check if the user is in the "Admin" role
+        {
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-fill"></i> @userName <!-- Display the User's Name and Icon -->
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" asp-controller="Admin" asp-action="Dashboard">
+                            <img src="~/NiceAdmin/assets/img/logo.png" alt="Admin Icon" class="me-3" style="width: 24px; height: 24px; margin-right: 10px; font-size: 1.2rem;"> <!-- Adjusted margin-end -->
+                            Admin Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" asp-controller="Account" asp-action="Logout">
+                            <i class="bi bi-box-arrow-right" style="margin-right: 10px; font-size: 1.2rem;"></i> <!-- Added inline style for margin and adjusted font size -->
+                            Sign Out
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
+        else if (User.IsInRole("USER")) // Check if the user is in the "User" role
+        {
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-fill"></i> @userName <!-- Display the User's Name and Icon -->
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li>
+                        <a class="dropdown-item" asp-controller="User" asp-action="Home">
+                            <img src="~/NiceAdmin/assets/img/logo.png" alt="Admin Icon" class="me-3" style="width: 24px; height: 24px; margin-right: 10px; font-size: 1.2rem;"> <!-- Adjusted margin-end -->
+                            User Home
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" asp-controller="Account" asp-action="Logout">
+                            <i class="bi bi-box-arrow-right" style="margin-right: 10px; font-size: 1.2rem;"></i> <!-- Added inline style for margin and adjusted font size -->
+                            Sign Out
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
     }
     else
     {
@@ -17,5 +68,7 @@
             <a class="nav-link nav-item" asp-controller="Account" asp-action="Register">Register</a>
         </li>
     }
-
 </ul>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+

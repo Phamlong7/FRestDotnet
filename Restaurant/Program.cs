@@ -59,14 +59,29 @@ app.UseAuthorization();  // Ensures authorization is enabled
 #pragma warning disable
 app.UseEndpoints(endpoints =>
 {
+    // Route for Admin area
     endpoints.MapAreaControllerRoute(
         name: "Admin",
         areaName: "Admin",
         pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}");
+
+    // Route for User area
+    endpoints.MapAreaControllerRoute(
+        name: "User",
+        areaName: "User",
+        pattern: "User/{controller=Home}/{action=Index}/{id?}");
+
+    // Route for Home controller in main application
+    endpoints.MapControllerRoute(
+        name: "Home",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    // Default route for other controllers
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+
 
 // Continue with the rest of the setup
 app.UseHttpsRedirection();

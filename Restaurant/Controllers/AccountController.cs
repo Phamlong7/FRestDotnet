@@ -54,9 +54,9 @@ namespace Restaurant.Controllers
                 {
                     // Add role claim
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Role, user.Role)
-                };
+                        {
+                            new Claim(ClaimTypes.Role, user.Role)
+                        };
 
                     await _userManager.AddClaimsAsync(user, claims);
 
@@ -68,7 +68,7 @@ namespace Restaurant.Controllers
 
                     if (user.Role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                        return RedirectToAction("Index", "Home");
                     }
                     else if (user.Role.Equals("USER", StringComparison.OrdinalIgnoreCase))
                     {
@@ -406,6 +406,15 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
+            // Check if the new password is the same as the current password
+            var newPasswordHash = _userManager.PasswordHasher.HashPassword(user, model.NewPassword);
+            var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, model.NewPassword);
+            if (passwordVerificationResult == Microsoft.AspNetCore.Identity.PasswordVerificationResult.Success)
+            {
+                ModelState.AddModelError("", "The new password must be different from the current password.");
+                return View(model);
+            }
+
             // Generate a password reset token
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -415,7 +424,7 @@ namespace Restaurant.Controllers
             if (result.Succeeded)
             {
                 // Refresh sign-in cookie if the user is currently signed in
-                if (User.Identity.IsAuthenticated)
+                if (User?.Identity?.IsAuthenticated == true)
                 {
                     await _signInManager.RefreshSignInAsync(user);
                 }
