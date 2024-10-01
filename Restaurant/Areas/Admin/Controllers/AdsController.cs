@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class adsController : Controller
+    public class FileService : Controller
     {
         private readonly DataContext _dataContext;
         private readonly UserManager<UserModel> _userManager;
         private readonly IFileService _fileService;
 
-        public adsController(DataContext context, UserManager<UserModel> userManager, IFileService fileService)
+        public FileService(DataContext context, UserManager<UserModel> userManager, IFileService fileService)
         {
             _dataContext = context;
             _userManager = userManager;
