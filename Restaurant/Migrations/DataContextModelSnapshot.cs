@@ -279,7 +279,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("updatedBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -300,7 +299,6 @@ namespace Restaurant.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
 
                     b.Property<string>("banner")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("categoryId")
@@ -311,7 +309,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("createdBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -332,7 +329,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("updatedBy")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

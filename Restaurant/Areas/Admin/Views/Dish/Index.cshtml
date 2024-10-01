@@ -42,26 +42,26 @@
                         }
                         else
                         {
-                        <!-- Table with stripped rows -->
-                        <table class="table datatable">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <b>Id</b>
-                                    </th>
-                                    <th>Title</th>
-                                    <th>CategoryId</th>
-                                    <th>Price</th>
-                                    <th>Banner</th>
-                                    <th data-type="date" data-format="YYYY/DD/MM">CreatedDate</th>
-                                    <th data-type="date" data-format="YYYY/DD/MM">UpdatedDate</th>
-                                    <th>Status</th>
-                                    <th>Actions</th> <!-- New column for action buttons -->
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
+                            <!-- Table with stripped rows -->
+                            <table class="table datatable">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <b>Id</b>
+                                        </th>
+                                        <th>Title</th>
+                                        <th>CategoryId</th>
+                                        <th>Price</th>
+                                        <th>Banner</th>
+                                        <th data-type="date" data-format="YYYY/DD/MM">CreatedDate</th>
+                                        <th data-type="date" data-format="YYYY/DD/MM">UpdatedDate</th>
+                                        <th>Status</th>
+                                        <th>Actions</th> <!-- New column for action buttons -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
                                         if (item != null)
                                         {
                                             <tr>
@@ -69,7 +69,16 @@
                                                 <td>@item.title</td>
                                                 <td>@item.categoryId</td>
                                                 <td>@item.price</td>
-                                                <td>@item.banner</td>
+                                                <td>
+                                                    @if (!string.IsNullOrWhiteSpace(item.banner))
+                                                    {
+                                                        <img alt="banner upload" style="width: 100px;height:80px" src="/Media/@item.banner" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>No image</span>
+                                                    }
+                                                </td>
                                                 <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.status</td>
@@ -105,10 +114,10 @@
                                                 </td>
                                             </tr>
                                         }
-                                }
-                        
-                            </tbody>
-                        </table>
+                                    }
+
+                                </tbody>
+                            </table>
                         }
                         <!-- End Table with stripped rows -->
 
@@ -120,4 +129,3 @@
     </section>
 
 </main><!-- End #main -->
-

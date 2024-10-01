@@ -1,0 +1,107 @@
+﻿@model Restaurant.Models.DishModel
+
+@{
+    ViewData["Title"] = "Add A Dish";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<main id="content" class="content-area">
+    <div class="pagetitle">
+        <h1>Add A Dish</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Tables</li>
+                <li class="breadcrumb-item active">Add Dish</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Add A Dish</h5>
+                        <form asp-action="Create" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @Html.AntiForgeryToken()
+
+                            <!-- Title Input -->
+                            <div class="row mb-3">
+                                <label asp-for="title" class="col-sm-2 col-form-label">Title</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="title" class="form-control" />
+                                    <span asp-validation-for="title" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Banner Upload Input -->
+                            <div class="row mb-3">
+                                <label asp-for="BannerUpload" class="col-sm-2 col-form-label">Banner</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="BannerUpload" class="form-control" type="file" />
+                                </div>
+                            </div>
+
+                            <!-- Content Input -->
+                            <div class="row mb-3">
+                                <label asp-for="content" class="col-sm-2 col-form-label">Content</label>
+                                <div class="col-sm-10">
+                                    <textarea asp-for="content" class="form-control"></textarea>
+                                    <span asp-validation-for="content" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Price Input -->
+                            <div class="row mb-3">
+                                <label asp-for="price" class="col-sm-2 col-form-label">Price</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="price" class="form-control" />
+                                    <span asp-validation-for="price" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Category Dropdown -->
+                            <div class="row mb-3">
+                                <label asp-for="categoryId" class="col-sm-2 col-form-label">Category</label>
+                                <div class="col-sm-10">
+                                    <select asp-for="categoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
+                                    <span asp-validation-for="categoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="row mb-4">
+                                <div class="col-sm-6 text-end">
+                                    <a asp-controller="Dish" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="submit" class="btn btn-primary">Create</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    @{
+        await Html.PartialAsync("_ValidationScriptsPartial");
+    }
+}

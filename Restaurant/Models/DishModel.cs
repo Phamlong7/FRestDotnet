@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,7 +11,7 @@ namespace Restaurant.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Tự động tạo giá trị cho khóa chính
-        public long id { get; set; }
+        public long id { get; set; }  // Sửa từ 'object' thành 'long'
 
         [Required]
         [MaxLength(255)]
@@ -22,29 +23,37 @@ namespace Restaurant.Models
         [MaxLength(10)]
         public string status { get; set; } = "ACTIVE";
 
-        [Column(TypeName = "datetime")] // Kiểu dữ liệu
+        [Column(TypeName = "datetime")] // Kiểu dữ liệu cho ngày tạo
         public DateTime? createdDate { get; set; } = DateTime.Now;
 
-        [Column(TypeName = "datetime")] // Kiểu dữ liệu
+        [Column(TypeName = "datetime")] // Kiểu dữ liệu cho ngày cập nhật
         public DateTime? updatedDate { get; set; }
 
-        [MaxLength(50)] // Giới hạn độ dài cho tên người tạo
-        public string createdBy { get; set; }
+        [MaxLength(50)]
+        [ValidateNever]
+        public string? createdBy { get; set; }
 
-        [MaxLength(50)] // Giới hạn độ dài cho tên người cập nhật
-        public string updatedBy { get; set; }
+        [MaxLength(50)]
+        [ValidateNever]
+        public string? updatedBy { get; set; }
 
-        public string banner { get; set; }
+        [ValidateNever]
+        public string? banner { get; set; }
+
+        [NotMapped]
+        public IFormFile BannerUpload { get; set; } // Thuộc tính cho file upload
 
         [ForeignKey("Category")] // Chỉ định khóa ngoại
         public long? categoryId { get; set; }
 
         public decimal? price { get; set; }
 
-        // Mối quan hệ với CategoryModel
+        // Thuộc tính điều hướng tới CategoryModel
+        [ValidateNever]
         public CategoryModel category { get; set; }
 
-        // Mối quan hệ với OrderDetailModel
+        // Quan hệ với OrderDetailModel
+        [ValidateNever]
         public ICollection<OrderDetailModel> orderDetails { get; set; }
     }
 }

@@ -68,9 +68,9 @@
 
     <div class="mb-3">
         <label>Current Image:</label><br />
-        @if (!string.IsNullOrEmpty(Model.image))
+        @if (!string.IsNullOrEmpty(Model.url))
         {
-            <img src="@Url.Content("~/Media/" + Model.image)" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
+            <img src="@Url.Content("~/Media/" + Model.url)" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
         }
         else
         {

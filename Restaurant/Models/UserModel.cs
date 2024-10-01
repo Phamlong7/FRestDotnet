@@ -24,7 +24,7 @@ namespace Restaurant.Models
         public DateTime? UpdatedDate { get; set; } // Ngày cập nhật, có thể để trống
 
         [MaxLength(50)]
-        public string? CreatedBy { get; set; }
+        public string? CreatedBy { get; set; } = "USER";
 
         [MaxLength(50)]
         public string? UpdatedBy { get; set; }

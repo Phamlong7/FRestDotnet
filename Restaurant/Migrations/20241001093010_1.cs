@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Restaurant.Migrations
 {
     /// <inheritdoc />
-    public partial class dddd : Migration
+    public partial class _1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -91,9 +91,9 @@ namespace Restaurant.Migrations
                     status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     createdDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    banner = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    banner = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -112,7 +112,7 @@ namespace Restaurant.Migrations
                     createdDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -282,9 +282,9 @@ namespace Restaurant.Migrations
                     status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     createdDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    banner = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    banner = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     categoryId = table.Column<long>(type: "bigint", nullable: true),
                     price = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
@@ -305,7 +305,8 @@ namespace Restaurant.Migrations
                 {
                     orderId = table.Column<long>(type: "bigint", nullable: false),
                     dishId = table.Column<long>(type: "bigint", nullable: false),
-                    quantity = table.Column<int>(type: "int", nullable: false)
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    price = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {

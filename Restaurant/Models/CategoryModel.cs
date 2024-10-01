@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -27,13 +28,17 @@ namespace Restaurant.Models
         [Column(TypeName = "datetime")] // Kiểu dữ liệu
         public DateTime? updatedDate { get; set; }
 
-        [MaxLength(50)] // Giới hạn độ dài cho tên người tạo
+        [MaxLength(50)]
+        [ValidateNever]// Giới hạn độ dài cho tên người tạo
         public string createdBy { get; set; }
 
-        [MaxLength(50)] // Giới hạn độ dài cho tên người cập nhật
-        public string updatedBy { get; set; }
+        [MaxLength(50)] // Giới hạn
+        [ValidateNever]// Giới hạn độ dài cho tên người tạo
+                       // độ dài cho tên người cập nhật
+        public string? updatedBy { get; set; }
 
         // Quan hệ một-nhiều với DishModel
+        [ValidateNever]
         public ICollection<DishModel> dish { get; set; }
     }
 }
