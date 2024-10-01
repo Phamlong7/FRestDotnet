@@ -45,6 +45,4 @@
             File.Delete(fullPath);
         }
     }
-
-
 }

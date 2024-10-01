@@ -35,6 +35,8 @@ builder.Services.AddScoped<RoleManager<IdentityRole<long>>>();
 // Add services to the container  
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IFileService, FileService>(); //file service
+builder.Services.AddSingleton<ConstantHelper>();
+builder.Services.AddTransient<SendMail>();
 
 // Configure logging before building the app
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
