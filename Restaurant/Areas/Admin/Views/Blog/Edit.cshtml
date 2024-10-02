@@ -46,7 +46,7 @@
                             @Html.AntiForgeryToken()
 
                             <div class="row mb-3">
-                                <label asp-for="title" class="col-sm-2 col-form-label"></label>
+                                <label asp-for="title" class="col-sm-2 col-form-label">Title</label>
                                 <div class="col-sm-10">
                                     <input asp-for="title" class="form-control" />
                                     <span asp-validation-for="title" class="text-danger"></span>
@@ -80,7 +80,7 @@
                             </div>
 
                             <div class="row mb-3">
-                                <label asp-for="content" class="col-sm-2 col-form-label"></label>
+                                <label asp-for="content" class="col-sm-2 col-form-label">Content</label>
                                 <div class="col-sm-10">
                                     <textarea asp-for="content" class="form-control"></textarea>
                                     <span asp-validation-for="content" class="text-danger"></span>
