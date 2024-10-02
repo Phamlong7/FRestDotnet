@@ -8,7 +8,7 @@ namespace Restaurant.Models
     {
         [Key]
         [Column(Order = 0)] // Xác định thứ tự của khóa chính
-        public long orderId { get; set; }
+        public long? orderId { get; set; }
 
         [Key]
         [Column(Order = 1)] // Xác định thứ tự của khóa chính
@@ -16,6 +16,9 @@ namespace Restaurant.Models
 
         public int quantity { get; set; }
 
+        public decimal? priceAtOrder {get; set; }
+        
+        
         // Quan hệ với OrderModel
         [ForeignKey("orderId")]
         public OrderModel order { get; set; }

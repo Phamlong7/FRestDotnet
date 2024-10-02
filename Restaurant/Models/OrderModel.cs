@@ -9,9 +9,10 @@ namespace Restaurant.Models
     public class OrderModel
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Tự động tạo giá trị cho khóa chính
         public long id { get; set; } // Use PascalCase for property names
 
-        public string message { get; set; } // Use PascalCase for property names
+        public string? message { get; set; } // Use PascalCase for property names
 
         [MaxLength(10)]
         public string status { get; set; } = "Pending"; // Use PascalCase for property names
@@ -20,9 +21,9 @@ namespace Restaurant.Models
 
         public DateTime? updatedDate { get; set; } // Nullable for optional
 
-        public string createdBy { get; set; } // Use PascalCase for property names
+        public string? createdBy { get; set; } // Use PascalCase for property names
 
-        public string updatedBy { get; set; } // Use PascalCase for property names
+        public string? updatedBy { get; set; } // Use PascalCase for property names
 
         public decimal? total { get; set; } // Nullable for optional total
 
