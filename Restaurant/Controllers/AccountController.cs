@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Restaurant.Models;
 using Restaurant.ViewModels;
 using System.ComponentModel.DataAnnotations;
@@ -42,7 +43,7 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
-                UserModel user;
+                UserModel? user;
 
                 // Check if the input is an email
                 if (new EmailAddressAttribute().IsValid(model.EmailOrUsername))
@@ -121,120 +122,42 @@ namespace Restaurant.Controllers
                     return View(model);
                 }
 
-                // No need to check for unique username
+                // Create a temporary user object without saving to the database
                 UserModel user = new UserModel
                 {
                     Email = model.Email,
-                    UserName = model.Name, // Allow overlapping usernames
+                    UserName = model.Name,
                     Role = "USER",
                     CreatedDate = DateTime.Now,
                     CreatedBy = "USER",
                     Status = "ACTIVE"
                 };
 
-                // Create the user
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                // Generate OTP
+                string otp = _constantHelper.GenerateOTP();
+
+                // Store user data, including the password and OTP temporarily
+                TempData["UserData"] = JsonConvert.SerializeObject(user);
+                TempData["UserPassword"] = model.Password; // Store password temporarily
+                TempData["OTP"] = otp;
+
+                // Send OTP via email
+                string subject = "Verify Your Email";
+                string body = $"Your OTP is: {otp}. It will expire in 5 minutes.";
+                bool emailSent = await _sendMail.SendEmailAsync(user.Email, subject, body);
+
+                if (emailSent)
                 {
-                    // Check if the USER role exists, create it if it doesn't
-                    if (!await _roleManager.RoleExistsAsync("USER"))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole<long>("USER"));
-                    }
-
-                    // Assign the USER role
-                    var roleResult = await _userManager.AddToRoleAsync(user, "USER");
-                    if (roleResult.Succeeded)
-                    {
-                        // Generate OTP
-                        string otp = _constantHelper.GenerateOTP();
-
-                        // Store OTP and email temporarily
-                        TempData["OTP"] = otp;
-                        TempData["UserEmail"] = user.Email;
-
-                        // Send OTP via email
-                        string subject = "Verify Your Email";
-                        string body = $"Your OTP is: {otp}. It will expire in 5 minutes.";
-                        bool emailSent = await _sendMail.SendEmailAsync(user.Email, subject, body);
-
-                        if (emailSent)
-                        {
-                            TempData["SuccessMessage"] = "Registration successful! Please check your email to verify your account.";
-                            return RedirectToAction("VerifyOTP", "Account");
-                        }
-                        else
-                        {
-                            ModelState.AddModelError("", "Failed to send verification email. Please try again.");
-                        }
-                    }
-                    else
-                    {
-                        foreach (var error in roleResult.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                    }
+                    TempData["SuccessMessage"] = "Registration successful! Please check your email to verify your account.";
+                    return RedirectToAction("VerifyOTP", "Account");
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    ModelState.AddModelError("", "Failed to send verification email. Please try again.");
                 }
             }
 
             return View(model);
-        }
-
-        public IActionResult VerifyEmail()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
-                {
-                    ModelState.AddModelError("", "User not found!");
-                    return View(model);
-                }
-
-                string otp = _constantHelper.GenerateOTP();
-
-                // Store OTP (consider using a more secure method in production)
-                TempData["OTP"] = otp;
-                TempData["UserEmail"] = model.Email;
-
-                string subject = "Your OTP for Register";
-                string body = $"Your OTP is: {otp}. It will expire in 10 seconds.";
-
-                bool emailSent = await _sendMail.SendEmailAsync(model.Email, subject, body);
-
-                if (!emailSent)
-                {
-                    ModelState.AddModelError("", "Failed to send OTP. Please try again.");
-                    return View(model);
-                }
-
-                return RedirectToAction("VerifyOTP", "Account");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while verifying email for user {Email}", model.Email);
-                ModelState.AddModelError("", "An error occurred. Please try again later.");
-                return View(model);
-            }
         }
 
         public IActionResult VerifyEmailForChangePassword()
@@ -311,9 +234,10 @@ namespace Restaurant.Controllers
             if (ModelState.IsValid)
             {
                 string? storedOTP = TempData["OTP"] as string;
-                string? userEmail = TempData["UserEmail"] as string;
+                string? userDataJson = TempData["UserData"] as string;
+                string? userPassword = TempData["UserPassword"] as string; // Retrieve the stored password
 
-                if (string.IsNullOrEmpty(storedOTP) || string.IsNullOrEmpty(userEmail))
+                if (string.IsNullOrEmpty(storedOTP) || string.IsNullOrEmpty(userDataJson) || string.IsNullOrEmpty(userPassword))
                 {
                     ModelState.AddModelError("", "OTP has expired. Please request a new one.");
                     return View();
@@ -321,20 +245,34 @@ namespace Restaurant.Controllers
 
                 if (otp == storedOTP)
                 {
-                    // Find the user by email
-                    var user = await _userManager.FindByEmailAsync(userEmail);
-                    if (user == null)
+                    // Deserialize user data
+                    UserModel user = JsonConvert.DeserializeObject<UserModel>(userDataJson);
+
+                    // Create the user in the database using the stored password
+                    var result = await _userManager.CreateAsync(user, userPassword);
+                    if (result.Succeeded)
                     {
-                        ModelState.AddModelError("", "User not found.");
-                        return View();
+                        // Assign the USER role
+                        if (!await _roleManager.RoleExistsAsync("USER"))
+                        {
+                            await _roleManager.CreateAsync(new IdentityRole<long>("USER"));
+                        }
+                        await _userManager.AddToRoleAsync(user, "USER");
+
+                        // Mark the user's email as confirmed
+                        user.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user);
+
+                        TempData["SuccessMessage"] = "Your email has been successfully verified! You can now log in.";
+                        return RedirectToAction("Login", "Account");
                     }
-
-                    // Mark the user's email as confirmed
-                    user.EmailConfirmed = true;
-                    await _userManager.UpdateAsync(user);
-
-                    TempData["SuccessMessage"] = "Your email has been successfully verified! You can now log in.";
-                    return RedirectToAction("Login", "Account");
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                    }
                 }
                 else
                 {
