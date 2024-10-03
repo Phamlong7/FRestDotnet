@@ -41,7 +41,7 @@ namespace Restaurant.Models
         public string? banner { get; set; }
 
         [NotMapped]
-        public IFormFile BannerUpload { get; set; } // Thuộc tính cho file upload
+        public IFormFile? BannerUpload { get; set; } // Thuộc tính cho file upload
 
         [ForeignKey("Category")] // Chỉ định khóa ngoại
         public long? categoryId { get; set; }

@@ -1,0 +1,104 @@
+﻿@model Restaurant.Models.OrderModel
+
+@{
+    ViewData["Title"] = "Order Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main id="content" class="content-area">
+    <div class="pagetitle">
+        <h1>Order Details</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Tables</li>
+                <li class="breadcrumb-item active">Data</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Details</h5>
+
+                        <div class="mb-3 row">
+                            <div class="col-md-6">
+                                <label class="form-label">Order ID</label>
+                                <input type="text" class="form-control" value="@Model.id" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Created Date</label>
+                                <input type="text" class="form-control"
+                                       value="@(Model.createdDate.HasValue ? Model.createdDate.Value.ToString("g") : "N/A")"
+                                       readonly />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-md-6">
+                                <label class="form-label">User ID</label>
+                                <input type="text" class="form-control" value="@Model.userId" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Total Amount</label>
+                                <input type="text" class="form-control"
+                                       value="@(Model.total.HasValue ? Model.total.Value.ToString("C") : "N/A")"
+                                       readonly />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-md-12">
+                                <label class="form-label">Status</label>
+                                <input type="text" class="form-control" value="@Model.status" readonly />
+                            </div>
+                        </div>
+
+                        <table id="dishTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Dish Name</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.orderDetails)
+                                {
+                                    <tr>
+                                        <td>@(detail.dish.title ?? "N/A")</td> <!-- Accessing DishName from DishModel -->
+                                        <td>@detail.quantity</td>
+                                        <td>
+                                            @(detail.priceAtOrder.HasValue ? (detail.priceAtOrder.Value *
+                                                detail.quantity).ToString("C") : "N/A")
+                                        </td>
+                                        <!-- Total Price (priceAtOrder * quantity) -->
+                                        <td>
+                                            @(detail.priceAtOrder.HasValue ? detail.priceAtOrder.Value.ToString("C") :
+                                                "N/A")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label asp-for="message" class="form-label">Message</label>
+                            <textarea asp-for="message" class="form-control" readonly></textarea>
+                        </div>
+
+                        <!-- Buttons Row -->
+                        <div class="mb-4 d-flex justify-content-center">
+                            <a asp-controller="Order" asp-action="Index" class="btn btn-secondary">Return</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

@@ -23,11 +23,13 @@ namespace Restaurant.Areas.Admin.Controllers
 
             // Last 7 days data
             var last7DaysSales = _context.orderDetails
-                .Where(od => od.order.createdDate >= lastWeek)
+                .Where(od => od.order.createdDate >= lastWeek
+                             && od.order.status == "Approved")  // Only include orders with "Approved" status
                 .Sum(od => od.quantity);
 
             var last7DaysOrders = _context.order
-                .Count(o => o.createdDate >= lastWeek);
+                .Count(o => o.createdDate >= lastWeek
+                            && (o.status == "Pending" || o.status == "Approved"));  // Count orders with either "Pending" or "Approved" status
 
             var last7DaysCustomers = _context.user
                 .Where(u => u.CreatedDate >= lastWeek && u.Role == "USER")
@@ -39,11 +41,16 @@ namespace Restaurant.Areas.Admin.Controllers
             var previous7Days = lastWeek.AddDays(-7);
 
             var previous7DaysSales = _context.orderDetails
-                .Where(od => od.order.createdDate >= previous7Days && od.order.createdDate < lastWeek)
+                .Where(od => od.order.createdDate >= previous7Days
+                             && od.order.createdDate < lastWeek
+                             && od.order.status == "Approved")  // Only include orders with "Approved" status
                 .Sum(od => od.quantity);
 
             var previous7DaysOrders = _context.order
-                .Count(o => o.createdDate >= previous7Days && o.createdDate < lastWeek);
+                .Count(o => o.createdDate >= previous7Days
+                            && o.createdDate < lastWeek
+                            && o.status == "Pending" || o.status == "Approved");  // Only count orders with "Approved" status
+
 
             var previous7DaysCustomers = _context.user
                 .Where(u => u.CreatedDate >= previous7Days && u.CreatedDate < lastWeek && u.Role == "USER")
@@ -57,7 +64,7 @@ namespace Restaurant.Areas.Admin.Controllers
             var ordersChange = CalculatePercentageChange(previous7DaysOrders, last7DaysOrders);
             var customersChange = CalculatePercentageChange(previous7DaysCustomers, last7DaysCustomers);
 
-            // Calculate for Reports 
+            // Calculate Report Data Charts
             var reportData = Enumerable.Range(0, 7)
                 .Select(offset => today.AddDays(-offset))
                 .Select(date => new
@@ -66,7 +73,7 @@ namespace Restaurant.Areas.Admin.Controllers
                     Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date),
                     Revenue = _context.orderDetails
                         .Where(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date)
-                        .Sum(od => od.quantity * od.price) ?? 0,
+                        .Sum(od => (decimal?)od.order.total) ?? 0,  // Summing the 'total' from orderDetails
                     Customers = _context.user
                         .Where(u => u.CreatedDate.Date == date && u.Role == "USER")
                         .Select(u => u.Id)
@@ -76,28 +83,29 @@ namespace Restaurant.Areas.Admin.Controllers
                 .OrderBy(x => x.Date)
                 .ToList();
 
+
             // Query the orders placed 
             var recentSales = _context.order
-                .Where(o => o.createdDate >= previous7Days && o.createdDate <= today)
-                .Select(o => new
-                {
-                    OrderId = o.id,
-                    Customer = o.user.UserName,
-                    Product = o.orderDetails
-                                .Select(od => od.dish.title) // Dish title (from OrderDetails)
-                                .FirstOrDefault(), // Assuming one product per order
-                    Price = o.orderDetails
-                                .Select(od => od.dish.price) // Price from Dish
-                                .FirstOrDefault(),
-                    Status = o.status                 // Order status
-                })
-                .OrderByDescending(o => o.OrderId)
-                .Take(20)
-                .ToList();
+                 .Where(o => o.createdDate.Value.Date >= previous7Days
+                             && o.createdDate.Value.Date <= today
+                             && o.status == "Approved")  // Only include orders with status "Approved"
+                 .Select(o => new
+                 {
+                     OrderId = o.id,
+                     Customer = o.user.UserName,
+                     Product = o.orderDetails
+                                  .Select(od => od.dish.title) // Dish title (from OrderDetails)
+                                  .FirstOrDefault(), // Assuming one product per order
+                     Price = o.total,
+                     Status = o.status  // Order status
+                 })
+                 .OrderByDescending(o => o.OrderId)
+                 .Take(10)
+                 .ToList();
 
             // Query the top-selling products
             var topSellingProducts = _context.orderDetails
-                .Where(od => od.order.createdDate >= previous7Days && od.order.createdDate <= today)
+                .Where(od => od.order.createdDate.Value.Date >= previous7Days && od.order.createdDate.Value.Date <= today && od.order.status == "Approved")
                 .GroupBy(od => new { od.dishId, od.dish.title, od.dish.price, od.dish.banner })
                 .Select(g => new
                 {
@@ -106,7 +114,7 @@ namespace Restaurant.Areas.Admin.Controllers
                     DishPrice = g.Key.price,
                     DishBanner = g.Key.banner,
                     UnitsSold = g.Sum(od => od.quantity), // Sum of quantities sold
-                    Revenue = g.Sum(od => od.quantity * od.price) // Total revenue for the product
+                    Revenue = g.Sum(od => od.quantity * od.priceAtOrder) // Total revenue for the product
                 })
                 .OrderByDescending(p => p.UnitsSold) // Order by the number of units sold
                 .Take(5) // Limit to top 10 products

@@ -16,6 +16,9 @@
         </div>
     </div>
 }
+@{
+    var recentSales = ViewBag.RecentSales as List<dynamic>; // Cast to List<dynamic> or the specific type
+}
 <section class="section dashboard">
     <div class="row">
 
@@ -176,44 +179,47 @@
                                         <th scope="col">#</th>
                                         <th scope="col">Customer</th>
                                         <th scope="col">Dish</th>
-                                        <th scope="col">Price</th>
+                                        <th scope="col">Total</th>
                                         <th scope="col">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if (ViewBag.RecentSales != null)
                                     {
-                                        foreach (var sale in ViewBag.RecentSales)
+                                        foreach (var resale in ViewBag.RecentSales)
                                         {
-                                            <tr>
-                                                <td>@sale.OrderId</td>
-                                                <td>@sale.Customer</td>
-                                                <td>@sale.Product</td>
-                                                <td>
-                                                    <span class="
-                                         @(sale.Price >= 100 ? "text-success" :
-                                           sale.Price >= 50 ? "text-danger" :
-                                           "text-warning")">
-                                                        $@sale.Price
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="badge
-                                         @(sale.Status == "Completed" ? "bg-success" :
-                                           sale.Status == "Pending" ? "bg-warning" :
-                                           sale.Status == "Cancelled" ? "bg-danger" :
-                                           "bg-secondary")">
-                                                        @sale.Status
-                                                    </span>
-                                                </td>
-                                            </tr>
+                                            if (resale.Status == "Approved") // Only display Approved orders
+                                            {
+                                                <tr>
+                                                    <td>@resale.OrderId</td>
+                                                    <td>@resale.Customer</td>
+                                                    <td>@resale.Product</td> <!-- Handle null for Product -->
+                                                    <td>
+                                                        <span class="@(resale.Price >= 100 ? "text-success" :
+                                                        resale.Price >= 50 ? "text-warning" :
+                                                        "text-danger")">
+                                                            $@resale.Price?.ToString("F2")  <!-- Format price to 2 decimal places -->
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-success">@resale.Status</span> <!-- Only Approved orders are shown -->
+                                                    </td>
+                                                </tr>
+                                            }
                                         }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center">No recent sales available.</td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div><!-- End Recent Sales -->
+
                 <!-- Top Selling -->
                 <div class="col-12">
                     <div class="card top-selling overflow-auto">
@@ -237,12 +243,24 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    <img src="@dish.DishBanner" alt="@dish.DishTitle" width="50" height="50" />
+                                                    <img src="/Media/@dish.DishBanner" alt="@dish.DishTitle" width="50" height="50" />
                                                 </td>
                                                 <td>@dish.DishTitle</td>
-                                                <td>$@dish.DishPrice</td>
+                                                <td>
+                                                    <span class="@(dish.DishPrice >= 100 ? "text-success" :
+                                                        dish.DishPrice >= 50 ? "text-warning" :
+                                                        "text-danger")">
+                                                        $@dish.DishPrice?.ToString("F2")  <!-- Format price to 2 decimal places -->
+                                                    </span>
+                                                </td>
                                                 <td>@dish.UnitsSold</td>
-                                                <td>$@dish.Revenue</td>
+                                                <td>
+                                                    <span class="@(dish.Revenue >= 500 ? "text-success" :
+                                                        dish.Revenue >= 300 ? "text-warning" :
+                                                        "text-danger")">
+                                                        $@dish.Revenue?.ToString("F2")  <!-- Format price to 2 decimal places -->
+                                                    </span>
+                                                </td>
                                             </tr>
                                         }
                                     }

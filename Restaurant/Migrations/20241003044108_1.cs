@@ -251,12 +251,12 @@ namespace Restaurant.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     createdDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     updatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    createdBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    updatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    createdBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    updatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     total = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     userId = table.Column<long>(type: "bigint", nullable: true)
                 },
@@ -306,7 +306,7 @@ namespace Restaurant.Migrations
                     orderId = table.Column<long>(type: "bigint", nullable: false),
                     dishId = table.Column<long>(type: "bigint", nullable: false),
                     quantity = table.Column<int>(type: "int", nullable: false),
-                    price = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
+                    priceAtOrder = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -344,7 +344,7 @@ namespace Restaurant.Migrations
 
             modelBuilder.Entity("Restaurant.Models.OrderDetailModel", b =>
                 {
-                    b.Property<long>("orderId")
+                    b.Property<long?>("orderId")
                         .HasColumnType("bigint")
                         .HasColumnOrder(0);
 
@@ -352,7 +352,7 @@ namespace Restaurant.Migrations
                         .HasColumnType("bigint")
                         .HasColumnOrder(1);
 
-                    b.Property<decimal?>("price")
+                    b.Property<decimal?>("priceAtOrder")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("quantity")
@@ -374,14 +374,12 @@ namespace Restaurant.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
 
                     b.Property<string>("createdBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("createdDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("message")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("status")
@@ -393,7 +391,6 @@ namespace Restaurant.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("updatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("updatedDate")

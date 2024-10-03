@@ -4,9 +4,31 @@
     ViewData["Title"] = "Ads Management";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
+<!-- Toast Notification -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["ErrorMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
 
 <main id="content" class="content-area">
-
     <div class="pagetitle">
         <h1>Ads Management</h1>
         <nav>
@@ -125,3 +147,21 @@
     </section>
 
 </main><!-- End #main -->
+
+<script>
+    // Initialize toast notification with extended display time
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds (10000 milliseconds)
+                autohide: true // Set to true for auto-hiding the toast
+            })
+        })
+        toastList.forEach(toast => toast.show());
+    });
+</script>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

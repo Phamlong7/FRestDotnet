@@ -24,9 +24,9 @@
         <form asp-action="Login" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <label asp-for="EmailOrUsername" class="form-label">Email or Username</label>
+                <input asp-for="EmailOrUsername" class="form-control" />
+                <span asp-validation-for="EmailOrUsername" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Password" class="form-label"></label>
@@ -41,7 +41,7 @@
             <div class="form-check mb-3">
                 <label class="form-check-label">
                     <input asp-for="RememberMe" class="form-check-input" />
-                    @Html.DisplayNameFor(a=> a.RememberMe)
+                    @Html.DisplayNameFor(a => a.RememberMe)
                 </label>
             </div>
             <input type="submit" value="Login" class="btn btn-success w-100 p-2" />
@@ -69,7 +69,7 @@
     });
 </script>
 
-@section Scripts{
+@section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
     }

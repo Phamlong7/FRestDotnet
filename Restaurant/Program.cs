@@ -25,6 +25,7 @@ builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
     options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
+    options.User.AllowedUserNameCharacters = string.Empty;
 })
 .AddEntityFrameworkStores<DataContext>()
 .AddDefaultTokenProviders();

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models;
 using Restaurant.ViewModels;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace Restaurant.Controllers
@@ -41,7 +42,20 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                UserModel user;
+
+                // Check if the input is an email
+                if (new EmailAddressAttribute().IsValid(model.EmailOrUsername))
+                {
+                    // Input is an email
+                    user = await _userManager.FindByEmailAsync(model.EmailOrUsername);
+                }
+                else
+                {
+                    // Input is a username
+                    user = await _userManager.FindByNameAsync(model.EmailOrUsername);
+                }
+
                 if (user == null)
                 {
                     ModelState.AddModelError("", "User not found.");
@@ -53,9 +67,9 @@ namespace Restaurant.Controllers
                 {
                     // Add role claim
                     var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Role, user.Role)
-                        };
+                {
+                    new Claim(ClaimTypes.Role, user.Role)
+                };
 
                     await _userManager.AddClaimsAsync(user, claims);
 
@@ -99,16 +113,27 @@ namespace Restaurant.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Check if the email is already in use
+                var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
+                if (existingUserByEmail != null)
+                {
+                    ModelState.AddModelError("", "Email is already in use.");
+                    return View(model);
+                }
+
+                // No need to check for unique username
                 UserModel user = new UserModel
                 {
                     Email = model.Email,
-                    UserName = model.Name,
-                    EmailConfirmed = false // Make sure the email is not confirmed yet
+                    UserName = model.Name, // Allow overlapping usernames
+                    Role = "USER",
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = "USER",
+                    Status = "ACTIVE"
                 };
 
                 // Create the user
                 var result = await _userManager.CreateAsync(user, model.Password);
-
                 if (result.Succeeded)
                 {
                     // Check if the USER role exists, create it if it doesn't
@@ -119,25 +144,22 @@ namespace Restaurant.Controllers
 
                     // Assign the USER role
                     var roleResult = await _userManager.AddToRoleAsync(user, "USER");
-
                     if (roleResult.Succeeded)
                     {
                         // Generate OTP
                         string otp = _constantHelper.GenerateOTP();
 
-                        // Store OTP and email temporarily (can also store in a more persistent way)
+                        // Store OTP and email temporarily
                         TempData["OTP"] = otp;
                         TempData["UserEmail"] = user.Email;
 
                         // Send OTP via email
                         string subject = "Verify Your Email";
-                        string body = $"Your OTP is: {otp}. It will expire in 10 minutes.";
-
+                        string body = $"Your OTP is: {otp}. It will expire in 5 minutes.";
                         bool emailSent = await _sendMail.SendEmailAsync(user.Email, subject, body);
 
                         if (emailSent)
                         {
-                            // Redirect to OTP verification page
                             TempData["SuccessMessage"] = "Registration successful! Please check your email to verify your account.";
                             return RedirectToAction("VerifyOTP", "Account");
                         }
@@ -152,7 +174,6 @@ namespace Restaurant.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
-                        return View(model);
                     }
                 }
                 else
@@ -161,7 +182,6 @@ namespace Restaurant.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
-                    return View(model);
                 }
             }
 
@@ -216,6 +236,7 @@ namespace Restaurant.Controllers
                 return View(model);
             }
         }
+
         public IActionResult VerifyEmailForChangePassword()
         {
             return View();

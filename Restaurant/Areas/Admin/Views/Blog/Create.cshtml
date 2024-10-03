@@ -3,17 +3,7 @@
     ViewData["Title"] = "Add A Blog";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
-        <div class="d-flex">
-            <div class="toast-body">
-                @TempData["SuccessMessage"]
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 n-auto" data-bs-dismis="toast" aria-label="Close"></button>
-        </div>
-    </div>
-}
+
 <main id="content" class="content-area">
     <div class="pagetitle">
         <h1>Add A Blog</h1>
@@ -72,8 +62,3 @@
         </div>
     </div>
 </main><!-- End #main -->
-@section Scripts {
-    @{
-        @await Html.PartialAsync("_ValidationScriptsPartial")
-    }
-}

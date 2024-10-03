@@ -106,6 +106,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 existingBlog.updatedDate = DateTime.Now;
                 existingBlog.content = blog.content;
                 existingBlog.status = blog.status;
+                existingBlog.title = blog.title;
                 await _dataContext.SaveChangesAsync(); // Save changes to the database
                 // Set success message in TempData
                 TempData["SuccessMessage"] = "Blog edited successfully!";
