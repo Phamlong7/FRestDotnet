@@ -71,16 +71,15 @@
                                 {
                                     <tr>
                                         <td>@(detail.dish.title ?? "N/A")</td> <!-- Accessing DishName from DishModel -->
-                                        <td>@detail.quantity</td>
-                                        <td>
-                                            @(detail.priceAtOrder.HasValue ? (detail.priceAtOrder.Value *
-                                                detail.quantity).ToString("C") : "N/A")
-                                        </td>
-                                        <!-- Total Price (priceAtOrder * quantity) -->
                                         <td>
                                             @(detail.priceAtOrder.HasValue ? detail.priceAtOrder.Value.ToString("C") :
                                                 "N/A")
                                         </td>
+                                        <td>
+                                            @(detail.priceAtOrder.HasValue ? (detail.priceAtOrder.Value *
+                                                detail.quantity).ToString("C") : "N/A")
+                                        </td>
+                                        <td>@detail.quantity</td>
                                     </tr>
                                 }
                             </tbody>

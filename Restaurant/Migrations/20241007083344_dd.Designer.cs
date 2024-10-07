@@ -12,8 +12,8 @@ using Restaurant.Repository;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241003044108_1")]
-    partial class _1
+    [Migration("20241007083344_dd")]
+    partial class dd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
