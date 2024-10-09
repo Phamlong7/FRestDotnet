@@ -1,4 +1,14 @@
-﻿
+﻿@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
 <section class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
@@ -16,18 +26,18 @@
         <div class="row d-flex align-items-stretch no-gutters">
             <div class="col-md-6 pt-5 px-2 pb-2 p-md-5 order-md-last">
                 <h2 class="h4 mb-2 mb-md-5 font-weight-bold">Contact Us</h2>
-                <form action="#">
+                <form method="post" asp-action="SendContactMessage">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Name">
+                        <input type="text" name="name" class="form-control" placeholder="Your Name" value="@ViewBag.UserName" readonly required>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Email">
+                        <input type="email" name="email" class="form-control" placeholder="Your Email" value="@ViewBag.UserEmail" readonly required>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Subject">
+                        <input type="text" name="subject" class="form-control" placeholder="Subject" required>
                     </div>
                     <div class="form-group">
-                        <textarea name="" id="" cols="30" rows="7" class="form-control" placeholder="Message"></textarea>
+                        <textarea name="message" cols="30" rows="7" class="form-control" placeholder="Message" required></textarea>
                     </div>
                     <div class="form-group">
                         <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
@@ -47,26 +57,39 @@
                 <h2 class="h4 font-weight-bold">Contact Information</h2>
             </div>
             <div class="w-100"></div>
-            <div class="col-md-3 d-flex">
+            <div class="col-md-5 d-flex">
                 <div class="dbox">
-                    <p><span>Address:</span> 198 West 21th Street, Suite 721 New York NY 10016</p>
+                    <p><span>Address:</span> FPT University Quy Nhon</p>
                 </div>
             </div>
-            <div class="col-md-3 d-flex">
+            <div class="col-md-5 d-flex">
                 <div class="dbox">
-                    <p><span>Phone:</span> <a href="tel://1234567920">+ 1235 2355 98</a></p>
+                    <p><span>Phone:</span> <a href="tel://1234567920">0123456789</a></p>
                 </div>
             </div>
-            <div class="col-md-3 d-flex">
+            <div class="col-md-5 d-flex">
                 <div class="dbox">
-                    <p><span>Email:</span> <a href="mailto:info@yoursite.com">info@yoursite.com</a></p>
+                    <p><span>Email:</span> <a href="mailto:info@yoursite.com">FRest@gmail.com</a></p>
                 </div>
             </div>
-            <div class="col-md-3 d-flex">
+            <div class="col-md-5 d-flex">
                 <div class="dbox">
-                    <p><span>Website</span> <a href="#">yoursite.com</a></p>
+                    <p><span>Leader:</span>LongPND</a></p>
                 </div>
             </div>
         </div>
     </div>
 </section>
+<script>
+    // Initialize toast notification with extended display time
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds (10000 milliseconds)
+                autohide: true // Set to true for auto-hiding the toast
+            })
+        })
+        toastList.forEach(toast => toast.show());
+    });
+</script>

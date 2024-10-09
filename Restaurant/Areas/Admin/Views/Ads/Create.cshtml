@@ -7,6 +7,7 @@
 }
 
 <main id="content" class="content-area">
+    }
     <div class="pagetitle">
         <h1>Create New Ad</h1>
         <nav>
@@ -18,53 +19,72 @@
     </div><!-- End Page Title -->
 
     <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-
-                <div class="card">
-                    <div class="card-body">
-                        <form asp-area="Admin" asp-controller="Ads" asp-action="Create" method="post" enctype="multipart/form-data">
-                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> <!-- Validation summary -->
-
-                            <div class="mb-3">
-                                <label asp-for="imageUpload" class="form-label">Image</label>
-                                <input asp-for="imageUpload" class="form-control" type="file" accept="image/*" required />
-                                <span asp-validation-for="imageUpload" class="text-danger"></span>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Add An Ad</h5>
+                            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="row mb-3">
+                                <label asp-for="imageUpload" class="col-sm-2 col-form-label">Image</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="imageUpload" class="form-control" type="file" accept="image/*" required />
+                                    <span asp-validation-for="imageUpload" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label asp-for="status" class="form-label">Status</label>
-                                <select asp-for="status" class="form-select" required>
-                                    <option value="">Select Status</option>
-                                    <option value="ACTIVE">Active</option>
-                                    <option value="INACTIVE">Inactive</option>
-                                </select>
-                                <span asp-validation-for="status" class="text-danger"></span>
+
+                            <div class="row mb-3">
+                                <label asp-for="status" class="col-sm-2 col-form-label">Status</label>
+                                <div class="col-sm-10">
+                                    <select asp-for="status" class="form-select" required>
+                                        <option value="">Select Status</option>
+                                        <option value="ACTIVE">Active</option>
+                                        <option value="INACTIVE">Inactive</option>
+                                    </select>
+                                    <span asp-validation-for="status" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label asp-for="width" class="form-label">Width</label>
-                                <input asp-for="width" class="form-control" type="number" required />
-                                <span asp-validation-for="width" class="text-danger"></span>
+
+                            <div class="row mb-3">
+                                <label asp-for="width" class="col-sm-2 col-form-label">Width</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="width" class="form-control" type="number" required />
+                                    <span asp-validation-for="width" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label asp-for="height" class="form-label">Height</label>
-                                <input asp-for="height" class="form-control" type="number" required />
-                                <span asp-validation-for="height" class="text-danger"></span>
+                            <div class="row mb-3">
+                                <label asp-for="height" class="col-sm-2 col-form-label">Height</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="height" class="form-control" type="number" required />
+                                    <span asp-validation-for="height" class="text-danger"></span>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label asp-for="position" class="form-label">Position</label>
-                                <input asp-for="position" class="form-control" required />
-                                <span asp-validation-for="position" class="text-danger"></span>
+                            <div class="row mb-3">
+                                <label asp-for="position" class="col-sm-2 col-form-label">Position</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="position" class="form-control" required />
+                                    <span asp-validation-for="position" class="text-danger"></span>
+                                </div>
                             </div>
-
                             <!-- The hidden URL field is not needed anymore -->
                             @*<input type="hidden" asp-for="url" />*@
 
-                            <button type="submit" class="btn btn-primary">Create</button>
-                            <a href="@Url.Action("Index", "Ads", new { area = "Admin" })" class="btn btn-secondary">Cancel</a>
+                            <div class="row mb-4">
+                                <div class="col-sm-6 text-end">
+                                    <a asp-controller="Ads" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <!-- Create and Cancel buttons -->
+                                    <button type="submit" class="btn btn-primary">Create</button>
+                                </div>
+
+                            </div>
                         </form>
                     </div>
                 </div>

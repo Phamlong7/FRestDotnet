@@ -1,60 +1,90 @@
 ﻿@model Restaurant.Models.WebSettingModel
 @{
     ViewData["Title"] = "Edit Web Setting";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h2>Edit Web Setting</h2>
+<main id="content" class="content-area">
+    <div class="pagetitle">
+        <h1>Edit Web Setting</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item">Web Settings</li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="id" />
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Edit Web Setting</h5>
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="id" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="mb-3">
-        <label asp-for="content" class="form-label">Content</label>
-        <textarea asp-for="content" class="form-control" required></textarea>
-        <span asp-validation-for="content" class="text-danger"></span>
+                            <div class="row mb-3">
+                                <label asp-for="content" class="col-sm-2 col-form-label">Content</label>
+                                <div class="col-sm-10">
+                                    <textarea asp-for="content" class="form-control" required></textarea>
+                                    <span asp-validation-for="content" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="imageUpload" class="col-sm-2 col-form-label">Upload New Image</label>
+                                <div class="col-sm-10">
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(Model.image))
+                                        {
+                                            <img alt="Current Image" style="max-width: 200px; max-height: 200px; margin-right: 15px;"
+                                                 src="@Url.Content("~/Media/" + Model.image)" />
+                                        }
+                                        <input asp-for="imageUpload" class="form-control" type="file" />
+                                    </div>
+                                    <span asp-validation-for="imageUpload" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="status" class="col-sm-2 col-form-label">Status</label>
+                                <div class="col-sm-10">
+                                    <select asp-for="status" class="form-select" required>
+                                        <option value="">Select Status</option>
+                                        <option value="ACTIVE" selected="@(Model.status == "ACTIVE")">Active</option>
+                                        <option value="INACTIVE" selected="@(Model.status == "INACTIVE")">Inactive</option>
+                                    </select>
+                                    <span asp-validation-for="status" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="type" class="col-sm-2 col-form-label">Type</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="type" class="form-control" required />
+                                    <span asp-validation-for="type" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Buttons Row -->
+                            <div class="row mb-4">
+                                <div class="col-sm-6 text-end">
+                                    <a asp-controller="WebSettings" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div> <!-- Close card body -->
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="imageUpload" class="form-label">Upload New Image</label>
-        <input type="file" asp-for="imageUpload" class="form-control" />
-        <span asp-validation-for="imageUpload" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label>Current Image:</label><br />
-        @if (!string.IsNullOrEmpty(Model.image))
-        {
-            <img src="@Url.Content("~/Media/" + Model.image)" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
-        }
-        else
-        {
-            <span>No image uploaded.</span>
-        }
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="status" class="form-label">Status</label>
-        <select asp-for="status" class="form-select" required>
-            <option value="">Select Status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-        </select>
-        <span asp-validation-for="status" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="type" class="form-label">Type</label>
-        <input asp-for="type" class="form-control" required />
-        <span asp-validation-for="type" class="text-danger"></span>
-    </div>
-
-    <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+</main><!-- End #main -->
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

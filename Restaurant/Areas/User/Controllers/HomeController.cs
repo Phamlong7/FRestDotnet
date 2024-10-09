@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Restaurant.Models;
 using Restaurant.Repository;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Restaurant.Areas.User.Controllers
 {
@@ -9,23 +14,36 @@ namespace Restaurant.Areas.User.Controllers
     public class HomeController : Controller
     {
         private readonly DataContext _context;
-        public HomeController(DataContext context)
+        private readonly UserManager<UserModel> _userManager;
+
+        public HomeController(DataContext context, UserManager<UserModel> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index()
         {
+            // Get the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+
             var today = DateTime.Today;
             var lastWeek = today.AddDays(-7);
             var previous7Days = lastWeek.AddDays(-7);
 
-            // Calculate for Reports   
+            // Calculate reports only for the current logged-in user
             var reportData = Enumerable.Range(0, 7)
                 .Select(offset => today.AddDays(-offset))
                 .Select(date => new
                 {
                     Date = date,
-                    Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date && od.order.user.UserName != null), 
+                    Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue
+                                                              && od.order.createdDate.Value.Date == date
+                                                              && od.order.userId == currentUser.Id), // Filter by logged-in user's orders
                 })
                 .OrderBy(x => x.Date)
                 .ToList();

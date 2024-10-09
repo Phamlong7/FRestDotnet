@@ -59,20 +59,5 @@ namespace Restaurant.ViewModels
                 return false;
             }
         }
-
-        // Method to generate and send OTP
-        public async Task<bool> SendOtpAsync(string to)
-        {
-            // Generate OTP
-            string otp = _constantHelper.GenerateOTP();
-            string subject = "Your OTP Code";
-            string body = $"Your OTP code is: {otp}";
-
-            // Log OTP generation for debugging (you can remove this in production)
-            _logger.LogDebug("Generated OTP: {OTP} for {Recipient}", otp, to);
-
-            // Send email containing the OTP
-            return await SendEmailAsync(to, subject, body);
-        }
     }
 }
