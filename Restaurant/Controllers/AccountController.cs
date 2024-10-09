@@ -11,16 +11,16 @@ namespace Restaurant.Controllers
     public class AccountController : Controller
     {
         private readonly SignInManager<UserModel> _signInManager;
-        private readonly Microsoft.AspNetCore.Identity.UserManager<UserModel> _userManager;
-        private readonly Microsoft.AspNetCore.Identity.RoleManager<IdentityRole<long>> _roleManager;
+        private readonly UserManager<UserModel> _userManager;
+        private readonly RoleManager<IdentityRole<long>> _roleManager;
         private readonly ConstantHelper _constantHelper;
         private readonly SendMail _sendMail;
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(
              SignInManager<UserModel> signInManager,
-             Microsoft.AspNetCore.Identity.UserManager<UserModel> userManager,
-             Microsoft.AspNetCore.Identity.RoleManager<IdentityRole<long>> roleManager,
+             UserManager<UserModel> userManager,
+             RoleManager<IdentityRole<long>> roleManager,
              ILogger<AccountController> logger,
              ConstantHelper constantHelper,
              SendMail sendMail)
@@ -246,8 +246,12 @@ namespace Restaurant.Controllers
                 if (otp == storedOTP)
                 {
                     // Deserialize user data
-                    UserModel user = JsonConvert.DeserializeObject<UserModel>(userDataJson);
-
+                    UserModel? user = JsonConvert.DeserializeObject<UserModel>(userDataJson);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "Failed to deserialize user data.");
+                        return View();
+                    }
                     // Create the user in the database using the stored password
                     var result = await _userManager.CreateAsync(user, userPassword);
                     if (result.Succeeded)
@@ -366,8 +370,8 @@ namespace Restaurant.Controllers
 
             // Check if the new password is the same as the current password
             var newPasswordHash = _userManager.PasswordHasher.HashPassword(user, model.NewPassword);
-            var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, model.NewPassword);
-            if (passwordVerificationResult == Microsoft.AspNetCore.Identity.PasswordVerificationResult.Success)
+            var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash ?? string.Empty, model.NewPassword);
+            if (passwordVerificationResult == PasswordVerificationResult.Success)
             {
                 ModelState.AddModelError("", "The new password must be different from the current password.");
                 return View(model);
