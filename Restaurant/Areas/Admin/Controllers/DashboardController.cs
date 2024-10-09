@@ -70,10 +70,10 @@ namespace Restaurant.Areas.Admin.Controllers
                 .Select(date => new
                 {
                     Date = date,
-                    Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date),
-                    Revenue = _context.orderDetails
-                        .Where(od => od.order.createdDate.HasValue && od.order.createdDate.Value.Date == date)
-                        .Sum(od => (decimal?)od.order.total) ?? 0,  // Summing the 'total' from orderDetails
+                    Order = _context.order.Count(od => od.createdDate.HasValue && od.createdDate.Value.Date == date && od.status == "Approved"),
+                    Revenue = _context.order
+                        .Where(od => od.createdDate.HasValue && od.createdDate.Value.Date == date)
+                        .Sum(od => (decimal?)od.total) ?? 0,  // Summing the 'total' from orderDetails
                     Customers = _context.user
                         .Where(u => u.CreatedDate.Date == date && u.Role == "USER")
                         .Select(u => u.Id)
@@ -86,22 +86,20 @@ namespace Restaurant.Areas.Admin.Controllers
 
             // Query the orders placed 
             var recentSales = _context.order
-                 .Where(o => o.createdDate.Value.Date >= previous7Days
-                             && o.createdDate.Value.Date <= today
-                             && o.status == "Approved")  // Only include orders with status "Approved"
-                 .Select(o => new
-                 {
-                     OrderId = o.id,
-                     Customer = o.user.UserName,
-                     Product = o.orderDetails
-                                  .Select(od => od.dish.title) // Dish title (from OrderDetails)
-                                  .FirstOrDefault(), // Assuming one product per order
-                     Price = o.total,
-                     Status = o.status  // Order status
-                 })
-                 .OrderByDescending(o => o.OrderId)
-                 .Take(10)
-                 .ToList();
+                .Where(o => o.createdDate.Value.Date >= previous7Days
+                            && o.createdDate.Value.Date <= today
+                            && o.status == "Approved")  // Only include orders with status "Approved"
+                .Select(o => new
+                {
+                    OrderId = o.id,
+                    Customer = o.user.UserName,
+                    Product = string.Join(", ", o.orderDetails.Select(od => od.dish.title)), // Join all dish titles
+                    Price = o.total,
+                    Status = o.status  // Order status
+                })
+                .OrderByDescending(o => o.OrderId)
+                .Take(10)
+                .ToList();
 
             // Query the top-selling products
             var topSellingProducts = _context.orderDetails
@@ -117,7 +115,7 @@ namespace Restaurant.Areas.Admin.Controllers
                     Revenue = g.Sum(od => od.quantity * od.priceAtOrder) // Total revenue for the product
                 })
                 .OrderByDescending(p => p.UnitsSold) // Order by the number of units sold
-                .Take(5) // Limit to top 10 products
+                .Take(5) 
                 .ToList();
 
             // Query the Blog and Updates

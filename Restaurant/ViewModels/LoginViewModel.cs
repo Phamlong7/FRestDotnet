@@ -5,7 +5,7 @@ namespace Restaurant.ViewModels
     public class LoginViewModel
     {
         [Required(ErrorMessage = "Email or Username is required.")]
-        public string EmailOrUsername { get; set; } // Allow either email or username
+        public string EmailOrUsername { get; set; } 
 
         [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
