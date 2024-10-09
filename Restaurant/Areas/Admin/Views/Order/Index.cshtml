@@ -4,6 +4,19 @@
     ViewData["Title"] = "Order Management";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true"
+        style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+}
 
 <main id="content" class="content-area">
 
@@ -74,23 +87,23 @@
                                                 <td>
                                                     <!-- Update Button -->
                                                     <a href="@Url.Action("Edit", "Order", new { id = item.id })"
-                                                       class="btn btn-warning btn-sm">
+                                                        class="btn btn-warning btn-sm">
                                                         <i class="bi bi-pencil"></i> Update
                                                     </a>
                                                     <!-- Detail Button -->
                                                     <a href="@Url.Action("Detail", "Order", new { id = item.id })"
-                                                       class="btn btn-info btn-sm">
+                                                        class="btn btn-info btn-sm">
                                                         <i class="bi bi-eye"></i> Detail
                                                     </a>
                                                     <!-- Delete Button -->
                                                     <a href="javascript:void(0);" class="btn btn-danger btn-sm"
-                                                       data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
                                                         <i class="bi bi-trash"></i> Delete
                                                     </a>
 
                                                     <!-- Delete Confirmation Modal -->
                                                     <div class="modal fade" id="deleteModal-@item.id" tabindex="-1"
-                                                         aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
+                                                        aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
@@ -99,7 +112,7 @@
                                                                         Deletion
                                                                     </h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                            aria-label="Close"></button>
+                                                                        aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     Are you sure you want to delete the order
@@ -108,11 +121,11 @@
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary"
-                                                                            data-bs-dismiss="modal">
+                                                                        data-bs-dismiss="modal">
                                                                         Cancel
                                                                     </button>
                                                                     <a href="@Url.Action("Delete", "Order", new { id = item.id })"
-                                                                       class="btn btn-danger">Confirm Delete</a>
+                                                                        class="btn btn-danger">Confirm Delete</a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -134,3 +147,17 @@
     </section>
 
 </main><!-- End #main -->
+
+<script>
+    // Initialize toast notification with extended display time
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds (10000 milliseconds)
+                autohide: true // Set to true for auto-hiding the toast
+            })
+        })
+        toastList.forEach(toast => toast.show());
+    });
+</script>
