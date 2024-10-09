@@ -128,7 +128,7 @@ namespace Restaurant.Areas.Admin.Controllers
                 _fileService.DeleteFile(blog.banner, "Media");
             }
             // Set success message in TempData
-            TempData["SuccessMessage"] = "Blog edited successfully!";
+            TempData["SuccessMessage"] = "Blog deleted successfully!";
             return RedirectToAction("Index");
         }
     }

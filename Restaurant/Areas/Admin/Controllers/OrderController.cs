@@ -40,6 +40,13 @@ namespace Restaurant.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrderViewModel model)
         {
+            // Check if any dishes are added
+            if (model.OrderDetails == null || !model.OrderDetails.Any())
+            {
+                TempData["ErrorMessage"] = "You must add at least one dish to the order.";
+                return View(model);
+            }
+
             if (ModelState.IsValid)
             {
                 // Get the current user's ID
@@ -88,6 +95,7 @@ namespace Restaurant.Areas.Admin.Controllers
         {
             // Retrieve the order along with order details
             var order = _dataContext.order
+                .Include(o => o.user) // include relative user
                 .Include(o => o.orderDetails) // Include order details
                 .ThenInclude(od => od.dish) // Include Dish data if you have a navigation property
                 .FirstOrDefault(o => o.id == id); // Find order by id
@@ -112,6 +120,13 @@ namespace Restaurant.Areas.Admin.Controllers
             if (order == null)
             {
                 return NotFound();
+            }
+
+            // Retrieve the user information based on the userId from the order
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == order.userId);
+            if (user != null)
+            {
+                ViewBag.UserName = user.UserName; // Pass the username to the view
             }
 
             // Map OrderModel to OrderViewModel
@@ -156,6 +171,8 @@ namespace Restaurant.Areas.Admin.Controllers
 
                     // Save changes to the database
                     await _dataContext.SaveChangesAsync();
+                    // Set success message in TempData
+                    TempData["SuccessMessage"] = "Order edited successfully!";
                     return RedirectToAction("Index");
                 }
             }
