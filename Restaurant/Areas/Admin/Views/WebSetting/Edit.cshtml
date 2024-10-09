@@ -40,7 +40,7 @@
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(Model.image))
                                         {
-                                            <img alt="Current Image" style="max-width: 200px; max-height: 200px; margin-right: 15px;"
+                                            <img alt="Current Image" style="max-width: 150px; margin-right: 15px;"
                                                  src="@Url.Content("~/Media/" + Model.image)" />
                                         }
                                         <input asp-for="imageUpload" class="form-control" type="file" />
