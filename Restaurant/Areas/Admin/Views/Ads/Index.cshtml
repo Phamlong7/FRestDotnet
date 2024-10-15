@@ -93,7 +93,9 @@
                                                 <td>@item.position</td>
                                                 <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
-                                                <td>@item.status</td>
+                                                <td style="color: @(item.status == "ACTIVE" ? "green" : "red")">
+                                                    @item.status
+                                                </td>
                                                 <td>
                                                     <!-- Update Button -->
                                                     <a href="@Url.Action("Edit", "Ads", new { area = "Admin", id = item.id })" class="btn btn-warning btn-sm">

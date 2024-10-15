@@ -83,7 +83,9 @@
                                                 <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.total</td>
-                                                <td>@item.status</td>
+                                                <td style="color: @(item.status == "Pending" ? "brown" : item.status == "Approved" ? "green" : item.status == "Rejected" ? "red" : "black")">
+                                                    @item.status
+                                                </td>
                                                 <td>
                                                     <!-- Update Button -->
                                                     <a href="@Url.Action("Edit", "Order", new { id = item.id })"
