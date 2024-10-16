@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models;
+using Restaurant.Utility;
 using Restaurant.ViewModels;
 using System.Threading.Tasks;
 
