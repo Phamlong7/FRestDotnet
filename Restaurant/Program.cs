@@ -38,6 +38,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IFileService, FileService>(); //file service
 builder.Services.AddSingleton<ConstantHelper>();
 builder.Services.AddTransient<SendMail>();
+builder.Services.AddSession(options =>         //session
+{
+    options.IdleTimeout = TimeSpan.FromHours(1);
+});
 
 // Configure logging before building the app
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
@@ -54,7 +58,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication(); // Ensures authentication is enabled  
-app.UseAuthorization();  // Ensures authorization is enabled  
+app.UseAuthorization();  // Ensures authorization is enabled
+app.UseSession(); 
 
 // Route Controller  
 #pragma warning disable
