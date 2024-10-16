@@ -8,7 +8,7 @@ using Restaurant.Areas.Admin;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure services before building the app
-
+builder.Services.AddLogging();
 // Connection Database 
 builder.Services.AddDbContext<DataContext>(options =>
 {
@@ -38,10 +38,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IFileService, FileService>(); //file service
 builder.Services.AddSingleton<ConstantHelper>();
 builder.Services.AddTransient<SendMail>();
-builder.Services.AddSession(options =>         //session
-{
-    options.IdleTimeout = TimeSpan.FromHours(1);
-});
+builder.Services.AddScoped<SendMail>();
 
 // Configure logging before building the app
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
@@ -58,8 +55,7 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication(); // Ensures authentication is enabled  
-app.UseAuthorization();  // Ensures authorization is enabled
-app.UseSession(); 
+app.UseAuthorization();  // Ensures authorization is enabled  
 
 // Route Controller  
 #pragma warning disable
