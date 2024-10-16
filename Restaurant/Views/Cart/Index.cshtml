@@ -1,7 +1,7 @@
 ﻿@model List<Restaurant.ViewModels.CartItemViewModel>
 
 <section class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_3.jpg');"
-         data-stellar-background-ratio="0.5">
+    data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
         <div class="row no-gutters slider-text align-items-end justify-content-center">
@@ -21,68 +21,79 @@
     </div>
 </section>
 
+@{
+    int index = 0; // Initialize the index variable
+}
 <section class="ftco-section ftco-no-pt ftco-no-pb cart-section">
     <div class="container">
         <h2 class="h4 mb-2 mb-md-5 font-weight-bold">Your Cart</h2>
 
         @if (Model.Any())
         {
-            <table class="table table-borderless cart-table">
-                <thead>
-                    <tr>
-                        <th>Dish Information</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr class="cart-item" data-dishid="@item.DishId">
-                            <!-- Product Information (Image + Title + Remove link) -->
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="/Media/@item.Banner" alt="@item.Title"
-                                         style=" width: 80px; height: 80px; object-fit: cover;" />
-                                    <div class="ml-3">
-                                        <p class="mb-1">@item.Title</p>
-                                        <a href="javascript:void(0);" onclick="removeItem(@item.DishId)"
-                                           class="text-primary">Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
-                            <td class="quantity-control">
-                                <button onclick="decrementQty(@item.DishId)">-</button>
-                                <input type="number" value="@item.Quantity" min="1" data-dishid="@item.DishId" />
-                                <button onclick="incrementQty(@item.DishId)">+</button>
-                            </td>
-                            <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
+            <form method="post" action="@Url.Action("Create", "OrderHistory", new { area = "User" })">
+                <table class="table table-borderless cart-table">
+                    <thead>
+                        <tr>
+                            <th>Dish Information</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="cart-item" data-dishid="@item.DishId">
+                                <!-- Product Information (Image + Title + Remove link) -->
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="/Media/@item.Banner" alt="@item.Title"
+                                            style=" width: 80px; height: 80px; object-fit: cover;" />
+                                        <div class="ml-3">
+                                            <p class="mb-1">@item.Title</p>
+                                            <a href="javascript:void(0);" onclick="removeItem(@item.DishId)"
+                                                class="text-primary">Remove</a>
+                                        </div>
+                                    </div>
+                                </td>
 
-            <!-- Total Amount Button -->
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <h5 class="mb-0">Total Amount:</h5>
-                <span id="grand-total" class="h4">
-                    @Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity :
-                             0).ToString("N0")$
-                </span>
-            </div>
+                                <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
+                                <td class="quantity-control">
+                                    <button type="button" onclick="decrementQty(@item.DishId)">-</button>
+                                    <input type="number" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1"
+                                        data-dishid="@item.DishId" />
+                                    <input type="hidden" name="OrderDetails[@index].DishId" value="@item.DishId" />
+                                    <input type="hidden" name="OrderDetails[@index].DishName" value="@item.Title" />
+                                    <input type="hidden" name="OrderDetails[@index].Price" value="@item.Price" />
+                                    <button type="button" onclick="incrementQty(@item.DishId)">+</button>
+                                </td>
+                                <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
+                            </tr>
+                            @* Increment the index after each iteration *@
+                            index++;
+                        }
+                    </tbody>
+                </table>
 
-            <!-- Message Input Field -->
-            <div class="form-group mt-4">
-                <label for="orderMessage">Message</label>
-                <textarea id="orderMessage" class="form-control" rows="3" placeholder="Your message"></textarea>
-            </div>
+                <!-- Total Amount Button -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <h5 class="mb-0">Total Amount:</h5>
+                    <span id="grand-total" class="h4">
+                        @Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity :
+                                 0).ToString("N0")$
+                    </span>
+                </div>
 
-            <div class="form-group mt-4 text-right">
-                <button class="btn btn-primary py-2 px-4" onclick="proceedToOrder()">Add To Order</button>
-            </div>
+                <!-- Message Input Field -->
+                <div class="form-group mt-4">
+                    <label for="orderMessage">Message</label>
+                    <textarea id="orderMessage" name="Message" class="form-control" rows="3" placeholder="Your message"></textarea>
+                </div>
+
+                <div class="form-group mt-4 text-right">
+                    <button class="btn btn-primary py-2 px-4" type="submit">Add To Order</button>
+                </div>
+            </form>
         }
         else
         {
@@ -215,52 +226,4 @@
         // Add an event listener to save the message when typing
         document.getElementById('orderMessage').addEventListener('input', saveMessageToLocalStorage);
     };
-
-    function proceedToOrder() {
-        const message = document.getElementById('orderMessage').value;
-
-        // Gather cart data
-        const cartItems = [];
-        const cartRows = document.querySelectorAll('.cart-item');
-
-        cartRows.forEach(row => {
-            const dishId = row.getAttribute('data-dishid'); // Fetch the dish ID
-            const quantityInput = row.querySelector('input[type="number"]');
-            const price = parseFloat(row.children[1].innerText.replace('$', '').replace(/,/g, ''));
-
-            cartItems.push({
-                DishId: parseInt(dishId, 10), // Convert to integer
-                Quantity: parseInt(quantityInput.value, 10),
-                Price: price
-            });
-        });
-
-        console.log(cartItems); // Log the cart items to the console
-
-        // Send cart data to server via AJAX
-        fetch('/User/OrderHistory/Create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                OrderDetails: cartItems,
-                Message: message
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert("Order created successfully!");
-                    localStorage.removeItem('orderMessage'); // Clear message after successful order
-                    window.location.href = "/User/OrderHistory"; // Redirect to order history
-                } else {
-                    alert("Failed to create order. Please try again.");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("An error occurred. Please try again.");
-            });
-    }
-
 </script>
