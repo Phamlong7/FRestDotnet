@@ -1,76 +1,266 @@
-﻿
-<section class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
+﻿@model List<Restaurant.ViewModels.CartItemViewModel>
+
+<section class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_3.jpg');"
+         data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
         <div class="row no-gutters slider-text align-items-end justify-content-center">
             <div class="col-md-9 ftco-animate text-center mb-4">
-                <h1 class="mb-2 bread">Cart Item</h1>
-                <p class="breadcrumbs"><span class="mr-2"><a asp-action="Index" asp-controller="Home">Home <i class="ion-ios-arrow-forward"></i></a></span> <span>Cart Item<i class="ion-ios-arrow-forward"></i></span></p>
+                <h1 class="mb-2 bread">Cart</h1>
+                <p class="breadcrumbs">
+                    <span class="mr-2">
+                        <a asp-action="Index" asp-controller="Home">
+                            Home <i class="ion-ios-arrow-forward"></i>
+                        </a>
+                    </span> <span>
+                        Cart <i class="ion-ios-arrow-forward"></i>
+                    </span>
+                </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Cart Page Section -->
 <section class="ftco-section ftco-no-pt ftco-no-pb cart-section">
     <div class="container">
-        <div class="row d-flex align-items-stretch no-gutters">
-            <!-- Cart Items -->
-            <div class="col-md-6 pt-5 px-2 pb-2 p-md-5 order-md-last">
-                <h2 class="h4 mb-2 mb-md-5 font-weight-bold">Your Cart</h2>
-                <!-- Cart Item 1 -->
-                <div class="cart-item mb-4">
-                    <p class="font-weight-bold">Product Name</p>
-                    <p>Description of the product.</p>
-                    <div class="d-flex justify-content-between">
-                        <span>Price: $20.00</span>
-                        <input type="number" class="form-control w-25" value="1" min="1" max="10">
-                    </div>
-                    <button class="btn btn-danger mt-3">Remove</button>
-                    <hr>
-                </div>
+        <h2 class="h4 mb-2 mb-md-5 font-weight-bold">Your Cart</h2>
 
-                <!-- Additional Cart Items (Copy for more items) -->
-                <!-- Proceed to Checkout -->
-                <div class="form-group">
-                    <button class="btn btn-primary py-3 px-5">Proceed to Order</button>
-                </div>
+        @if (Model.Any())
+        {
+            <table class="table table-borderless cart-table">
+                <thead>
+                    <tr>
+                        <th>Dish Information</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="cart-item" data-dishid="@item.DishId">
+                            <!-- Product Information (Image + Title + Remove link) -->
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="/Media/@item.Banner" alt="@item.Title"
+                                         style=" width: 80px; height: 80px; object-fit: cover;" />
+                                    <div class="ml-3">
+                                        <p class="mb-1">@item.Title</p>
+                                        <a href="javascript:void(0);" onclick="removeItem(@item.DishId)"
+                                           class="text-primary">Remove</a>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
+                            <td class="quantity-control">
+                                <button onclick="decrementQty(@item.DishId)">-</button>
+                                <input type="number" value="@item.Quantity" min="1" data-dishid="@item.DishId" />
+                                <button onclick="incrementQty(@item.DishId)">+</button>
+                            </td>
+                            <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Total Amount Button -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <h5 class="mb-0">Total Amount:</h5>
+                <span id="grand-total" class="h4">
+                    @Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity :
+                             0).ToString("N0")$
+                </span>
             </div>
-            <!-- Map or Promotion Section (Optional) -->
-            <div class="col-md-6 d-flex align-items-stretch">
-                <div id="map">
-                    <!-- You can use this section for promotion or checkout details -->
-                    <p class="text-center py-5">Cart Summary or Promotional Information</p>
-                </div>
+
+            <!-- Message Input Field -->
+            <div class="form-group mt-4">
+                <label for="orderMessage">Message</label>
+                <textarea id="orderMessage" class="form-control" rows="3" placeholder="Your message"></textarea>
             </div>
-        </div>
+
+            <div class="form-group mt-4 text-right">
+                <button class="btn btn-primary py-2 px-4" onclick="proceedToOrder()">Add To Order</button>
+            </div>
+        }
+        else
+        {
+            <p>Your cart is empty</p>
+            <img src="/images/Arona.jpg" alt="Empty Cart" style="max-width: 300px; margin-top: 10px;" />
+            <p>Continue shopping at <a href="/Menu">here</a>.</p>
+        }
     </div>
 </section>
 
-<!-- Order Summary Section -->
-<section class="ftco-section cart-summary-section">
-    <div class="container">
-        <div class="row d-flex cart-info">
-            <div class="col-md-12 mb-4">
-                <h2 class="h4 font-weight-bold">Order Summary</h2>
-            </div>
-            <div class="w-100"></div>
-            <div class="col-md-3 d-flex">
-                <div class="dbox">
-                    <p><span>Subtotal:</span> $20.00</p>
-                </div>
-            </div>
-            <div class="col-md-3 d-flex">
-                <div class="dbox">
-                    <p><span>Tax:</span> $2.00</p>
-                </div>
-            </div>
-            <div class="col-md-3 d-flex">
-                <div class="dbox">
-                    <p><span>Total:</span> $22.00</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<script>
 
+    function removeItem(dishId) {
+        $.ajax({
+            url: '@Url.Action("Remove", "Cart")',
+            type: 'POST',
+            data: { dishId: dishId },
+            success: function (response) {
+                if (response.success) {
+                    // Remove the row from the DOM
+                    $('tr[data-dishid="' + dishId + '"]').remove();
+
+                    // Check if the cart is now empty after removal
+                    if (response.isEmpty) {
+                        // Trigger a page reload to show the empty cart message
+                        location.reload();
+                    }
+                }
+            },
+            error: function () {
+                alert('An error occurred while removing the item.');
+            }
+        });
+    }
+
+    function updateCartQuantity(dishId, newQuantity) {
+        $.ajax({
+            url: '/Cart/UpdateQuantity',  // Ensure the route is correct based on your controller
+            type: 'POST',
+            data: {
+                dishId: dishId,
+                newQuantity: newQuantity
+            },
+            success: function (response) {
+                if (response.success) {
+                    console.log('Quantity updated successfully.');
+
+                    // Select the cart item row using the data-dishid attribute
+                    var itemRow = document.querySelector('tr[data-dishid="' + dishId + '"]');
+
+                    if (itemRow) {
+                        // Get the price per item
+                        var priceText = itemRow.querySelector('td:nth-child(2)').innerText;
+                        var price = parseFloat(priceText.replace('₫', '').replace(',', ''));
+
+                        // Update the quantity in the input field
+                        var inputField = itemRow.querySelector('input[data-dishid="' + dishId + '"]');
+                        inputField.value = newQuantity;
+
+                        // Update the total price for this item
+                        var totalPriceField = itemRow.querySelector('td:nth-child(4)');
+                        totalPriceField.innerText = (price * newQuantity).toLocaleString() + '$';
+
+                        // Update the grand total
+                        updateGrandTotal();
+                    } else {
+                        console.error('Cart item not found for dishId:', dishId);
+                    }
+                } else {
+                    console.error('Failed to update the quantity.');
+                }
+            },
+            error: function () {
+                alert('Failed to update quantity.');
+            }
+        });
+    }
+
+
+    function decrementQty(dishId) {
+        var input = document.querySelector('input[data-dishid="' + dishId + '"]');
+        var currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            var newQuantity = currentValue - 1;
+            input.value = newQuantity;
+            updateCartQuantity(dishId, newQuantity);  // Call AJAX to update quantity in session
+        }
+    }
+
+    function incrementQty(dishId) {
+        var input = document.querySelector('input[data-dishid="' + dishId + '"]');
+        var currentValue = parseInt(input.value);
+        var newQuantity = currentValue + 1;
+        input.value = newQuantity;
+        updateCartQuantity(dishId, newQuantity);  // Call AJAX to update quantity in session
+    }
+
+    function updateGrandTotal() {
+        var grandTotal = 0;
+
+        // Loop through all items and sum up the totals
+        document.querySelectorAll('.cart-item').forEach(function (itemRow) {
+            var itemTotalText = itemRow.querySelector('td:nth-child(4)').innerText;
+            var itemTotal = parseFloat(itemTotalText.replace('₫', '').replace(',', ''));
+            grandTotal += itemTotal;
+        });
+
+        // Update the grand total field
+        document.getElementById('grand-total').innerText = grandTotal.toLocaleString() + '$';
+    }
+
+    // Function to save the message to local storage
+    function saveMessageToLocalStorage() {
+        const message = document.getElementById('orderMessage').value;
+        localStorage.setItem('orderMessage', message);
+    }
+
+    // Function to load the message from local storage
+    function loadMessageFromLocalStorage() {
+        const savedMessage = localStorage.getItem('orderMessage');
+        if (savedMessage) {
+            document.getElementById('orderMessage').value = savedMessage;
+        }
+    }
+
+    // Load the message when the page is loaded
+    window.onload = function () {
+        loadMessageFromLocalStorage();
+
+        // Add an event listener to save the message when typing
+        document.getElementById('orderMessage').addEventListener('input', saveMessageToLocalStorage);
+    };
+
+    function proceedToOrder() {
+        const message = document.getElementById('orderMessage').value;
+
+        // Gather cart data
+        const cartItems = [];
+        const cartRows = document.querySelectorAll('.cart-item');
+
+        cartRows.forEach(row => {
+            const dishId = row.getAttribute('data-dishid'); // Fetch the dish ID
+            const quantityInput = row.querySelector('input[type="number"]');
+            const price = parseFloat(row.children[1].innerText.replace('$', '').replace(/,/g, ''));
+
+            cartItems.push({
+                DishId: parseInt(dishId, 10), // Convert to integer
+                Quantity: parseInt(quantityInput.value, 10),
+                Price: price
+            });
+        });
+
+        console.log(cartItems); // Log the cart items to the console
+
+        // Send cart data to server via AJAX
+        fetch('/User/OrderHistory/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                OrderDetails: cartItems,
+                Message: message
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Order created successfully!");
+                    localStorage.removeItem('orderMessage'); // Clear message after successful order
+                    window.location.href = "/User/OrderHistory"; // Redirect to order history
+                } else {
+                    alert("Failed to create order. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred. Please try again.");
+            });
+    }
+
+</script>
