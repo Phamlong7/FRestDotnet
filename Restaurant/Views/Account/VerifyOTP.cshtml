@@ -1,8 +1,9 @@
-﻿@{
+﻿@using Restaurant.Utility
+@{
     ViewData["Title"] = "Verify OTP";
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
 }
-@model Restaurant.ViewModels.ConstantHelper
+@model ConstantHelper
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">

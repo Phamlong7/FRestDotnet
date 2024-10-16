@@ -1,4 +1,4 @@
-﻿namespace Restaurant.ViewModels
+﻿namespace Restaurant.Utility
 {
     public class ConstantHelper
     {

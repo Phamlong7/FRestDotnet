@@ -1,14 +1,16 @@
-using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
-using Restaurant.Models;
 using Microsoft.EntityFrameworkCore;
-using Restaurant.ViewModels;
 using Restaurant.Areas.Admin;
+using Restaurant.Models;
+using Restaurant.Repository;
+using Restaurant.Utility;
+using Restaurant.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure services before building the app
 builder.Services.AddLogging();
+
 // Connection Database 
 builder.Services.AddDbContext<DataContext>(options =>
 {
@@ -38,7 +40,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IFileService, FileService>(); //file service
 builder.Services.AddSingleton<ConstantHelper>();
 builder.Services.AddTransient<SendMail>();
-builder.Services.AddScoped<SendMail>();
+
+// Add session services
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // Configure logging before building the app
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
@@ -55,7 +64,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication(); // Ensures authentication is enabled  
-app.UseAuthorization();  // Ensures authorization is enabled  
+app.UseAuthorization();  // Ensures authorization is enabled
+app.UseSession(); // Now sessions are configured and can be used
 
 // Route Controller  
 #pragma warning disable
@@ -83,7 +93,6 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
-
 
 // Continue with the rest of the setup
 app.UseHttpsRedirection();
