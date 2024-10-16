@@ -8,7 +8,7 @@ using Restaurant.Areas.Admin;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure services before building the app
-
+builder.Services.AddLogging();
 // Connection Database 
 builder.Services.AddDbContext<DataContext>(options =>
 {
@@ -38,6 +38,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IFileService, FileService>(); //file service
 builder.Services.AddSingleton<ConstantHelper>();
 builder.Services.AddTransient<SendMail>();
+builder.Services.AddScoped<SendMail>();
 
 // Configure logging before building the app
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
