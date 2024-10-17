@@ -24,15 +24,15 @@
                         </a>
                         <div class="text pt-3 pb-4 px-4">
                             <div class="meta">
-                                <div><a href="#">@blog.createdDate?.ToString("MMM. dd, yyyy")</a></div>
-                                <div><a href="#">@blog.createdBy</a></div>
+                                <div>@blog.createdDate?.ToString("MMM. dd, yyyy")</div>
+                                <div>@blog.createdBy</div>
                             </div>
                             <h3 class="heading">
-                                <a href="@Url.Action("Details", "Blog", new { id = blog.id })">@blog.title</a>
+                                <a href="@Url.Action("Details", "Stories", new { id = blog.id })">@blog.title</a>
                             </h3>
                             <p class="clearfix">
-                                <a href="@Url.Action("Details", "Blog", new { id = blog.id })" class="float-left read">Read more</a>
-                                <a href="#" class="float-right meta-chat"><span class="icon-chat"></span> 0</a>
+                                <a href="@Url.Action("Details", "Stories", new { id = blog.id })" class="float-left read">Read more</a>
+                                <a class="float-right meta-chat"><span class="icon-chat"></span> 0</a>
                             </p>
                         </div>
                     </div>
