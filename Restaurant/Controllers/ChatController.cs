@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Azure;
 using Azure.AI.OpenAI;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using static System.Environment;
 using OpenAI.Chat;
 
 namespace Restaurant.Controllers
@@ -13,55 +10,75 @@ namespace Restaurant.Controllers
     [Route("api/[controller]")]
     public class ChatController : ControllerBase
     {
-        // Hardcoded Azure OpenAI settings
-        private readonly string _endpoint = "https://frestai3.openai.azure.com/"; // Replace with your actual endpoint
-        private readonly string _apiKey = "1ad3113d0f104022a08c5e9131278429"; // Replace with your actual API key
-        private readonly string _deploymentName = "FRestAI3"; // Replace with your actual deployment name
+        private readonly AzureOpenAIClient _azureClient;
+        private readonly ChatClient _chatClient;
+        private readonly ILogger<ChatController> _logger;
 
-        private readonly AzureOpenAIClient _client;
-
-        public ChatController()
+        public ChatController(IConfiguration configuration, ILogger<ChatController> logger)
         {
-            _client = new AzureOpenAIClient(new Uri(_endpoint), new AzureKeyCredential(_apiKey));
+            _logger = logger;
+            var endpoint = GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT");
+            var apiKey = GetEnvironmentVariable("AZURE_OPENAI_API_KEY");
+
+            _logger.LogInformation($"Endpoint: {endpoint}");
+            _logger.LogInformation($"API Key: {apiKey}"); // Ensure not to log sensitive information in production!
+            if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey))
+            {
+                throw new InvalidOperationException("Azure OpenAI endpoint and API key must be set in environment variables.");
+            }
+
+            _azureClient = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+            _chatClient = _azureClient.GetChatClient("gpt-35-turbo"); // Use your custom deployment name
         }
 
         [HttpPost("stream")]
         public async Task StreamChatAsync([FromBody] ChatRequest request)
         {
-            var chatClient = _client.GetChatClient(_deploymentName);
-
-            var options = new ChatCompletionOptions();
-
-            var messages = new List<ChatMessage>
+            if (string.IsNullOrEmpty(request?.Message))
             {
-                ChatMessage.CreateUserMessage(request.Message)
-            };
-
+                Response.StatusCode = 400; // Bad Request
+                await Response.WriteAsync("Message cannot be null or empty.");
+                return;
+            }
             Response.ContentType = "text/event-stream";
             await Response.StartAsync();
-
-            StringBuilder citationBuilder = new StringBuilder();
-
-            await foreach (var update in chatClient.CompleteChatStreamingAsync(messages, options))
+            try
             {
-                if (update.ContentUpdate != null)
-                {
-                    foreach (var contentPart in update.ContentUpdate)
+                var chatUpdates = _chatClient.CompleteChatStreamingAsync(
+                    new List<ChatMessage>
                     {
-                        await Response.WriteAsync($"data: {contentPart.Text}\n\n");
+                new SystemChatMessage("You are a helpful assistant that talks like a professional chief."),
+                new UserChatMessage(request.Message)
+                    });
+
+                await foreach (var chatUpdate in chatUpdates)
+                {
+                    if (chatUpdate.Role.HasValue)
+                    {
+                        await Response.WriteAsync($"data: {chatUpdate.Role}:\n\n");
                         await Response.Body.FlushAsync();
+                    }
+
+                    foreach (var contentPart in chatUpdate.ContentUpdate)
+                    {
+                        var lines = contentPart.Text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                        foreach (var line in lines)
+                        {
+                            await Response.WriteAsync($"data: {line}\n\n");
+                            await Response.Body.FlushAsync();
+                        }
                     }
                 }
             }
-
-            if (citationBuilder.Length > 0)
+            catch (Exception ex)
             {
-                await Response.WriteAsync($"data: \n\nCitations:\n{citationBuilder}\n\n");
+                _logger.LogError(ex, "Error occurred while streaming chat.");
+                await Response.WriteAsync($"data: Error: {ex.Message}\n\n");
+            }
+            finally
+            {
                 await Response.Body.FlushAsync();
             }
-
-            await Response.WriteAsync("data: [DONE]\n\n");
-            await Response.Body.FlushAsync();
         }
     }
 
