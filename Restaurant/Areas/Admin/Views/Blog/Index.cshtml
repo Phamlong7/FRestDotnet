@@ -131,12 +131,12 @@
                                                             </div>
                                                         </div>
                                                     </div>
+
                                                 </td>
                                             </tr>
                                         }
                                     }
                                 </tbody>
-
                             </table>
                             <!-- End Table with stripped rows -->
                         }
@@ -161,6 +161,7 @@
         })
         toastList.forEach(toast => toast.show());
     });
+
     function toggleContent(button) {
         var contentPreview = button.previousElementSibling.previousElementSibling; // The preview content
         var contentFull = button.previousElementSibling; // The full content
@@ -177,7 +178,6 @@
             button.innerText = "Show More";
         }
     }
-
 </script>
 
 @section Scripts {
