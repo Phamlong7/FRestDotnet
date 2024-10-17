@@ -41,9 +41,9 @@ namespace Restaurant.Areas.User.Controllers
                 .Select(date => new
                 {
                     Date = date,
-                    Order = _context.orderDetails.Count(od => od.order.createdDate.HasValue
-                                                              && od.order.createdDate.Value.Date == date
-                                                              && od.order.userId == currentUser.Id), // Filter by logged-in user's orders
+                    Order = _context.order.Count(o => o.createdDate.HasValue
+                                                              && o.createdDate.Value.Date == date
+                                                              && o.userId == currentUser.Id), // Filter by logged-in user's orders
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
