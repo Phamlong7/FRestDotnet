@@ -80,7 +80,16 @@
                                             <tr>
                                                 <td>@item.id</td>
                                                 <td>@item.title</td>
-                                                <td>@item.content</td>
+                                                <td>
+                                                    <div class="content-container">
+                                                        <span class="content-preview">@item.content.Substring(0, Math.Min(100, item.content.Length))...</span>
+                                                        @if (item.content.Length > 100)
+                                                        {
+                                                            <span class="content-full" style="display: none;">@item.content</span>
+                                                            <button class="btn btn-link show-more" onclick="toggleContent(this)">Show More</button>
+                                                        }
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     @if (!string.IsNullOrWhiteSpace(item.banner))
                                                     {
@@ -122,12 +131,12 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                 </td>
                                             </tr>
                                         }
                                     }
                                 </tbody>
+
                             </table>
                             <!-- End Table with stripped rows -->
                         }
@@ -152,6 +161,23 @@
         })
         toastList.forEach(toast => toast.show());
     });
+    function toggleContent(button) {
+        var contentPreview = button.previousElementSibling.previousElementSibling; // The preview content
+        var contentFull = button.previousElementSibling; // The full content
+
+        if (contentFull.style.display === "none") {
+            // Show full content and change button text
+            contentFull.style.display = "inline";
+            contentPreview.style.display = "none";
+            button.innerText = "Show Less";
+        } else {
+            // Show only the preview content and change button text
+            contentFull.style.display = "none";
+            contentPreview.style.display = "inline";
+            button.innerText = "Show More";
+        }
+    }
+
 </script>
 
 @section Scripts {
