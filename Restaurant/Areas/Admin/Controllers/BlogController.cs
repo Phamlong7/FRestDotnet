@@ -131,5 +131,14 @@ namespace Restaurant.Areas.Admin.Controllers
             TempData["SuccessMessage"] = "Blog deleted successfully!";
             return RedirectToAction("Index");
         }
+        public async Task<IActionResult> Details(long id)
+        {
+            var blog = await _dataContext.blog.FindAsync(id);
+            if (blog == null)
+            {
+                return NotFound(); // Return 404 if the blog is not found
+            }
+            return View(blog); // Pass the blog to the view
+        }
     }
 }
