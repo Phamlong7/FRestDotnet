@@ -1,7 +1,7 @@
 ﻿@model List<Restaurant.ViewModels.CartItemViewModel>
 
 <section class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_3.jpg');"
-    data-stellar-background-ratio="0.5">
+         data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
         <div class="row no-gutters slider-text align-items-end justify-content-center">
@@ -48,11 +48,11 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <img src="/Media/@item.Banner" alt="@item.Title"
-                                            style=" width: 80px; height: 80px; object-fit: cover;" />
+                                             style=" width: 80px; height: 80px; object-fit: cover;" />
                                         <div class="ml-3">
                                             <p class="mb-1">@item.Title</p>
                                             <a href="javascript:void(0);" onclick="removeItem(@item.DishId)"
-                                                class="text-primary">Remove</a>
+                                               class="text-primary">Remove</a>
                                         </div>
                                     </div>
                                 </td>
@@ -61,7 +61,7 @@
                                 <td class="quantity-control">
                                     <button type="button" onclick="decrementQty(@item.DishId)">-</button>
                                     <input type="number" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1"
-                                        data-dishid="@item.DishId" />
+                                           data-dishid="@item.DishId" />
                                     <input type="hidden" name="OrderDetails[@index].DishId" value="@item.DishId" />
                                     <input type="hidden" name="OrderDetails[@index].DishName" value="@item.Title" />
                                     <input type="hidden" name="OrderDetails[@index].Price" value="@item.Price" />

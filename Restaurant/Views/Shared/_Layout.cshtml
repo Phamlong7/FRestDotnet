@@ -154,7 +154,7 @@
                     <li class="nav-item"><a asp-action="Index" asp-controller="Stories" class="nav-link">Stories</a></li>
                     <li class="nav-item"><a asp-action="Index" asp-controller="Menu" class="nav-link">Menu</a></li>
                     <li class="nav-item"><a asp-action="Index" asp-controller="Contact" class="nav-link">Contact</a></li>
-                    <li class="nav-item"><a asp-action="Index" asp-controller="Cart" class="nav-link">Cart</a></li>
+                    <li class="nav-item"><a asp-action="Index" asp-controller="Cart" class="nav-link">Cart <span class="cart-number">@(ViewData["NumberCart"] is null ? 0 : Convert.ToInt32(ViewData["NumberCart"]))</span></a></li>
                     <partial name="_LoginPartial" />
                 </ul>       
             </div>
@@ -278,12 +278,11 @@
     <script src="~/js/bootstrap-datepicker.js"></script>
     <script src="~/js/jquery.timepicker.min.js"></script>
     <script src="~/js/scrollax.min.js"></script>
-    <script src="~/https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="~/js/google-map.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script> <!-- BlockUI Script -->
     <script src="~/js/main.js"></script>
     <script src="~/js/cart.js" asp-append-version="true"></script>
     <!-- jQuery and Bootstrap Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         function toggleChatbox() {
