@@ -47,7 +47,7 @@ namespace Restaurant.Controllers
                 var chatUpdates = _chatClient.CompleteChatStreamingAsync(
                     new List<ChatMessage>
                     {
-                new SystemChatMessage("You are a helpful assistant that talks like a professional chef."),
+                new SystemChatMessage("You are a helpful assistant that talks like a professional chief."),
                 new UserChatMessage(request.Message)
                     });
 

@@ -28,6 +28,95 @@
     <link rel="stylesheet" href="~/css/style.css">
 
     <link rel="stylesheet" href="~/css/cart.css">
+    <style>
+        /* Chat Icon Styles */
+        #chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0d6efd;
+            color: #fff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+            #chat-icon:hover {
+                transform: scale(1.1);
+            }
+
+        /* Chatbox Styles */
+        #chatbox {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #chatbox-body {
+            height: calc(100% - 110px);
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        #chatbox-footer {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            position: relative;
+            bottom: 25px;
+        }
+
+        /* Message Styles */
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 80%;
+        }
+
+            .message.user {
+                background-color: #e9ecef;
+                align-self: flex-end;
+                margin-left: auto;
+            }
+
+            .message.assistant {
+                background-color: #0d6efd;
+                color: white;
+                align-self: flex-start;
+            }
+
+        #chat-input {
+            border-radius: 20px;
+            padding-right: 40px;
+            width: 100%;
+        }
+
+        #send-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #0d6efd;
+        }
+    </style>
 </head>
 <body>
     <div class="py-1 bg-black top">
@@ -62,10 +151,10 @@
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item active"><a asp-action="Index" asp-controller="Home" class="nav-link">Home</a></li>
                     <li class="nav-item"><a asp-action="Index" asp-controller="About" class="nav-link">About</a></li>
-                    <li class="nav-item"><a asp-action="Index" asp-controller="Stories" class="nav-link">Stories</a></li>
                     <li class="nav-item"><a asp-action="Index" asp-controller="Menu" class="nav-link">Menu</a></li>
+                    <li class="nav-item"><a asp-action="Index" asp-controller="Stories" class="nav-link">Stories</a></li>
                     <li class="nav-item"><a asp-action="Index" asp-controller="Contact" class="nav-link">Contact</a></li>
-                    <li class="nav-item"><a asp-action="Index" asp-controller="Cart" class="nav-link">Cart <span class="cart-number">@(ViewData["NumberCart"] is null ? 0 : Convert.ToInt32(ViewData["NumberCart"]))</span></a></li>
+                    <li class="nav-item"><a asp-action="Index" asp-controller="Cart" class="nav-link">Cart</a></li>
                     <partial name="_LoginPartial" />
                 </ul>       
             </div>
@@ -73,6 +162,27 @@
     </nav>
     <!-- END nav -->
 @RenderBody()
+
+    <div id="chat-icon" onclick="toggleChatbox()">
+        <i class="bi bi-chat-dots-fill"></i>
+    </div>
+
+    <div id="chatbox" class="card">
+        <div id="chatbox-header" class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0">Chat with our Support AI</h5>
+        </div>
+        <div id="chatbox-body" class="card-body d-flex flex-column">
+            <p class="align-self-center text-muted">Welcome to FRest Chat!</p>
+        </div>
+        <div id="chatbox-footer" class="card-footer">
+            <div class="input-group">
+                <input type="text" id="chat-input" class="form-control" placeholder="Type a message...">
+                <button id="send-btn" class="btn btn-primary">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <footer class="ftco-footer ftco-bg-dark ftco-section">
         <div class="container">
@@ -170,9 +280,73 @@
     <script src="~/js/scrollax.min.js"></script>
     <script src="~/https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="~/js/google-map.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script> <!-- BlockUI Script -->
     <script src="~/js/main.js"></script>
     <script src="~/js/cart.js" asp-append-version="true"></script>
+    <!-- jQuery and Bootstrap Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        function toggleChatbox() {
+            const chatbox = $('#chatbox');
+            chatbox.is(':visible') ? chatbox.hide() : chatbox.show();
+        }
+        $(document).ready(function () {
+            $('#send-btn').click(async function () {
+                const message = $('#chat-input').val();
+                if (!message) return;
+                $('#chatbox-body').append(`<div class="message user">User: ${message}</div>`);
+                $('#chat-input').val('');
+
+                try {
+                    const response = await fetch('/api/chat/stream', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ Message: message }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder('utf-8');
+                    let assistantResponseDiv = $('<div class="message assistant"></div>');
+                    $('#chatbox-body').append(assistantResponseDiv);
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const content = line.slice(6).trim();
+                                if (content === '[DONE]') continue;
+                                assistantResponseDiv.append(content + ' ');
+                            }
+                        }
+
+                        $('#chatbox-body').scrollTop($('#chatbox-body')[0].scrollHeight);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    $('#chatbox-body').append(`<div class="message error">Error: ${error.message}</div>`);
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('#send-btn').click(sendMessage);
+
+            $('#chat-input').on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
