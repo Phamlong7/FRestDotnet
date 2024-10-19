@@ -4,10 +4,12 @@ using Restaurant.Models;
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "ADMIN")]
     public class AdsController : Controller
     {
         private readonly DataContext _dataContext;

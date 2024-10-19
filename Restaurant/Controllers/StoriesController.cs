@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.Repository;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Restaurant.Controllers
@@ -16,13 +17,29 @@ namespace Restaurant.Controllers
         }
 
         // GET: Stories/Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            // Retrieve the list of blogs ordered by creation date (or modify the ordering as needed)
+            int pageSize = 6; // Set the number of blogs per page
+
+            // Retrieve the list of active blogs ordered by creation date and apply pagination
             var blogs = await _dataContext.blog
                 .Where(b => b.status == "ACTIVE") // Filter based on status if applicable
                 .OrderByDescending(b => b.createdDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            // Get the total number of active blogs for pagination
+            var totalBlogs = await _dataContext.blog
+                .Where(b => b.status == "ACTIVE")
+                .CountAsync();
+
+            // Calculate the total number of pages
+            var totalPages = (int)System.Math.Ceiling((double)totalBlogs / pageSize);
+
+            // Pass the current page and total pages to the view for pagination controls
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(blogs);
         }

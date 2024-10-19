@@ -5,7 +5,9 @@
             <div class="col-md-9 ftco-animate text-center mb-4">
                 <h1 class="mb-2 bread">Blog</h1>
                 <p class="breadcrumbs">
-                    <span class="mr-2"><a asp-action="Index" asp-controller="Home">Home <i class="ion-ios-arrow-forward"></i></a></span>
+                    <span class="mr-2">
+                        <a asp-action="Index" asp-controller="Home">Home <i class="ion-ios-arrow-forward"></i></a>
+                    </span>
                     <span>Blog <i class="ion-ios-arrow-forward"></i></span>
                 </p>
             </div>
@@ -20,8 +22,7 @@
             {
                 <div class="col-md-4 ftco-animate">
                     <div class="blog-entry">
-                        <a href="@Url.Action("Details", "Stories", new { id = blog.id })" class="block-20" style="background-image: url('/Media/@blog.banner');">
-                        </a>
+                        <a href="@Url.Action("Details", "Stories", new { id = blog.id })" class="block-20" style="background-image: url('/Media/@blog.banner');"></a>
                         <div class="text pt-3 pb-4 px-4">
                             <div class="meta">
                                 <div><a href="#">@blog.createdDate?.ToString("MMM. dd, yyyy")</a></div>
@@ -39,17 +40,40 @@
                 </div>
             }
         </div>
+
         <div class="row no-gutters my-5">
             <div class="col text-center">
                 <div class="block-27">
                     <ul>
-                        <li><a href="#">&lt;</a></li>
-                        <li class="active"><span>1</span></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li><a href="#">&gt;</a></li>
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li><a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })">&lt;</a></li>
+                        }
+                        else
+                        {
+                            <li class="disabled"><span>&lt;</span></li>
+                        }
+
+                        @for (var i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            if (i == ViewBag.CurrentPage)
+                            {
+                                <li class="active"><span>@i</span></li>
+                            }
+                            else
+                            {
+                                <li><a href="@Url.Action("Index", new { page = i })">@i</a></li>
+                            }
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li><a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })">&gt;</a></li>
+                        }
+                        else
+                        {
+                            <li class="disabled"><span>&gt;</span></li>
+                        }
                     </ul>
                 </div>
             </div>

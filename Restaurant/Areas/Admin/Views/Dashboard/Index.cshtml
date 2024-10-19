@@ -280,28 +280,32 @@
 
             </div>
         </div><!-- End Left side columns -->
-
         <!-- Right side columns -->
         <div class="col-lg-4">
-            <!-- News & Updates Traffic -->
-            <div class="card">
-                <div class="card-body pb-0">
-                    <h5 class="card-title">News &amp; Updates <span>| Today</span></h5>
+        <!-- News & Updates Traffic -->
+        <div class="card">
+            <div class="card-body pb-0">
+                <h5 class="card-title">News &amp; Updates <span>| Today</span></h5>
 
-                    <div class="news">
-                        @if (ViewBag.BlogUpdates != null && ((IEnumerable<dynamic>)ViewBag.BlogUpdates).Any())
+                <!-- Scrollable news section -->
+                <div class="news" style="max-height: 100vh; overflow-y: auto;">
+                    <!-- Set fixed height and enable scrolling -->
+                    @if (ViewBag.BlogUpdates != null && ((IEnumerable<dynamic>)ViewBag.BlogUpdates).Any())
+                    {
+                        foreach (var blog in ViewBag.BlogUpdates)
                         {
-                            foreach (var blog in ViewBag.BlogUpdates)
-                            {
-                                <div class="post-item clearfix">
-                                            <img src="/Media/@blog.BlogBanner" alt="@blog.BlogTitle" width="50" height="50" />
-                                    <h4>@blog.BlogTitle</h4>
-                                    <p>@blog.BlogContent</p>
+                            <div class="post-item clearfix" style="margin-bottom: 10px;">
+                                <img src="/Media/@blog.BlogBanner" alt="@blog.BlogTitle" width="50" height="50" style="float: left; margin-right: 10px;" />
+                                <div style="overflow: hidden;">
+                                    <h4 style="margin: 0;">@blog.BlogTitle</h4>
+                                    <p class="content-preview" style="display: inline; margin-left: 0px; margin-right: 5px;">@blog.BlogContent.Substring(0, Math.Min(90, blog.BlogContent.Length))  </p> <!-- Preview content -->
+                                    <p class="content-full" style="display: none; margin-left: 0px;">@blog.BlogContent</p> <!-- Full content -->
+                                    <a href="javascript:void(0);" class="show-more" onclick="toggleContent(this)">Show More</a>
                                 </div>
-                            }
+                            </div>
                         }
-                    </div><!-- End sidebar recent posts -->
-                    @if (ViewBag.BlogUpdates == null || !((IEnumerable<dynamic>)ViewBag.BlogUpdates).Any())
+                    }
+                    else
                     {
                         <div class="alert alert-warning text-center" role="alert">
                             <h6 class="font-weight-bold">No news updates found.</h6>
@@ -309,11 +313,11 @@
                             <p>Check back later for exciting content.</p>
                         </div>
                     }
-                </div>
-            </div><!-- End News & Updates -->
-        </div><!-- End Right side columns -->
+                </div><!-- End scrollable news section -->
 
-     </div>
+            </div>
+        </div><!-- End News & Updates -->
+    </div><!-- End Right side columns -->
 </section>
 <script>
     // Initialize toast notification with extended display time
@@ -327,5 +331,21 @@
         })
         toastList.forEach(toast => toast.show());
     });
+
+    function toggleContent(button) {
+        var contentPreview = button.previousElementSibling.previousElementSibling; // The preview content
+        var contentFull = button.previousElementSibling; // The full content
+        if (contentFull.style.display === "none") {
+            // Show full content and change button text
+            contentFull.style.display = "inline";
+            contentPreview.style.display = "none";
+            button.innerText = "Show Less";
+        } else {
+            // Show only the preview content and change button text
+            contentFull.style.display = "none";
+            contentPreview.style.display = "inline";
+            button.innerText = "Show More";
+        }
+    }
 </script>
 
