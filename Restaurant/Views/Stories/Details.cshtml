@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row no-gutters slider-text align-items-end justify-content-center">
             <div class="col-md-9 ftco-animate text-center mb-4">
-                <h1 class="mb-2 bread">@Model.title</h1>
+                <h1 class="mb-2 bread">Blog</h1>
                 <p class="breadcrumbs">
                     <span class="mr-2"><a asp-action="Index" asp-controller="Home">Home <i class="ion-ios-arrow-forward"></i></a></span>
                     <span>Blog <i class="ion-ios-arrow-forward"></i></span>
@@ -27,8 +27,8 @@
                             <div><a href="#">@Model.createdDate?.ToString("MMM. dd, yyyy")</a></div>
                             <div><a href="#">@Model.createdBy</a></div>
                         </div>
-                        <h3 class="heading">@Model.title</h3>
-                        <p>@Model.content</p>
+                        <h3 class="heading text-break">@Model.title</h3>
+                        <p class="text-break">@Model.content</p>
                     </div>
                 </div>
             </div>

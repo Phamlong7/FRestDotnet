@@ -52,6 +52,12 @@ namespace Restaurant.Controllers
             {
                 return NotFound();
             }
+
+            blog.ViewCount++;
+
+            _dataContext.Update(blog);
+            await _dataContext.SaveChangesAsync();
+
             return View(blog);
         }
     }

@@ -36,5 +36,6 @@ namespace Restaurant.Models
         public string? banner { get; set; }
         [NotMapped] // not map to database
         public IFormFile? BannerUpload { get; set; }
+        public int ViewCount { get; set; } = 0;
     }
 }
