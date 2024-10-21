@@ -70,9 +70,9 @@ namespace Restaurant.Areas.Admin.Controllers
                 .Select(date => new
                 {
                     Date = date,
-                    Order = _context.order.Count(od => od.createdDate.HasValue && od.createdDate.Value.Date == date && od.status == "Approved"),
+                    Order = _context.order.Count(od => od.updatedDate.HasValue && od.updatedDate.Value.Date == date && od.status == "Approved"),
                     Revenue = _context.order
-                        .Where(od => od.createdDate.HasValue && od.createdDate.Value.Date == date)
+                        .Where(od => od.updatedDate.HasValue && od.updatedDate.Value.Date == date && od.status == "Approved")
                         .Sum(od => (decimal?)od.total) ?? 0,  // Summing the 'total' from orderDetails
                     Customers = _context.user
                         .Where(u => u.CreatedDate.Date == date && u.Role == "USER")
@@ -103,7 +103,7 @@ namespace Restaurant.Areas.Admin.Controllers
 
             // Query the top-selling products
             var topSellingProducts = _context.orderDetails
-                .Where(od => od.order.createdDate.Value.Date >= previous7Days && od.order.createdDate.Value.Date <= today && od.order.status == "Approved")
+                .Where(od => od.order.updatedDate.Value.Date >= previous7Days && od.order.updatedDate.Value.Date <= today && od.order.status == "Approved")
                 .GroupBy(od => new { od.dishId, od.dish.title, od.dish.price, od.dish.banner })
                 .Select(g => new
                 {
@@ -112,10 +112,10 @@ namespace Restaurant.Areas.Admin.Controllers
                     DishPrice = g.Key.price,
                     DishBanner = g.Key.banner,
                     UnitsSold = g.Sum(od => od.quantity), // Sum of quantities sold
-                    Revenue = g.Sum(od => od.quantity * od.priceAtOrder) // Total revenue for the product
+                    Revenue = g.Sum(od => od.quantity * od.dish.price) // Calculate revenue: quantity * dish price
                 })
                 .OrderByDescending(p => p.UnitsSold) // Order by the number of units sold
-                .Take(5) 
+                .Take(5)
                 .ToList();
 
             // Query the Blog and Updates

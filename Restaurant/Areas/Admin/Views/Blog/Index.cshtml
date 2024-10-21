@@ -81,12 +81,28 @@
                                                 <td>@item.id</td>
                                                 <td>@item.title</td>
                                                 <td>
-                                                    <div class="content-container">
-                                                        <span class="content-preview">@item.content.Substring(0, Math.Min(100, item.content.Length))...</span>
+                                                    <div class="content-container" style="max-width: 300px; overflow: hidden; position: relative;">
+                                                        <!-- Preview content with truncation and ellipsis -->
+                                                        <span class="content-preview" style="display: block; height: 60px; overflow: hidden; text-overflow: ellipsis;">
+                                                            @item.content.Substring(0, Math.Min(100, item.content.Length))...
+                                                        </span>
                                                         @if (item.content.Length > 100)
                                                         {
+                                                            <!-- Full content hidden by default -->
                                                             <span class="content-full" style="display: none;">@item.content</span>
-                                                            <button class="btn btn-link show-more" onclick="toggleContent(this)">Show More</button>
+                                                            <a class="show-more"
+                                                               style="
+                                                                    display: inline-block;
+                                                                    margin-top: 10px;
+                                                                    color: #007bff; /* Link color */
+                                                                    text-decoration: none;
+                                                                    font-size: 0.875rem;
+                                                                    font-weight: 500;
+                                                                    transition: color 0.3s ease, text-shadow 0.3s ease;
+                                                                     "
+                                                               onmouseover="this.style.color='#0056b3'; this.style.textShadow='0 1px 5px rgba(0, 0, 0, 0.2)'"
+                                                               onmouseout="this.style.color='#007bff'; this.style.textShadow='none'"
+                                                               onclick="toggleContent(this)">Show More</a>
                                                         }
                                                     </div>
                                                 </td>

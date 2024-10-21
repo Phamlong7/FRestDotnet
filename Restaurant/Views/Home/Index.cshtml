@@ -9,48 +9,40 @@
         </div>
     </div>
 }
+
 <section class="home-slider owl-carousel js-fullheight">
-    <div class="slider-item js-fullheight" style="background-image: url(images/bg_1.jpg);">
-        <div class="overlay"></div>
-        <div class="container">
-            <div class="row slider-text js-fullheight justify-content-center align-items-center" data-scrollax-parent="true">
-
-                <div class="col-md-12 col-sm-12 text-center ftco-animate">
-                    <span class="subheading">FRest</span>
-                    <h1 class="mb-4">Best Restaurant</h1>
+    @if (ViewBag.SettingHomePage != null && ViewBag.SettingHomePage.Count > 0)
+    {
+        foreach (var setting in ViewBag.SettingHomePage)
+        {
+            <div class="slider-item js-fullheight" style="background-image: url('/Media/@setting.SettingImage');">
+                <div class="overlay"></div>
+                <div class="container">
+                    <div class="row slider-text js-fullheight justify-content-center align-items-center" data-scrollax-parent="true">
+                        <div class="col-md-12 col-sm-12 text-center ftco-animate">
+                            <span class="subheading">@setting.SettingType</span>
+                            <h1 class="mb-4">@setting.SettingContent</h1> <!-- Displaying content -->
+                        </div>
+                    </div>
                 </div>
-
+            </div>
+        }
+    }
+    else
+    {
+        <div class="slider-item js-fullheight" style="background-image: url(images/default_bg.jpg);">
+            <!-- Default background if no settings -->
+            <div class="overlay"></div>
+            <div class="container">
+                <div class="row slider-text js-fullheight justify-content-center align-items-center" data-scrollax-parent="true">
+                    <div class="col-md-12 col-sm-12 text-center ftco-animate">
+                        <span class="subheading">FRest</span>
+                        <h1 class="mb-4">@ViewBag.SettingHomePage[0]?.SettingType ?? "Welcome to Our Restaurant"</h1> <!-- Default to SettingType or fallback text -->
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="slider-item js-fullheight" style="background-image: url(images/bg_2.jpg);">
-        <div class="overlay"></div>
-        <div class="container">
-            <div class="row slider-text js-fullheight justify-content-center align-items-center" data-scrollax-parent="true">
-
-                <div class="col-md-12 col-sm-12 text-center ftco-animate">
-                    <span class="subheading">FRest</span>
-                    <h1 class="mb-4">Nutritious &amp; Tasty</h1>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div class="slider-item js-fullheight" style="background-image: url(images/bg_3.jpg);">
-        <div class="overlay"></div>
-        <div class="container">
-            <div class="row slider-text justify-content-center align-items-center" data-scrollax-parent="true">
-
-                <div class="col-md-12 col-sm-12 text-center ftco-animate">
-                    <span class="subheading">FRest</span>
-                    <h1 class="mb-4">Delicious Specialties</h1>
-                </div>
-
-            </div>
-        </div>
-    </div>
+    }
 </section>
 
 <section class="ftco-section ftco-no-pt ftco-no-pb">
@@ -59,49 +51,35 @@
             <div class="col-md-12">
                 <div class="featured">
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="featured-menus ftco-animate">
-                                <div class="menu-img img" style="background-image: url(images/breakfast-1.jpg);"></div>
-                                <div class="text text-center">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                    <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
+                        @if (ViewBag.NewDishes != null && ViewBag.NewDishes.Count > 0)
+                        {
+                            foreach (var dish in ViewBag.NewDishes)
+                            {
+                                <div class="col-md-3">
+                                    <div class="featured-menus ftco-animate">
+                                        <div class="menu-img img" style="background-image: url('/Media/@dish.DishBanner');"></div>
+                                        <div class="text text-center">
+                                            <h3>@dish.DishTitle</h3>
+                                            <p>
+                                                <span>@dish.DishContent</span>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-md-12">
+                                <p class="text-center">No new dishes available.</p>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="featured-menus ftco-animate">
-                                <div class="menu-img img" style="background-image: url(images/breakfast-2.jpg);"></div>
-                                <div class="text text-center">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                    <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="featured-menus ftco-animate">
-                                <div class="menu-img img" style="background-image: url(images/breakfast-3.jpg);"></div>
-                                <div class="text text-center">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                    <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="featured-menus ftco-animate">
-                                <div class="menu-img img" style="background-image: url(images/breakfast-4.jpg);"></div>
-                                <div class="text text-center">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                    <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 
 <section class="ftco-section ftco-wrap-about">
     <div class="container">
@@ -181,39 +159,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4 d-flex align-self-stretch ftco-animate text-center">
-                <div class="media block-6 services d-block">
-                    <div class="icon d-flex justify-content-center align-items-center">
-                        <span class="flaticon-cake"></span>
+            @if (ViewBag.SettingServices != null && ViewBag.SettingServices.Count > 0)
+            {
+                foreach (var service in ViewBag.SettingServices)
+                {
+                    <div class="col-md-4 d-flex align-self-stretch ftco-animate text-center">
+                        <div class="media block-6 services d-block">
+                            <div class="icon d-flex justify-content-center align-items-center">
+                                <img src="@Url.Content("~/Media/" + service.SettingImage)" alt="@service.SettingType" style="max-width: 100%; height: auto;" />
+                            </div>
+                            <div class="media-body p-2 mt-3">
+                                <p>@service.SettingContent</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="media-body p-2 mt-3">
-                        <h3 class="heading">Birthday Party</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
-                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-md-12 text-center">
+                    <p>No services available.</p>
                 </div>
-            </div>
-            <div class="col-md-4 d-flex align-self-stretch ftco-animate text-center">
-                <div class="media block-6 services d-block">
-                    <div class="icon d-flex justify-content-center align-items-center">
-                        <span class="flaticon-meeting"></span>
-                    </div>
-                    <div class="media-body p-2 mt-3">
-                        <h3 class="heading">Business Meetings</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-self-stretch ftco-animate text-center">
-                <div class="media block-6 services d-block">
-                    <div class="icon d-flex justify-content-center align-items-center">
-                        <span class="flaticon-tray"></span>
-                    </div>
-                    <div class="media-body p-2 mt-3">
-                        <h3 class="heading">Wedding Party</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 </section>
@@ -227,122 +194,36 @@
             </div>
         </div>
         <div class="row no-gutters d-flex align-items-stretch">
-            <div class="col-md-12 col-lg-6 d-flex align-self-stretch">
-                <div class="menus d-sm-flex ftco-animate align-items-stretch">
-                    <div class="menu-img img" style="background-image: url(images/breakfast-1.jpg);"></div>
-                    <div class="text d-flex align-items-center">
-                        <div>
-                            <div class="d-flex">
-                                <div class="one-half">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                </div>
-                                <div class="one-forth">
-                                    <span class="price">$29</span>
-                                </div>
+            @if (ViewBag.TopDishes != null && ViewBag.TopDishes.Count > 0)
+            {
+                @foreach (var dish in ViewBag.TopDishes)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100" style="border: none; border-radius: 10px; margin: 15px;
+                             box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: transform 0.2s;"
+                             onmouseover="this.style.transform='translateY(-5px)';"
+                             onmouseout="this.style.transform='translateY(0)';">
+                            <div class="menu-img img" style="background-image: url('/Media/@dish.DishBanner');
+                                    background-size: cover;
+                                    background-position: center;
+                                    height: 180px;  /* Adjust height */
+                                    border-radius: 10px 10px 0 0;">
                             </div>
-                            <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                            <p><a href="#" class="btn btn-primary">Order now</a></p>
+                            <div class="card-body text-center">
+                                <h5 class="card-title font-weight-bold" style="font-size: 1.3rem;">@dish.DishTitle</h5>
+                                <p class="card-text text-muted" style="font-size: 1rem;">@dish.DishContent</p>
+                                <h5 class="text-success font-weight-bold mb-3">$@dish.DishPrice</h5>
+                            </div>
                         </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="col-md-12">
+                    <p class="text-center">No dishes available.</p>
                 </div>
-            </div>
-            <div class="col-md-12 col-lg-6 d-flex align-self-stretch">
-                <div class="menus d-sm-flex ftco-animate align-items-stretch">
-                    <div class="menu-img img" style="background-image: url(images/breakfast-2.jpg);"></div>
-                    <div class="text d-flex align-items-center">
-                        <div>
-                            <div class="d-flex">
-                                <div class="one-half">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                </div>
-                                <div class="one-forth">
-                                    <span class="price">$29</span>
-                                </div>
-                            </div>
-                            <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                            <p><a href="#" class="btn btn-primary">Order now</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-12 col-lg-6 d-flex align-self-stretch">
-                <div class="menus d-sm-flex ftco-animate align-items-stretch">
-                    <div class="menu-img img order-md-last" style="background-image: url(images/breakfast-3.jpg);"></div>
-                    <div class="text d-flex align-items-center">
-                        <div>
-                            <div class="d-flex">
-                                <div class="one-half">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                </div>
-                                <div class="one-forth">
-                                    <span class="price">$29</span>
-                                </div>
-                            </div>
-                            <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                            <p><a href="#" class="btn btn-primary">Order now</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12 col-lg-6 d-flex align-self-stretch">
-                <div class="menus d-sm-flex ftco-animate align-items-stretch">
-                    <div class="menu-img img order-md-last" style="background-image: url(images/breakfast-5.jpg);"></div>
-                    <div class="text d-flex align-items-center">
-                        <div>
-                            <div class="d-flex">
-                                <div class="one-half">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                </div>
-                                <div class="one-forth">
-                                    <span class="price">$29</span>
-                                </div>
-                            </div>
-                            <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                            <p><a href="#" class="btn btn-primary">Order now</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-12 col-lg-6 d-flex align-self-stretch">
-                <div class="menus d-sm-flex ftco-animate align-items-stretch">
-                    <div class="menu-img img" style="background-image: url(images/breakfast-6.jpg);"></div>
-                    <div class="text d-flex align-items-center">
-                        <div>
-                            <div class="d-flex">
-                                <div class="one-half">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                </div>
-                                <div class="one-forth">
-                                    <span class="price">$29</span>
-                                </div>
-                            </div>
-                            <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                            <p><a href="#" class="btn btn-primary">Order now</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12 col-lg-6 d-flex align-self-stretch">
-                <div class="menus d-sm-flex ftco-animate align-items-stretch">
-                    <div class="menu-img img" style="background-image: url(images/breakfast-2.jpg);"></div>
-                    <div class="text d-flex align-items-center">
-                        <div>
-                            <div class="d-flex">
-                                <div class="one-half">
-                                    <h3>Grilled Beef with potatoes</h3>
-                                </div>
-                                <div class="one-forth">
-                                    <span class="price">$29</span>
-                                </div>
-                            </div>
-                            <p><span>Meat</span>, <span>Potatoes</span>, <span>Rice</span>, <span>Tomatoe</span></p>
-                            <p><a href="#" class="btn btn-primary">Order now</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 </section>
@@ -352,166 +233,38 @@
         <div class="row justify-content-center mb-5 pb-2">
             <div class="col-md-12 text-center heading-section ftco-animate">
                 <span class="subheading">Chef</span>
-                <h2 class="mb-4">Our Master Chef</h2>
+                <h2 class="mb-4">Our Master Chefs</h2>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6 col-lg-3 ftco-animate">
-                <div class="staff">
-                    <div class="img" style="background-image: url(images/chef-4.jpg);"></div>
-                    <div class="text pt-4">
-                        <h3>John Smooth</h3>
-                        <span class="position mb-2">Restaurant Owner</span>
-                        <div class="faded">
-                            <ul class="ftco-social d-flex">
-                                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-google-plus"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-                            </ul>
+            @foreach (var chef in ViewBag.TopChef)
+            {
+                <div class="col-md-6 col-lg-3 ftco-animate">
+                    <div class="staff" style="position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); transition: transform 0.4s ease, box-shadow 0.4s ease;">
+                        <div class="img" style="background-image: url('/Media/@chef.SettingImage'); background-size: cover; background-position: center; height: 300px; transition: transform 0.4s ease;">
+                        </div>
+                        <div class="text pt-4 text-center" style="background-color: #fff; padding: 20px; transition: background-color 0.4s ease;">
+                            <h3 style="margin-bottom: 10px; font-size: 1.3rem; font-weight: bold; color: #333; white-space: nowrap; overflow-x: auto;">@chef.SettingContent</h3>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-lg-3 ftco-animate">
-                <div class="staff">
-                    <div class="img" style="background-image: url(images/chef-2.jpg);"></div>
-                    <div class="text pt-4">
-                        <h3>Rebeca Welson</h3>
-                        <span class="position mb-2">Head Chef</span>
-                        <div class="faded">
-                            <ul class="ftco-social d-flex">
-                                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-google-plus"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 ftco-animate">
-                <div class="staff">
-                    <div class="img" style="background-image: url(images/chef-3.jpg);"></div>
-                    <div class="text pt-4">
-                        <h3>Kharl Branyt</h3>
-                        <span class="position mb-2">Chef</span>
-                        <div class="faded">
-                            <ul class="ftco-social d-flex">
-                                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-google-plus"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 ftco-animate">
-                <div class="staff">
-                    <div class="img" style="background-image: url(images/chef-1.jpg);"></div>
-                    <div class="text pt-4">
-                        <h3>Luke Simon</h3>
-                        <span class="position mb-2">Chef</span>
-                        <div class="faded">
-                            <ul class="ftco-social d-flex">
-                                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-google-plus"></span></a></li>
-                                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<section class="ftco-section testimony-section img">
-    <div class="overlay"></div>
-    <div class="container">
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-12 text-center heading-section ftco-animate">
-                <span class="subheading">Testimony</span>
-                <h2 class="mb-4">Happy Customer</h2>
-            </div>
-        </div>
-        <div class="row ftco-animate justify-content-center">
-            <div class="col-md-12">
-                <div class="carousel-testimony owl-carousel ftco-owl">
-                    <div class="item">
-                        <div class="testimony-wrap text-center pb-5">
-                            <div class="user-img mb-4" style="background-image: url(images/person_1.jpg)">
-                                <span class="quote d-flex align-items-center justify-content-center">
-                                    <i class="icon-quote-left"></i>
-                                </span>
-                            </div>
-                            <div class="text p-3">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                                <p class="name">Jason McClean</p>
-                                <span class="position">Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap text-center pb-5">
-                            <div class="user-img mb-4" style="background-image: url(images/person_2.jpg)">
-                                <span class="quote d-flex align-items-center justify-content-center">
-                                    <i class="icon-quote-left"></i>
-                                </span>
-                            </div>
-                            <div class="text p-3">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                                <p class="name">Mark Stevenson</p>
-                                <span class="position">Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap text-center pb-5">
-                            <div class="user-img mb-4" style="background-image: url(images/person_3.jpg)">
-                                <span class="quote d-flex align-items-center justify-content-center">
-                                    <i class="icon-quote-left"></i>
-                                </span>
-                            </div>
-                            <div class="text p-3">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                                <p class="name">Art Leonard</p>
-                                <span class="position">Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap text-center pb-5">
-                            <div class="user-img mb-4" style="background-image: url(images/person_4.jpg)">
-                                <span class="quote d-flex align-items-center justify-content-center">
-                                    <i class="icon-quote-left"></i>
-                                </span>
-                            </div>
-                            <div class="text p-3">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                                <p class="name">Rose Henderson</p>
-                                <span class="position">Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap text-center pb-5">
-                            <div class="user-img mb-4" style="background-image: url(images/person_3.jpg)">
-                                <span class="quote d-flex align-items-center justify-content-center">
-                                    <i class="icon-quote-left"></i>
-                                </span>
-                            </div>
-                            <div class="text p-3">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                                <p class="name">Ian Boner</p>
-                                <span class="position">Customer</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <style>
+                    .staff:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+                    }
+
+                        .staff:hover .img {
+                            transform: scale(1.1);
+                        }
+
+                        .staff:hover .text {
+                            background-color: #f8f9fa;
+                        }
+                </style>
+            }
+            @* End of foreach *@
         </div>
     </div>
 </section>
@@ -524,61 +277,53 @@
                 <h2 class="mb-4">Recent Posts</h2>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4 ftco-animate">
-                <div class="blog-entry">
-                    <a href="blog-single.html" class="block-20" style="background-image: url('images/image_1.jpg');">
-                    </a>
-                    <div class="text pt-3 pb-4 px-4">
-                        <div class="meta">
-                            <div><a href="#">Sept. 06, 2019</a></div>
-                            <div><a href="#">Admin</a></div>
+
+        @if (ViewBag.TopBlog != null && ViewBag.TopBlog.Count > 0)
+        {
+            <div class="row">
+                @foreach (var blog in ViewBag.TopBlog)
+                {
+                    <div class="col-md-4 ftco-animate">
+                        <div class="blog-entry" style="border: none; border-radius: 10px; margin: 15px;
+                             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); transition: transform 0.2s;"
+                             onmouseover="this.style.transform='translateY(-5px)';"
+                             onmouseout="this.style.transform='translateY(0)';">
+                            <a href="@Url.Action("Details", "Stories", new { id = blog.BlogId })"
+                               class="block-20"
+                               style="background-image: url('/Media/@blog.BlogBanner');
+                                      height: 250px;  /* Increased height for bigger banner */
+                                      border-radius: 10px 10px 0 0;
+                                      background-size: cover;
+                                      background-position: center;">
+                            </a>
+                            <div class="text pt-3 pb-4 px-4">
+                                <div class="meta">
+                                    <div style="font-size: 0.85rem; color: #888;">@blog.BlogCreatedDate?.ToString("MMM. dd, yyyy")</div>
+                                </div>
+                                <h3 class="heading" style="font-size: 1.25rem; font-weight: bold;">
+                                    <a href="@Url.Action("Details", "Stories", new { id = blog.BlogId })" style="color: #333; text-decoration: none;">@blog.BlogTitle</a>
+                                </h3>
+                                <p class="clearfix" style="margin-top: 10px;">
+                                    <a href="@Url.Action("Details", "Stories", new { id = blog.BlogId })" class="float-left read" style="color: #007bff; text-decoration: none;">Read more</a>
+                                    <a class="float-right meta-chat" style="color: #888;"><span class="icon-chat"></span> 0</a>
+                                </p>
+                            </div>
                         </div>
-                        <h3 class="heading"><a href="#">Taste the delicious foods in Asia</a></h3>
-                        <p class="clearfix">
-                            <a href="#" class="float-left read">Read more</a>
-                            <a href="#" class="float-right meta-chat"><span class="icon-chat"></span> 3</a>
-                        </p>
                     </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="text-center">No recent blog posts available.</p>
                 </div>
             </div>
-            <div class="col-md-4 ftco-animate">
-                <div class="blog-entry">
-                    <a href="blog-single.html" class="block-20" style="background-image: url('images/image_2.jpg');">
-                    </a>
-                    <div class="text pt-3 pb-4 px-4">
-                        <div class="meta">
-                            <div><a href="#">Sept. 06, 2019</a></div>
-                            <div><a href="#">Admin</a></div>
-                        </div>
-                        <h3 class="heading"><a href="#">Taste the delicious foods in Asia</a></h3>
-                        <p class="clearfix">
-                            <a href="#" class="float-left read">Read more</a>
-                            <a href="#" class="float-right meta-chat"><span class="icon-chat"></span> 3</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 ftco-animate">
-                <div class="blog-entry">
-                    <a href="blog-single.html" class="block-20" style="background-image: url('images/image_3.jpg');">
-                    </a>
-                    <div class="text pt-3 pb-4 px-4">
-                        <div class="meta">
-                            <div><a href="#">Sept. 06, 2019</a></div>
-                            <div><a href="#">Admin</a></div>
-                        </div>
-                        <h3 class="heading"><a href="#">Taste the delicious foods in Asia</a></h3>
-                        <p class="clearfix">
-                            <a href="#" class="float-left read">Read more</a>
-                            <a href="#" class="float-right meta-chat"><span class="icon-chat"></span> 3</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 </section>
+
 <script>
     // Initialize toast notification with extended display time
     document.addEventListener('DOMContentLoaded', function () {

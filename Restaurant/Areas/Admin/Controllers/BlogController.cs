@@ -5,10 +5,12 @@ using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
 using Restaurant.Areas.Admin;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "ADMIN")]
     public class BlogController : Controller
     {
         private readonly DataContext _dataContext;
