@@ -41,6 +41,7 @@ namespace Restaurant.Areas.User.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrderViewModel model)
         {
             // Check if any dishes are added

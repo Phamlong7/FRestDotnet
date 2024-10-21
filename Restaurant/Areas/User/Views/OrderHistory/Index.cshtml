@@ -137,4 +137,7 @@
         })
         toastList.forEach(toast => toast.show());
     });
+
+    // Clear the order message from session storage after the order is placed
+    sessionStorage.removeItem('orderMessage');
 </script>
