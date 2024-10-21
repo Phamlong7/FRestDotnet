@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Restaurant.Repository;
+using Restaurant.Utility;
 using Restaurant.ViewModels;
 using X.PagedList;
 
 public class MenuController : Controller
 {
     private readonly DataContext _dataContext;
+    private const string CartSessionName = "CartSession";
 
     public MenuController(DataContext context)
     {
@@ -33,6 +35,12 @@ public class MenuController : Controller
                 .OrderBy(d => d.title)
                 .ToPagedList(pageNumber, pageSize)  // Using ToPagedList()
         };
+
+        // Retrieve the cart from session or initialize an empty list if none exists
+        var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
+
+        // Set the cart count in ViewData
+        ViewData["NumberCart"] = carts.Count;
 
         return View(viewModel);
     }

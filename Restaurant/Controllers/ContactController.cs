@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models;
+using Restaurant.Utility;
 using Restaurant.ViewModels;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace Restaurant.Controllers
         private readonly SendMail _sendMail;
         private readonly UserManager<UserModel> _userManager;
         private readonly ConstantHelper _constantHelper;
+        private const string CartSessionName = "CartSession";
 
         public ContactController(SendMail sendMail, UserManager<UserModel> userManager, ConstantHelper constantHelper)
         {
@@ -29,6 +31,11 @@ namespace Restaurant.Controllers
                 ViewBag.UserName = currentUser.UserName; // Assuming UserName contains the user's full name
                 ViewBag.UserEmail = currentUser.Email; // Get the user's email
             }
+            // Retrieve the cart from session or initialize an empty list if none exists
+            var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
+
+            // Set the cart count in ViewData
+            ViewData["NumberCart"] = carts.Count;
 
             return View();
         }
