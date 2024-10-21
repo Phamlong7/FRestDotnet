@@ -41,6 +41,7 @@ namespace Restaurant.Areas.User.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrderViewModel model)
         {
             // Check if any dishes are added
@@ -53,7 +54,7 @@ namespace Restaurant.Areas.User.Controllers
             if (ModelState.IsValid)
             {
                 // Get the current user's ID
-                var user = await _userManager.GetUserAsync(User); 
+                var user = await _userManager.GetUserAsync(User);
                 var orderDetails = model.OrderDetails.Select(od => new OrderDetailModel
                 {
                     dishId = od.DishId,

@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Restaurant.Models
 {
-    [Table("Blogs")] // Tên bảng trong cơ sở dữ liệu
+    [Table("Blogs")] 
     public class BlogModel
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Tự động tạo giá trị cho khóa chính
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
         public long id { get; set; }
 
         [Required]
@@ -21,20 +21,21 @@ namespace Restaurant.Models
         [MaxLength(10)]
         public string status { get; set; } = "ACTIVE";
 
-        [Column(TypeName = "datetime")] // Kiểu dữ liệu
+        [Column(TypeName = "datetime")] 
         public DateTime? createdDate { get; set; } = DateTime.Now;
 
-        [Column(TypeName = "datetime")] // Kiểu dữ liệu
+        [Column(TypeName = "datetime")] 
         public DateTime? updatedDate { get; set; }
 
-        [MaxLength(50)] // Giới hạn độ dài cho tên người tạo
+        [MaxLength(50)] 
         public string? createdBy { get; set; }
 
-        [MaxLength(50)] // Giới hạn độ dài cho tên người cập nhật
+        [MaxLength(50)] 
         public string? updatedBy { get; set; }
 
         public string? banner { get; set; }
-        [NotMapped] // not map to database
+        [NotMapped] 
         public IFormFile? BannerUpload { get; set; }
+        public int ViewCount { get; set; } = 0;
     }
 }

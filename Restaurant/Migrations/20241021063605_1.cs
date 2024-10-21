@@ -93,7 +93,8 @@ namespace Restaurant.Migrations
                     updatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     createdBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     updatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    banner = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    banner = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ViewCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

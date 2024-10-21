@@ -79,37 +79,24 @@
                                         {
                                             <tr>
                                                 <td>@item.id</td>
-                                                <td>@item.title</td>
+                                                <td class="text-break" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                                    @item.title.Substring(0, Math.Min(20, @item.title.Length))@(item.title.Length > 20 ? "..." : "")
+                                                </td>
                                                 <td>
-                                                    <div class="content-container" style="max-width: 300px; overflow: hidden; position: relative;">
-                                                        <!-- Preview content with truncation and ellipsis -->
-                                                        <span class="content-preview" style="display: block; height: 60px; overflow: hidden; text-overflow: ellipsis;">
-                                                            @item.content.Substring(0, Math.Min(100, item.content.Length))...
-                                                        </span>
+                                                    <div class="content-container" style="position: relative; padding-right: 20px;">
+                                                        <!-- Reduced padding -->
+                                                        <span class="content-preview text-break">@item.content.Substring(0, Math.Min(100, item.content.Length))...</span>
                                                         @if (item.content.Length > 100)
                                                         {
-                                                            <!-- Full content hidden by default -->
-                                                            <span class="content-full" style="display: none;">@item.content</span>
-                                                            <a class="show-more"
-                                                               style="
-                                                                    display: inline-block;
-                                                                    margin-top: 10px;
-                                                                    color: #007bff; /* Link color */
-                                                                    text-decoration: none;
-                                                                    font-size: 0.875rem;
-                                                                    font-weight: 500;
-                                                                    transition: color 0.3s ease, text-shadow 0.3s ease;
-                                                                     "
-                                                               onmouseover="this.style.color='#0056b3'; this.style.textShadow='0 1px 5px rgba(0, 0, 0, 0.2)'"
-                                                               onmouseout="this.style.color='#007bff'; this.style.textShadow='none'"
-                                                               onclick="toggleContent(this)">Show More</a>
+                                                            <span class="content-full text-break" style="display: none;">@item.content</span>
+                                                            <button class="btn btn-link show-more" onclick="toggleContent(this)" style="position: absolute; right: 10px;">Show More</button> <!-- Adjusted right -->
                                                         }
                                                     </div>
                                                 </td>
                                                 <td>
                                                     @if (!string.IsNullOrWhiteSpace(item.banner))
                                                     {
-                                                        <img alt="banner upload" style="width: 100px;height:80px" src="/Media/@item.banner" />
+                                                        <img alt="banner upload" style="width: 100px" src="/Media/@item.banner" />
                                                     }
                                                     else
                                                     {
@@ -118,13 +105,16 @@
                                                 </td>
                                                 <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
                                                 <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
-                                                <td style="color: @(item.status == "ACTIVE" ? "green" : "red")">
-                                                    @item.status
-                                                </td>
+                                                <td>@item.status</td>
                                                 <td>
                                                     <!-- Update Button -->
                                                     <a href="@Url.Action("Edit", "Blog", new { id = item.id })" class="btn btn-warning btn-sm">
                                                         <i class="bi bi-pencil"></i> Update
+                                                    </a>
+                                                    <!-- Details button -->
+                                                    <a href="@Url.Action("Detail", "Blog", new { id = item.id })"
+                                                       class="btn btn-info btn-sm">
+                                                        <i class="bi bi-eye"></i> Detail
                                                     </a>
                                                     <!-- Delete Button -->
                                                     <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
@@ -183,6 +173,7 @@
     function toggleContent(button) {
         var contentPreview = button.previousElementSibling.previousElementSibling; // The preview content
         var contentFull = button.previousElementSibling; // The full content
+
         if (contentFull.style.display === "none") {
             // Show full content and change button text
             contentFull.style.display = "inline";

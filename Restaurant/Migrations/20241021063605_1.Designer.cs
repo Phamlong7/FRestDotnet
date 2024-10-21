@@ -12,7 +12,7 @@ using Restaurant.Repository;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241003044108_1")]
+    [Migration("20241021063605_1")]
     partial class _1
     {
         /// <inheritdoc />
@@ -214,6 +214,9 @@ namespace Restaurant.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("banner")
                         .HasColumnType("nvarchar(max)");

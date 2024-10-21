@@ -30,7 +30,13 @@
 
         @if (Model.Any())
         {
-            <form method="post" action="@Url.Action("Create", "OrderHistory", new { area = "User" })">
+            // Dynamically set the form action based on the logged-in user's role
+            var formAction = User.IsInRole("ADMIN")
+            ? Url.Action("Create", "Order", new { area = "Admin" })
+            : Url.Action("Create", "OrderHistory", new { area = "User" });
+
+            <form method="post" action="@formAction">
+                @Html.AntiForgeryToken()
                 <table class="table table-borderless cart-table">
                     <thead>
                         <tr>
@@ -98,8 +104,8 @@
         else
         {
             <p>Your cart is empty</p>
-            <img src="/images/Arona.jpg" alt="Empty Cart" style="max-width: 300px; margin-top: 10px;" />
             <p>Continue shopping at <a href="/Menu">here</a>.</p>
+            <img src="/images/Arona.jpg" alt="Empty Cart" style="max-width: 300px; margin: 10px auto; display: block;" />
         }
     </div>
 </section>
@@ -147,7 +153,7 @@
                     if (itemRow) {
                         // Get the price per item
                         var priceText = itemRow.querySelector('td:nth-child(2)').innerText;
-                        var price = parseFloat(priceText.replace('₫', '').replace(',', ''));
+                        var price = parseFloat(priceText.replace('$', '').replace(',', ''));
 
                         // Update the quantity in the input field
                         var inputField = itemRow.querySelector('input[data-dishid="' + dishId + '"]');
@@ -197,7 +203,7 @@
         // Loop through all items and sum up the totals
         document.querySelectorAll('.cart-item').forEach(function (itemRow) {
             var itemTotalText = itemRow.querySelector('td:nth-child(4)').innerText;
-            var itemTotal = parseFloat(itemTotalText.replace('₫', '').replace(',', ''));
+            var itemTotal = parseFloat(itemTotalText.replace('$', '').replace(',', ''));
             grandTotal += itemTotal;
         });
 
@@ -205,15 +211,15 @@
         document.getElementById('grand-total').innerText = grandTotal.toLocaleString() + '$';
     }
 
-    // Function to save the message to local storage
-    function saveMessageToLocalStorage() {
+    // Function to save the message to session storage
+    function saveMessageToSessionStorage() {
         const message = document.getElementById('orderMessage').value;
-        localStorage.setItem('orderMessage', message);
+        sessionStorage.setItem('orderMessage', message);
     }
 
-    // Function to load the message from local storage
-    function loadMessageFromLocalStorage() {
-        const savedMessage = localStorage.getItem('orderMessage');
+    // Function to load the message from session storage
+    function loadMessageFromSessionStorage() {
+        const savedMessage = sessionStorage.getItem('orderMessage');
         if (savedMessage) {
             document.getElementById('orderMessage').value = savedMessage;
         }
@@ -221,9 +227,9 @@
 
     // Load the message when the page is loaded
     window.onload = function () {
-        loadMessageFromLocalStorage();
+        loadMessageFromSessionStorage();
 
         // Add an event listener to save the message when typing
-        document.getElementById('orderMessage').addEventListener('input', saveMessageToLocalStorage);
+        document.getElementById('orderMessage').addEventListener('input', saveMessageToSessionStorage);
     };
 </script>

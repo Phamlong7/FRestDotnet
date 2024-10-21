@@ -1,0 +1,65 @@
+﻿@model Restaurant.Models.BlogModel
+@{
+    ViewData["Title"] = "Blog Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<main id="content" class="content-area">
+    <div class="pagetitle">
+        <h1>Blog Details</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Tables</li>
+                <li class="breadcrumb-item active">Details</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Blog Details</h5>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Title</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-plaintext">@Model.title</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Status</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-plaintext">@Model.status</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Banner</label>
+                            <div class="col-sm-10">
+                                @if (!string.IsNullOrWhiteSpace(Model.banner))
+                                {
+                                    <img alt="banner" style="width: 150px; margin-right: 15px;" src="/Media/@Model.banner" />
+                                }
+                                else
+                                {
+                                    <span>No banner image uploaded.</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Content</label>
+                            <div class="col-sm-10">
+                                <p>@Model.content</p>
+                            </div>
+                        </div>
+                        <!-- Buttons Row -->
+                        <div class="row mb-4">
+                            <div class="col-sm-6 text-end">
+                                <a asp-controller="Blog" asp-action="Index" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </div>
+                    </div> <!-- Close card body -->
+                </div>
+            </div>
+        </div>
+    </div>
+</main><!-- End #main -->

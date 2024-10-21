@@ -7,13 +7,13 @@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true"
-        style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+         style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
         <div class="d-flex">
             <div class="toast-body">
                 @TempData["SuccessMessage"]
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                aria-label="Close"></button>
+                    aria-label="Close"></button>
         </div>
     </div>
 }
@@ -61,15 +61,14 @@
                                             <td>@item.createdDate?.ToString("yyyy/MM/dd")</td>
                                             <td>@item.updatedDate?.ToString("yyyy/MM/dd")</td>
                                             <td>@item.total</td>
-                                            <td
-                                                style="color: @(item.status == "Pending" ? "brown" : item.status == "Approved" ? "green" : item.status == "Rejected" ? "red" : "black")">
+                                            <td style="color: @(item.status == "Pending" ? "brown" : item.status == "Approved" ? "green" : item.status == "Rejected" ? "red" : "black")">
                                                 @item.status
                                             </td>
                                             <td>
 
                                                 <!-- Detail Button -->
                                                 <a href="@Url.Action("Detail", "OrderHistory", new { id = item.id })"
-                                                    class="btn btn-info btn-sm">
+                                                   class="btn btn-info btn-sm">
                                                     <i class="bi bi-eye"></i> Detail
                                                 </a>
 
@@ -79,13 +78,13 @@
                                                 {
                                                     <!-- Delete Button -->
                                                     <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal-@item.id">
+                                                       data-bs-target="#deleteModal-@item.id">
                                                         <i class="bi bi-trash"></i> Cancel
                                                     </a>
 
                                                     <!-- Delete Confirmation Modal -->
                                                     <div class="modal fade" id="deleteModal-@item.id" tabindex="-1"
-                                                        aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
+                                                         aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
@@ -94,18 +93,18 @@
                                                                         Cancel
                                                                     </h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                        aria-label="Close"></button>
+                                                                            aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     Are you sure you want to cancel the order <strong>@item.id</strong>
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary"
-                                                                        data-bs-dismiss="modal">
+                                                                            data-bs-dismiss="modal">
                                                                         Cancel
                                                                     </button>
                                                                     <a href="@Url.Action("Delete", "OrderHistory", new { id = item.id })"
-                                                                        class="btn btn-danger">Confirm Cancel</a>
+                                                                       class="btn btn-danger">Confirm Cancel</a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -137,4 +136,7 @@
         })
         toastList.forEach(toast => toast.show());
     });
+
+    // Clear the order message from session storage after the order is placed
+    sessionStorage.removeItem('orderMessage');
 </script>

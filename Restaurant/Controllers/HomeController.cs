@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Restaurant.Models;
 using Restaurant.Repository;
+using Restaurant.Utility;
+using Restaurant.ViewModels;
 
 namespace Restaurant.Controllers
 {
     public class HomeController : Controller
     {
         private readonly DataContext _context;
+        private const string CartSessionName = "CartSession";
 
         public HomeController(DataContext context)
         {
@@ -16,6 +19,11 @@ namespace Restaurant.Controllers
 
         public IActionResult Index()
         {
+            // Retrieve the cart from session or initialize an empty list if none exists
+            var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
+            // Set the cart count in ViewData
+            ViewData["NumberCart"] = carts.Count;
+
             // Get the top 3 WebSetting for the HomePage, ordered by creation date
             var SettingHomePage = _context.web_setting
                 .Where(w => w.status == "ACTIVE" && w.type == "Welcome To Our Restaurant")

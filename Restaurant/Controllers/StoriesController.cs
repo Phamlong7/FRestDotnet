@@ -2,14 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.Repository;
-using System.Linq;
-using System.Threading.Tasks;
+using Restaurant.Utility;
+using Restaurant.ViewModels;
 
 namespace Restaurant.Controllers
 {
     public class StoriesController : Controller
     {
         private readonly DataContext _dataContext;
+        private const string CartSessionName = "CartSession";
 
         public StoriesController(DataContext dataContext)
         {
@@ -41,6 +42,11 @@ namespace Restaurant.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
 
+            // Retrieve the cart from session or initialize an empty list if none exists
+            var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
+            // Set the cart count in ViewData
+            ViewData["NumberCart"] = carts.Count;
+
             return View(blogs);
         }
 
@@ -52,6 +58,11 @@ namespace Restaurant.Controllers
             {
                 return NotFound();
             }
+
+            blog.ViewCount++;
+            _dataContext.Update(blog);
+            await _dataContext.SaveChangesAsync();
+
             return View(blog);
         }
     }

@@ -212,6 +212,9 @@ namespace Restaurant.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
 
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("banner")
                         .HasColumnType("nvarchar(max)");
 
