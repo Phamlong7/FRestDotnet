@@ -1,0 +1,66 @@
+﻿@using Restaurant.ViewModels
+@model ExternalLoginRegistrationViewModel
+
+@{
+    ViewData["Title"] = "Registration";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<!-- Include Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+<div class="account-container">
+    <div class="account-box">
+        <h2 class="text-center mb-4">Create Your Account</h2>
+
+        <form asp-action="ExternalLoginRegistration" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label">Username</label>
+                <input asp-for="UserName" class="form-control" required />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" readonly /> <!-- Make email read-only -->
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
+
+            <button type="submit" class="btn btn-success w-100 p-2 mb-3">Register</button>
+            <div class="text-center">
+                <a asp-controller="Home" asp-action="Index" class="text-decoration-none mt-3">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Optional: Toast Notification for Success Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize toast notifications
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.forEach(function (toastEl) {
+            const toast = new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds
+                autohide: true
+            });
+            toast.show();
+        });
+    });
+</script>
