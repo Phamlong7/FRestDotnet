@@ -5,6 +5,7 @@ using Restaurant.Models;
 using Restaurant.Repository;
 using Restaurant.Utility;
 using Restaurant.ViewModels;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
 });
 
+// Identity configuration
 builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
@@ -49,6 +51,25 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
+})
+.AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+})
+.AddFacebook(facebookOptions =>
+{
+    facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+    facebookOptions.Scope.Add("email"); // Optional: Add scope for email
+});
+
+
 // Configure logging before building the app
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 
@@ -68,7 +89,6 @@ app.UseAuthorization();  // Ensures authorization is enabled
 app.UseSession(); // Now sessions are configured and can be used
 
 // Route Controller  
-#pragma warning disable
 app.UseEndpoints(endpoints =>
 {
     // Route for Admin area

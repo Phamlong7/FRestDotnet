@@ -1,0 +1,52 @@
+﻿@using Restaurant.Utility
+@{
+    ViewData["Title"] = "Verify OTP";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+@model ConstantHelper
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 250px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<div class="account-container">
+    <div class="account-box">
+        <h2 class="text-center mb-4">Verify OTP</h2>
+        <form asp-action="VerifyOTPForExternal" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label for="otp" class="form-label">Enter OTP</label>
+                <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter the 6-digit OTP" required maxlength="6" pattern="\d{6}" />
+                <span class="text-danger field-validation-valid" data-valmsg-for="otp" data-valmsg-replace="true"></span>
+            </div>
+            <input type="submit" value="Verify OTP" class="btn btn-success w-100 p-2" />
+            <div class="text-center mt-2">
+                <a asp-action="Login" class="text-decoration-none mt-3">Back to Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize toast notification with extended display time
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds
+                autohide: true // Set to true for auto-hiding the toast
+            });
+        });
+        toastList.forEach(toast => toast.show());
+    });
+</script>
+
