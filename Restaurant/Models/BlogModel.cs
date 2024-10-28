@@ -37,5 +37,6 @@ namespace Restaurant.Models
         [NotMapped] 
         public IFormFile? BannerUpload { get; set; }
         public int ViewCount { get; set; } = 0;
+        public List<CommentModel> Comments { get; set; } = new List<CommentModel>();
     }
 }

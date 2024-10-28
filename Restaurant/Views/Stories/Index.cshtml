@@ -18,65 +18,78 @@
 <section class="ftco-section bg-light">
     <div class="container">
         <div class="row">
-            @foreach (var blog in Model)
+            @if (Model == null || Model.Count == 0)
             {
-                <div class="col-md-4 ftco-animate">
-                    <div class="blog-entry">
-                        <a href="@Url.Action("Details", "Stories", new { id = blog.id })" class="block-20" style="background-image: url('/Media/@blog.banner');"></a>
-                        <div class="text pt-3 pb-4 px-4">
-                            <div class="meta">
-                                <div><a>@blog.createdDate?.ToString("MMM. dd, yyyy")</a></div>
-                                <div><a>@blog.createdBy</a></div>
+                <div class="col-md-12 text-center">
+                    <h3>There are no blog posts available right now.</h3>
+                    <p>Check back later for the latest updates!</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var blog in Model)
+                {
+                    <div class="col-md-4 ftco-animate">
+                        <div class="blog-entry">
+                            <a href="@Url.Action("Detail", "Stories", new { id = blog.id })" class="block-20" style="background-image: url('/Media/@blog.banner');"></a>
+                            <div class="text pt-3 pb-4 px-4">
+                                <div class="meta">
+                                    <div><a>@blog.createdDate?.ToString("MMM. dd, yyyy")</a></div>
+                                    <div><a>@blog.createdBy</a></div>
+                                </div>
+                                <h3 class="heading mb-1" style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <a href="@Url.Action("Detail", "Stories", new { id = blog.id })" class="d-block text-truncate text-decoration-none" title="@blog.title">@blog.title</a>
+                                </h3>
+                                <p class="clearfix">
+                                    <a href="@Url.Action("Detail", "Stories", new { id = blog.id })" class="float-left read">Read more</a>
+                                    <a class="float-right meta-chat"><i class="bi bi-eye"></i> @blog.ViewCount</a>
+                                </p>
                             </div>
-                            <h3 class="heading mb-1" style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <a href="@Url.Action("Details", "Stories", new { id = blog.id })" class="d-block text-truncate text-decoration-none" title="@blog.title">@blog.title</a>
-                            </h3>
-                            <p class="clearfix">
-                                <a href="@Url.Action("Details", "Stories", new { id = blog.id })" class="float-left read">Read more</a>
-                                <a class="float-right meta-chat"><i class="bi bi-eye"></i> @blog.ViewCount</a>
-                            </p>
                         </div>
                     </div>
-                </div>
+                }
             }
         </div>
 
-        <div class="row no-gutters my-5">
-            <div class="col text-center">
-                <div class="block-27">
-                    <ul>
-                        @if (ViewBag.CurrentPage > 1)
-                        {
-                            <li><a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })">&lt;</a></li>
-                        }
-                        else
-                        {
-                            <li class="disabled"><span>&lt;</span></li>
-                        }
-
-                        @for (var i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            if (i == ViewBag.CurrentPage)
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="row no-gutters my-5">
+                <div class="col text-center">
+                    <div class="block-27">
+                        <ul>
+                            @if (ViewBag.CurrentPage > 1)
                             {
-                                <li class="active"><span>@i</span></li>
+                                <li><a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })">&lt;</a></li>
                             }
                             else
                             {
-                                <li><a href="@Url.Action("Index", new { page = i })">@i</a></li>
+                                <li class="disabled"><span>&lt;</span></li>
                             }
-                        }
 
-                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                        {
-                            <li><a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })">&gt;</a></li>
-                        }
-                        else
-                        {
-                            <li class="disabled"><span>&gt;</span></li>
-                        }
-                    </ul>
+                            @for (var i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                if (i == ViewBag.CurrentPage)
+                                {
+                                    <li class="active"><span>@i</span></li>
+                                }
+                                else
+                                {
+                                    <li><a href="@Url.Action("Index", new { page = i })">@i</a></li>
+                                }
+                            }
+
+                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                            {
+                                <li><a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })">&gt;</a></li>
+                            }
+                            else
+                            {
+                                <li class="disabled"><span>&gt;</span></li>
+                            }
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
 </section>
