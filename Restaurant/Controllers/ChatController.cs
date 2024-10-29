@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Azure;
 using Azure.AI.OpenAI;
-using static System.Environment;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Restaurant.Utility;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using OpenAI.Chat;
 
 namespace Restaurant.Controllers
@@ -17,18 +22,17 @@ namespace Restaurant.Controllers
         public ChatController(IConfiguration configuration, ILogger<ChatController> logger)
         {
             _logger = logger;
-            var endpoint = GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT");
-            var apiKey = GetEnvironmentVariable("AZURE_OPENAI_API_KEY");
 
-            _logger.LogInformation($"Endpoint: {endpoint}");
-            _logger.LogInformation($"API Key: {apiKey}"); // Ensure not to log sensitive information in production!
+            var endpoint = configuration["AzureOpenAI:Endpoint"];
+            var apiKey = configuration["AzureOpenAI:ApiKey"];
+
             if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey))
             {
-                throw new InvalidOperationException("Azure OpenAI endpoint and API key must be set in environment variables.");
+                throw new InvalidOperationException("Azure OpenAI endpoint and API key must be set in appsettings.json.");
             }
 
             _azureClient = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
-            _chatClient = _azureClient.GetChatClient("gpt-35-turbo"); // Use your custom deployment name
+            _chatClient = _azureClient.GetChatClient("gpt-35-turbo");
         }
 
         [HttpPost("stream")]
@@ -40,14 +44,21 @@ namespace Restaurant.Controllers
                 await Response.WriteAsync("Message cannot be null or empty.");
                 return;
             }
+
             Response.ContentType = "text/event-stream";
             await Response.StartAsync();
+
             try
             {
+                // Load the system prompt
+                var systemPromptMessage = new SystemChatMessage(SystemPrompt.GetPrompt());
+
+                // Create chat messages with system prompt and user message
                 var chatUpdates = _chatClient.CompleteChatStreamingAsync(
                     new List<ChatMessage>
                     {
-                new UserChatMessage(request.Message)
+                        systemPromptMessage,
+                        new UserChatMessage(request.Message)
                     });
 
                 await foreach (var chatUpdate in chatUpdates)
@@ -83,6 +94,6 @@ namespace Restaurant.Controllers
 
     public class ChatRequest
     {
-        public string Message { get; set; }
+        public string? Message { get; set; }
     }
 }

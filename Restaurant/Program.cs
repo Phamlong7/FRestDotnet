@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Areas.Admin;
@@ -5,14 +6,13 @@ using Restaurant.Models;
 using Restaurant.Repository;
 using Restaurant.Utility;
 using Restaurant.ViewModels;
-using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure services before building the app
+// Configure logging
 builder.Services.AddLogging();
 
-// Connection Database 
+// Configure database context
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
@@ -29,7 +29,7 @@ builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
     options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
-    options.User.AllowedUserNameCharacters = string.Empty;
+    options.User.AllowedUserNameCharacters = string.Empty; // Specify allowed username characters if needed
 })
 .AddEntityFrameworkStores<DataContext>()
 .AddDefaultTokenProviders();
@@ -37,58 +37,65 @@ builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
 // Add RoleManager explicitly
 builder.Services.AddScoped<RoleManager<IdentityRole<long>>>();
 
-// Add services to the container  
+// Add other services
 builder.Services.AddControllersWithViews();
-builder.Services.AddTransient<IFileService, FileService>(); //file service
+builder.Services.AddTransient<IFileService, FileService>(); // File service
 builder.Services.AddSingleton<ConstantHelper>();
 builder.Services.AddTransient<SendMail>();
 
-// Add session services
+// Configure session services
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
+    options.Cookie.HttpOnly = true; // Prevent JavaScript access
+    options.Cookie.IsEssential = true; // Ensure the cookie is set even if the user does not consent
 });
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
-})
-.AddGoogle(googleOptions =>
-{
-    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-})
-.AddFacebook(facebookOptions =>
-{
-    facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
-    facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
-    facebookOptions.Scope.Add("email"); // Optional: Add scope for email
-});
+// Configure authentication
+builder.Services.AddAuthentication(); // Just call AddAuthentication without parameters
 
+// Configure authentication with cookie scheme
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Redirect to login page if not authenticated
+        options.LogoutPath = "/Account/Logout"; // Redirect to logout page
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect for access denied
+    })
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    })
+    .AddFacebook(facebookOptions =>
+    {
+        facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+        facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+        facebookOptions.Scope.Add("email"); // Optional: Add scope for email
+    });
 
-// Configure logging before building the app
+// Configure logging
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 
 // Build the app after configuring services
 var app = builder.Build();
 
-// Configure the HTTP request pipeline  
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
 
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthentication(); // Ensures authentication is enabled  
-app.UseAuthorization();  // Ensures authorization is enabled
-app.UseSession(); // Now sessions are configured and can be used
+app.UseSession(); // Enable session before authentication
 
-// Route Controller  
+// Ensure authentication and authorization are enabled
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Configure routing for controllers and areas
 app.UseEndpoints(endpoints =>
 {
     // Route for Admin area
@@ -103,7 +110,7 @@ app.UseEndpoints(endpoints =>
         areaName: "User",
         pattern: "User/{controller=Home}/{action=Index}/{id?}");
 
-    // Route for Home controller in main application
+    // Route for Home controller in the main application
     endpoints.MapControllerRoute(
         name: "Home",
         pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -114,8 +121,8 @@ app.UseEndpoints(endpoints =>
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
-// Continue with the rest of the setup
-app.UseHttpsRedirection();
+// Map controllers
 app.MapControllers();
 
+// Run the application
 app.Run();

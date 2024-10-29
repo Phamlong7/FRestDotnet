@@ -41,10 +41,17 @@ namespace Restaurant.Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data Source=LAPTOP-571RI1S9;Initial Catalog=FRest;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
-            }
+            optionsBuilder.UseSqlServer(GetConnectionString());
+        }
+        private string GetConnectionString()
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", true, true)
+                        .Build();
+            var strConn = config["ConnectionStrings:ConnectedDb"];
+
+            return strConn;
         }
     }
 }

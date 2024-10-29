@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -68,7 +70,6 @@ namespace Restaurant.Controllers
                 // Check if the user's account is ACTIVE
                 if (!user.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
                 {
-                    // If the user is INACTIVE or banned, show an appropriate message
                     ModelState.AddModelError("", "Your account has been banned or deactivated.");
                     return View(model);
                 }
@@ -79,13 +80,18 @@ namespace Restaurant.Controllers
                     // Add role claim
                     var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-                    await _userManager.AddClaimsAsync(user, claims);
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = model.RememberMe,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Set cookie expiration to 30 minutes
+                    };
 
-                    // Sign in again to refresh the cookie with the new claims
-                    await _signInManager.RefreshSignInAsync(user);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
                     // Set success notification
                     TempData["SuccessMessage"] = "Login successful! Welcome " + user.UserName;
@@ -489,6 +495,7 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme); // Change this line
             return RedirectToAction("Index", "Home");
         }
 
@@ -502,88 +509,108 @@ namespace Restaurant.Controllers
             return Challenge(properties, provider);
         }
 
-        // Callback after the external login provider returns
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
         {
-            returnUrl ??= Url.Content("~/"); // Default return URL
+            // Default return URL
+            returnUrl ??= Url.Content("~/");
 
+            // Check if there is an error from the remote provider
             if (remoteError != null)
             {
                 ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
                 return RedirectToAction(nameof(Login)); // Redirect to login page if there's an error
             }
 
-            var info = await _signInManager.GetExternalLoginInfoAsync(); // Get info from the external provider
-            if (info == null)
+            try
             {
-                return RedirectToAction(nameof(Login)); // If no info, return to login page
-            }
+                // Get info from the external provider
+                var info = await _signInManager.GetExternalLoginInfoAsync();
 
-            // Attempt to sign in with the external login
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
-
-            // Check if sign in was successful
-            if (result.Succeeded)
-            {
-                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-                if (user != null)
+                // Handle the case where the user cancels the external login
+                if (info == null)
                 {
-                    // Check if the user is ACTIVE
-                    if (!user.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // User is not active, handle the error appropriately
-                        await _signInManager.SignOutAsync(); // Ensure the user is signed out
-                        ModelState.AddModelError(string.Empty, "Your account has been banned or deactivated.");
-                        return RedirectToAction(nameof(Login)); // Redirect back to login with error
-                    }
+                    // User has canceled the external login process
+                    ModelState.AddModelError(string.Empty, "External login was canceled.");
+                    return RedirectToAction(nameof(Login)); // Redirect back to login page
                 }
 
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal?.Identity?.Name, info.LoginProvider);
-                return LocalRedirect(returnUrl); // Redirect on success
-            }
-            else if (result.IsLockedOut)
-            {
-                return RedirectToAction("Lockout"); // Handle locked-out users
-            }
-            else
-            {
-                // If user does not have an account, ask them to create one
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                if (email != null)
+                // Attempt to sign in with the external login
+                var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+
+                // Check if sign in was successful
+                if (result.Succeeded)
                 {
-                    // Check if the user already exists
-                    var user = await _userManager.FindByEmailAsync(email);
-                    if (user == null)
+                    var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                    if (user != null)
                     {
-                        // Redirect to the registration view to collect username and email
-                        var model = new ExternalLoginRegistrationViewModel
-                        {
-                            Email = email // Pre-fill email from external provider
-                        };
-                        ViewData["ReturnUrl"] = returnUrl; // Store return URL for later
-                        return View("ExternalLoginRegistration", model); // Show registration view
-                    }
-                    else
-                    {
-                        // Check if the user is ACTIVE before linking the account
+                        // Check if the user is ACTIVE
                         if (!user.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
                         {
+                            await _signInManager.SignOutAsync(); // Ensure the user is signed out
                             ModelState.AddModelError(string.Empty, "Your account has been banned or deactivated.");
                             return RedirectToAction(nameof(Login)); // Redirect back to login with error
                         }
-
-                        // Link the external login to their existing account
-                        await _userManager.AddLoginAsync(user, info);
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
                     }
-                }
 
-                // If email was not provided by the external provider
-                ModelState.AddModelError(string.Empty, "Email claim not received from provider.");
-                return RedirectToAction(nameof(Login));
+                    _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal?.Identity?.Name, info.LoginProvider);
+                    return LocalRedirect(returnUrl); // Redirect on success
+                }
+                else if (result.IsLockedOut)
+                {
+                    return RedirectToAction("Lockout"); // Handle locked-out users
+                }
+                else
+                {
+                    // If user does not have an account, ask them to create one
+                    var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                    if (email != null)
+                    {
+                        // Check if the user already exists
+                        var user = await _userManager.FindByEmailAsync(email);
+                        if (user == null)
+                        {
+                            // Redirect to the registration view to collect username and email
+                            var model = new ExternalLoginRegistrationViewModel
+                            {
+                                Email = email // Pre-fill email from external provider
+                            };
+                            ViewData["ReturnUrl"] = returnUrl; // Store return URL for later
+                            return View("ExternalLoginRegistration", model); // Show registration view
+                        }
+                        else
+                        {
+                            // Check if the user is ACTIVE before linking the account
+                            if (!user.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
+                            {
+                                ModelState.AddModelError(string.Empty, "Your account has been banned or deactivated.");
+                                return RedirectToAction(nameof(Login)); // Redirect back to login with error
+                            }
+
+                            // Link the external login to their existing account
+                            await _userManager.AddLoginAsync(user, info);
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl); // Redirect after linking
+                        }
+                    }
+
+                    // If email was not provided by the external provider
+                    ModelState.AddModelError(string.Empty, "Email claim not received from provider.");
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+            catch (AuthenticationFailureException ex)
+            {
+                _logger.LogError(ex, "An error occurred during external authentication.");
+                ModelState.AddModelError(string.Empty, "Authentication failed. Please try again.");
+                return RedirectToAction(nameof(Login)); // Redirect back to login page with error
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred during external authentication.");
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
+                return RedirectToAction(nameof(Login)); // Redirect back to login page with error
             }
         }
 

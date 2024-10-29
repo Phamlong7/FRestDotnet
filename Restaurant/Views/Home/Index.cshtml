@@ -30,14 +30,14 @@
     }
     else
     {
-        <div class="slider-item js-fullheight" style="background-image: url('/Media/@ViewBag.SettingImage');">
+        <div class="slider-item js-fullheight" style="background-image: url('/Media/default.jpg');">
             <!-- Default background if no settings -->
             <div class="overlay"></div>
             <div class="container">
                 <div class="row slider-text js-fullheight justify-content-center align-items-center" data-scrollax-parent="true">
                     <div class="col-md-12 col-sm-12 text-center ftco-animate">
                         <span class="subheading">FRest</span>
-                        <h1 class="mb-4">@ViewBag.SettingHomePage[0]?.SettingType ?? "Welcome to Our Restaurant"</h1> <!-- Default to SettingType or fallback text -->
+                        <h1 class="mb-4">Welcome to Our Restaurant</h1> <!-- Default text content -->
                     </div>
                 </div>
             </div>
@@ -60,9 +60,6 @@
                                         <div class="menu-img img" style="background-image: url('/Media/@dish.DishBanner');"></div>
                                         <div class="text text-center">
                                             <h3>@dish.DishTitle</h3>
-                                            <p>
-                                                <span>@dish.DishContent</span>
-                                            </p>
                                         </div>
                                     </div>
                                 </div>
