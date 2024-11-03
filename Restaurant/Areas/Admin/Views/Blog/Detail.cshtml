@@ -37,7 +37,7 @@
                             <div class="col-sm-10">
                                 @if (!string.IsNullOrWhiteSpace(Model.banner))
                                 {
-                                    <img alt="banner" style="width: 150px; margin-right: 15px;" src="/Media/@Model.banner" />
+                                    <img alt="banner" class="banner-image" src="/Media/@Model.banner" />
                                 }
                                 else
                                 {
@@ -48,7 +48,7 @@
                         <div class="row mb-3">
                             <label class="col-sm-2 col-form-label">Content</label>
                             <div class="col-sm-10">
-                                <p>@Model.content</p>
+                                <div>@Html.Raw(Model.content)</div>
                             </div>
                         </div>
                         <!-- Buttons Row -->
@@ -63,3 +63,20 @@
         </div>
     </div>
 </main><!-- End #main -->
+<style>
+    /* Ensure the banner image has a fixed width */
+    .banner-image {
+        width: 150px; /* Fixed width for the banner */
+        margin-right: 15px; /* Adjust margin as needed */
+        /* Remove display: inline-block to avoid centering */
+        float: left; /* Align to the left */
+    }
+
+    /* Ensure images within the blog content are responsive */
+    .card-body img {
+        max-width: 100%; /* Scale images down if they exceed the width of their container */
+        height: auto; /* Maintain the aspect ratio */
+        display: block; /* Center images horizontally */
+        margin: 0 auto; /* Center the image */
+    }
+</style>

@@ -11,6 +11,7 @@ namespace Restaurant.Controllers
     {
         private readonly DataContext _dataContext;
         private const string CartSessionName = "CartSession";
+        private const string WishlistCookieName = "wishlist";
 
         public StoriesController(DataContext dataContext)
         {
@@ -38,6 +39,9 @@ namespace Restaurant.Controllers
 
             var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
             ViewData["NumberCart"] = carts.Count;
+
+            var wishlists = CookieHelper.GetCookie<List<WishlistItemViewModel>>(HttpContext, WishlistCookieName) ?? new List<WishlistItemViewModel>();
+            ViewData["NumberWishList"] = wishlists.Count;
 
             return View(blogs);
         }
