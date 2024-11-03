@@ -1,0 +1,76 @@
+﻿@model Restaurant.Models.UserModel
+
+@{
+    ViewData["Title"] = "Change User Status";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main id="content" class="content-area">
+    <div class="pagetitle">
+        <h1>Edit User</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Tables</li>
+                <li class="breadcrumb-item active">Edit User</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Edit User</h5>
+                        <form asp-action="Edit" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @Html.AntiForgeryToken()
+
+                            <!-- Name Input (read-only) -->
+                            <div class="row mb-3">
+                                <label asp-for="UserName" class="col-sm-2 col-form-label">UserName</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="UserName" class="form-control" readonly="readonly" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Email Input (read-only) -->
+                            <div class="row mb-3">
+                                <label asp-for="Email" class="col-sm-2 col-form-label">Email</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="Email" class="form-control" readonly="readonly" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Status Dropdown -->
+                            <div class="row mb-3">
+                                <label asp-for="Status" class="col-sm-2 col-form-label">Status</label>
+                                <div class="col-sm-10">
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="ACTIVE" selected=@(Model.Status == "ACTIVE")>Active</option>
+                                        <option value="INACTIVE" selected=@(Model.Status == "INACTIVE")>Inactive</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="row mb-4">
+                                <div class="col-sm-6 text-end">
+                                    <a asp-controller="User" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

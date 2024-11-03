@@ -51,7 +51,7 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Dashboard">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "collapsed")" asp-action="Index" asp-controller="Dashboard">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
@@ -60,42 +60,49 @@
             <li class="nav-heading">Manage Board</li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Category">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "User" ? "active" : "collapsed")" asp-action="Index" asp-controller="User">
+                    <i class="bi bi-file-earmark-person-fill"></i>
+                    <span>Users</span>
+                </a>
+            </li><!-- End Users Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Category" ? "active" : "collapsed")" asp-action="Index" asp-controller="Category">
                     <i class="bi bi-archive"></i>
                     <span>Category</span>
                 </a>
             </li><!-- End Category Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Dish">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dish" ? "active" : "collapsed")" asp-action="Index" asp-controller="Dish">
                     <i class="bi bi-card-list"></i>
                     <span>Dishes</span>
                 </a>
             </li><!-- End Dishes Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Blog">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Blog" ? "active" : "collapsed")" asp-action="Index" asp-controller="Blog">
                     <i class="bi bi-book"></i>
                     <span>Blog</span>
                 </a>
             </li><!-- End Blog Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Order">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Order" ? "active" : "collapsed")" asp-action="Index" asp-controller="Order">
                     <i class="bi bi-basket"></i>
                     <span>Order</span>
                 </a>
             </li><!-- End Order Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="Ads">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Ads" ? "active" : "collapsed")" asp-action="Index" asp-controller="Ads">
                     <i class="bi bi-badge-ad-fill"></i>
                     <span>Ads</span>
                 </a>
             </li><!-- End Ads Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" asp-action="Index" asp-controller="WebSetting">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "WebSetting" ? "active" : "collapsed")" asp-action="Index" asp-controller="WebSetting">
                     <i class="bi bi-sliders"></i>
                     <span>Web Setting</span>
                 </a>
@@ -104,28 +111,28 @@
             <li class="nav-heading">Account</li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed " asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "collapsed")" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-house-fill"></i>
                     <span>Back to Home</span>
                 </a>
             </li><!-- Back to Home Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed " asp-area="" asp-controller="Account" asp-action="VerifyEmailForChangePassword">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["Action"]?.ToString() == "VerifyEmailForChangePassword" ? "active" : "collapsed")" asp-area="" asp-controller="Account" asp-action="VerifyEmailForChangePassword">
                     <i class="bi bi-person-fill-gear"></i>
                     <span>Change Password</span>
                 </a>
-             </li><!-- Change Password Nav -->
+            </li><!-- Change Password Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed " asp-area="" asp-controller="Account" asp-action="Logout">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["Action"]?.ToString() == "Logout" ? "active" : "collapsed")" asp-area="" asp-controller="Account" asp-action="Logout">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Sign Out</span>
                 </a>
             </li><!-- Sign Out Nav -->
         </ul>
 
-    </aside><!-- End Sidebar-->
+    </aside><!-- End Sidebar -->
 
     <main id="main" class="main">
 

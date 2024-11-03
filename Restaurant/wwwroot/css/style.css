@@ -9807,3 +9807,25 @@ textarea.form-control {
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -136px; } }
+
+/* Custom dropdown styles */
+.dropdown-menu {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 160px;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    transition: background-color 0.2s ease;
+}
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa; /* Light background on hover */
+        color: #007bff; /* Bootstrap primary color */
+    }
+
+.dropdown-toggle::after {
+    margin-left: .255em; /* Space between text and caret */
+    vertical-align: .255em; /* Align caret with text */
+}
