@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenAI.Chat;
+using System.Text;
 
 namespace Restaurant.Controllers
 {
@@ -57,9 +58,12 @@ namespace Restaurant.Controllers
                 var chatUpdates = _chatClient.CompleteChatStreamingAsync(
                     new List<ChatMessage>
                     {
-                        systemPromptMessage,
-                        new UserChatMessage(request.Message)
+                systemPromptMessage,
+                new UserChatMessage(request.Message)
                     });
+
+                // Buffer for constructing complete messages
+                var contentBuffer = new StringBuilder();
 
                 await foreach (var chatUpdate in chatUpdates)
                 {
@@ -71,13 +75,15 @@ namespace Restaurant.Controllers
 
                     foreach (var contentPart in chatUpdate.ContentUpdate)
                     {
-                        var lines = contentPart.Text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                        foreach (var line in lines)
-                        {
-                            await Response.WriteAsync($"data: {line}\n\n");
-                            await Response.Body.FlushAsync();
-                        }
+                        // Accumulate text parts to prevent splitting issues
+                        contentBuffer.Append(contentPart.Text);
                     }
+
+                    // Write the complete buffered content at once
+                    var bufferedText = contentBuffer.ToString();
+                    await Response.WriteAsync($"data: {bufferedText}\n\n");
+                    await Response.Body.FlushAsync();
+                    contentBuffer.Clear(); // Clear buffer after writing
                 }
             }
             catch (Exception ex)
@@ -92,7 +98,7 @@ namespace Restaurant.Controllers
         }
     }
 
-    public class ChatRequest
+        public class ChatRequest
     {
         public string? Message { get; set; }
     }
