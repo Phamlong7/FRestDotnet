@@ -17,6 +17,7 @@ namespace Restaurant.Repository
         public DbSet<AdsModel> ads { get; set; }
         public DbSet<BlogModel> blog { get; set; }
         public DbSet<UserModel> user { get; set; }
+        public DbSet<CommentModel> comment { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +38,17 @@ namespace Restaurant.Repository
                 .WithMany(c => c.dish)
                 .HasForeignKey(d => d.categoryId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<BlogModel>()
+                .HasMany(b => b.Comments)
+                .WithOne(c => c.Blog)
+                .HasForeignKey(c => c.BlogId);
+
+            modelBuilder.Entity<CommentModel>()
+                .HasOne(c => c.ParentComment)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(c => c.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

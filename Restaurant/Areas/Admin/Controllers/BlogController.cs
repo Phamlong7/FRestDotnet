@@ -135,12 +135,23 @@ namespace Restaurant.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Detail(long id)
         {
-            var blog = await _dataContext.blog.FindAsync(id);
+            // Fetch the blog entry with comments
+            var blog = await _dataContext.blog
+                .Include(b => b.Comments)
+                    .ThenInclude(c => c.Replies)
+                .FirstOrDefaultAsync(b => b.id == id);
+
             if (blog == null)
             {
-                return NotFound(); // Return 404 if the blog is not found
+                return NotFound();
             }
-            return View(blog); // Pass the blog to the view
+
+            // Increment the view count
+            blog.ViewCount++;
+            _dataContext.Update(blog);
+            await _dataContext.SaveChangesAsync();
+
+            return View(blog);
         }
     }
 }
