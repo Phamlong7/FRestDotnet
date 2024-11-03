@@ -7,7 +7,12 @@
             <div class="col-md-9 ftco-animate text-center mb-4">
                 <h1 class="mb-2 bread">@Model.title</h1>
                 <p class="breadcrumbs">
-                    <span class="mr-2"><a asp-action="Index" asp-controller="Home">Home <i class="ion-ios-arrow-forward"></i></a></span>
+                    <span class="mr-2">
+                        <a asp-action="Index" asp-controller="Home">
+                            Home
+                            <i class="ion-ios-arrow-forward"></i>
+                        </a>
+                    </span>
                     <span>Blog <i class="ion-ios-arrow-forward"></i></span>
                 </p>
             </div>
@@ -38,14 +43,14 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <h4 class="mb-4">Leave a Comment</h4>
-                <form asp-controller="Stories" asp-action="PostComment" method="post">
-                    <input type="hidden" name="BlogId" value="@Model.id" />
-                    <input type="hidden" name="UserName" value="@User.Identity.Name" />
+                <form asp-controller="Stories" asp-action="PostReply" method="post">
+                    <input type="hidden" name="blogId" value="@Model.id" />
+                    <input type="hidden" name="parentCommentId" value="null" />
                     <div class="form-group">
-                        <label for="Content">Comment</label>
-                        <textarea class="form-control" name="Content" rows="4" required></textarea>
+                        <label for="commentContent">Comment</label>
+                        <textarea class="form-control" id="commentContent" name="content" rows="4" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit Comment</button>
+                    <button type="submit" class="btn btn-primary btn-comment">Submit Comment</button>
                 </form>
             }
             else
@@ -60,86 +65,94 @@
             <div id="comments" class="comments-list">
                 @if (Model.Comments != null && Model.Comments.Any())
                 {
-                    // Filter only top-level comments
-                    var topLevelComments = Model.Comments.Where(c => c.ParentCommentId == null).OrderByDescending(c => c.CreatedDate).ToList();
+                    var topLevelComments = Model.Comments.Where(c => c.ParentCommentId == null)
+                    .OrderByDescending(c => c.CreatedDate)
+                    .ToList();
 
                     foreach (var comment in topLevelComments)
                     {
                         <div class="comment mb-4 p-3 border rounded">
                             <div class="d-flex justify-content-between align-items-start">
                                 <strong class="text-break">@comment.UserName</strong>
-                                @if (User.Identity.IsAuthenticated && comment.UserName == User.Identity.Name)
-                                {
-                                    <form id="delete-form-@comment.CommentId" asp-controller="Stories" asp-action="DeleteComment" method="post" style="display:inline;">
-                                        <input type="hidden" name="CommentId" value="@comment.CommentId" />
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@comment.CommentId)">Delete</button>
-                                    </form>
-                                }
-                            </div>
-                            <div class="content-toggle mt-2">
-                                <span class="preview-content text-break" style="word-wrap: break-word;">
-                                    @if (comment.Content.Length > 100)
-                                    {
-                                        @Html.Raw(comment.Content.Substring(0, 100) + "...")
-                                    }
-                                    else
-                                    {
-                                        @comment.Content
-                                    }
-                                </span>
-                                @if (comment.Content.Length > 100)
-                                {
-                                    <span class="full-content text-break" style="display:none; word-wrap: break-word;">@comment.Content</span>
-                                    <button class="btn btn-link" onclick="toggleContent(this)">Show More</button>
-                                }
-                            </div>
-                            <small class="text-muted">@comment.CreatedDate.ToString("MMM. dd, yyyy")</small>
-
-                            <div class="button-group mt-2">
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <button class="btn btn-secondary btn-sm" onclick="showReplyForm(@comment.CommentId)">Reply</button>
+                                    // Check if the user is an admin using your UserModel
+                                    bool isAdmin = User.IsInRole("ADMIN"); // Or check the role directly from the user data
+                                    bool isCommentOwner = comment.UserName == User.Identity.Name;
+
+                                    if (isAdmin || isCommentOwner)
+                                    {
+                                        <form id="delete-form-@comment.CommentId" asp-controller="Stories" asp-action="DeleteComment" method="post" style="display:inline;">
+                                            <input type="hidden" name="CommentId" value="@comment.CommentId" />
+                                            <button type="button" class="btn btn-danger btn-sm btn-delete" onclick="confirmDelete(@comment.CommentId)">Delete</button>
+                                        </form>
+                                    }
                                 }
+                            </div>
+                            <p class="text-break">@Html.Raw(comment.Content)</p>
+                            <small class="text-muted">@comment.CreatedDate.ToString("MMM. dd, yyyy HH:mm")</small>
+
+                            <!-- Reply Button -->
+                            <button class="btn btn-secondary btn-sm btn-reply" onclick="showReplyForm(@comment.CommentId)">Reply</button>
+
+                            <!-- Hidden reply form -->
+                            <div id="reply-form-@comment.CommentId" class="reply-form mt-2" style="display:none;">
+                                <form asp-controller="Stories" asp-action="PostReply" method="post">
+                                    <input type="hidden" name="blogId" value="@Model.id" />
+                                    <input type="hidden" name="parentCommentId" value="@comment.CommentId" />
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="content" rows="2" placeholder="Write your reply..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-post-reply">Post Reply</button>
+                                    <button type="button" class="btn btn-secondary btn-sm btn-cancel" onclick="hideReplyForm(@comment.CommentId)">Cancel</button>
+                                </form>
                             </div>
 
                             <!-- Display Replies -->
-                            <div class="replies mt-4 pl-4">
-                                @if (comment.Replies != null && comment.Replies.Any())
+                            @if (Model.Comments != null && Model.Comments.Any(c => c.ParentCommentId == comment.CommentId))
+                            {
+                                // Order replies from oldest to newest
+                                var replies = Model.Comments.Where(c => c.ParentCommentId == comment.CommentId)
+                                .OrderBy(c => c.CreatedDate);
+
+                                foreach (var reply in replies)
                                 {
-                                    foreach (var reply in comment.Replies.OrderBy(r => r.CreatedDate))
-                                    {
-                                        <div class="reply mb-3 p-2 border-left">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <strong class="text-break">@reply.UserName</strong>
-                                                @if (User.Identity.IsAuthenticated && reply.UserName == User.Identity.Name)
+                                    // Find the parent comment username
+                                    var parentUsername = Model.Comments.FirstOrDefault(c => c.CommentId == reply.ParentCommentId)?.UserName;
+
+                                    <div class="comment mb-2 p-2 border rounded" style="margin-left: 20px;">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <strong>@reply.UserName</strong>
+
+                                            <!-- Delete Button for Replies -->
+                                            @if (User.Identity.IsAuthenticated)
+                                            {
+                                                bool isReplyAdmin = User.IsInRole("ADMIN");
+                                                bool isReplyOwner = reply.UserName == User.Identity.Name;
+
+                                                if (isReplyAdmin || isReplyOwner)
                                                 {
                                                     <form id="delete-form-@reply.CommentId" asp-controller="Stories" asp-action="DeleteComment" method="post" style="display:inline;">
                                                         <input type="hidden" name="CommentId" value="@reply.CommentId" />
-                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@reply.CommentId)">Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-delete" onclick="confirmDelete(@reply.CommentId)">Delete</button>
                                                     </form>
                                                 }
-                                            </div>
-                                            <div class="content-toggle mt-1">
-                                                <span class="text-break" style="word-wrap: break-word;">@reply.Content</span>
-                                            </div>
-                                            <small class="text-muted">@reply.CreatedDate.ToString("MMM. dd, yyyy")</small>
+                                            }
                                         </div>
-                                    }
-                                }
-                            </div>
 
-                            <!-- Reply Form (hidden by default) -->
-                            <div id="reply-form-@comment.CommentId" class="reply-form" style="display:none; margin-top: 10px;">
-                                <form asp-action="PostReply" asp-controller="Stories" method="post">
-                                    <input type="hidden" name="parentCommentId" value="@comment.CommentId" />
-                                    <input type="hidden" name="blogId" value="@Model.id" />
-                                    <div class="form-group">
-                                        <label for="replyContent">Reply</label>
-                                        <textarea name="content" class="form-control" required></textarea>
+                                        <p>
+                                            @if (!string.IsNullOrEmpty(parentUsername))
+                                            {
+                                                <span style="font-weight: bold; color: #333;">@($"@{parentUsername}")</span>
+                                            }
+                                            @Html.Raw(reply.Content)
+                                        </p>
+
+                                        <small class="text-muted">@reply.CreatedDate.ToString("MMM. dd, yyyy HH:mm")</small>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Post Reply</button>
-                                </form>
-                            </div>
+                                }
+                            }
+
                         </div>
                     }
                 }
@@ -152,75 +165,37 @@
     </div>
 </section>
 
-<style>
-    .replies {
-        background-color: #f1f1f1;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .button-group {
-        margin-top: 10px;
-        margin-bottom: 15px;
-    }
-
-        .button-group button {
-            margin-right: 10px;
-        }
-
-    .comments-list {
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-    }
-
-    .comment {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        transition: background-color 0.3s;
-    }
-
-        .comment:hover {
-            background-color: #f1f1f1;
-        }
-
-        .comment strong {
-            font-size: 1.1em;
-            color: #333;
-        }
-
-        .comment small {
-            display: block;
-            color: #777;
-        }
-</style>
-
 <script>
-    function toggleContent(button) {
-        var contentToggle = button.parentElement.parentElement;
-        var contentPreview = contentToggle.querySelector('.preview-content');
-        var contentFull = contentToggle.querySelector('.full-content');
-
-        if (contentFull.style.display === "none") {
-            contentFull.style.display = "inline";
-            contentPreview.style.display = "none";
-            button.innerText = "Show Less";
-        } else {
-            contentFull.style.display = "none";
-            contentPreview.style.display = "inline";
-            button.innerText = "Show More";
-        }
-    }
-
-    function showReplyForm(commentId) {
-        const replyForm = document.getElementById(`reply-form-${commentId}`);
-        replyForm.style.display = replyForm.style.display === "none" ? "block" : "none";
-    }
-
     function confirmDelete(commentId) {
         if (confirm("Are you sure you want to delete this comment?")) {
             document.getElementById(`delete-form-${commentId}`).submit();
         }
     }
+
+    function showReplyForm(commentId) {
+        document.getElementById(`reply-form-${commentId}`).style.display = 'block';
+    }
+
+    function hideReplyForm(commentId) {
+        document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+    }
 </script>
+
+<style>
+    .button-group button {
+        margin-right: 5px; /* Add spacing between buttons */
+    }
+
+    .reply-button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .reply-form {
+        margin-bottom: 15px; /* Optional: space below the reply form */
+    }
+
+    .btn-reply {
+        margin: 10px;
+    }
+</style>
