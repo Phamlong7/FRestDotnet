@@ -1,5 +1,19 @@
 ﻿@model Restaurant.ViewModels.MenuViewModel
+@using Newtonsoft.Json
+@using Restaurant.ViewModels
 @using X.PagedList.Mvc.Core;
+
+@{
+    // Retrieve the wishlist from the cookie
+    var wishlistCookie = Context.Request.Cookies["wishlist"];
+    var wishlist = new List<WishlistItemViewModel>(); // Initialize as a List of WishlistItemViewModel
+
+    if (!string.IsNullOrEmpty(wishlistCookie))
+    {
+        wishlist = JsonConvert.DeserializeObject<List<WishlistItemViewModel>>(wishlistCookie) ?? new
+        List<WishlistItemViewModel>();
+    }
+}
 
 <section class="hero-wrap hero-wrap-2" style="background-image: url('/images/bg_3.jpg');" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
@@ -53,7 +67,14 @@
                                         <h5 class="card-title">@dish.title</h5>
                                         <p class="card-text">@dish.content</p>
                                         <p class="text-primary font-weight-bold">@dish.price?.ToString("C")</p>
-                                        <a href="#" class="btn btn-primary btn-add-cart" data-dish-id="@dish.id">Order now</a>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <a href="#" class="btn btn-primary btn-add-cart" data-dish-id="@dish.id"
+                                               style="flex-grow: 1; margin-right: 10px;">Order now</a>
+
+                                            <button class="wishlist-btn" data-dish-id="@dish.id" onclick="toggleWishlist(this)">
+                                                <i class="@(wishlist.Any(item => item.DishId == dish.id) ? "fas red-heart" : "far") fa-heart"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -84,3 +105,65 @@
         </div>
     </div>
 </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function toggleWishlist(button) {
+        const icon = button.querySelector('i');
+        const dishId = button.getAttribute('data-dish-id');
+        console.log('Dish ID:', dishId); // Log the dishId for debugging
+        const title = button.closest('.card-body').querySelector('.card-title').innerText;
+        const priceText = button.closest('.card-body').querySelector('.text-primary').innerText;
+        const banner = button.closest('.card').querySelector('img').src;
+
+        const price = parseFloat(priceText.replace(/[^0-9.-]+/g, ""));
+
+        const item = {
+            DishId: dishId,
+            Title: title,
+            Price: price,
+            Banner: banner
+        };
+
+        if (icon.classList.contains('far')) {
+            // Add to wishlist
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            icon.style.color = 'red';
+
+            // Send AJAX request to add to wishlist
+            $.ajax({
+                url: '/Wishlist/AddToWishlist',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(item),
+                success: function (updatedCount) {
+                    console.log('Added to wishlist, new count:', updatedCount);
+                    $('#wishlist-count').text(updatedCount); // Update the count in the navbar
+                },
+                error: function () {
+                    console.error('Error adding to wishlist');
+                }
+            });
+        } else {
+            // Remove from wishlist
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            icon.style.color = '';
+
+            $.ajax({
+                url: '/Wishlist/RemoveFromWishlist',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(dishId),
+                success: function (updatedCount) {
+                    console.log('Removed from wishlist, new count:', updatedCount);
+                    $('#wishlist-count').text(updatedCount); // Update the count in the navbar
+                },
+                error: function () {
+                    console.error('Error removing from wishlist');
+                }
+            });
+        }
+    }
+</script>

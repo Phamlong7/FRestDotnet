@@ -1,0 +1,82 @@
+﻿@model List<Restaurant.ViewModels.WishlistItemViewModel>
+
+<section class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_3.jpg');"
+    data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-end justify-content-center">
+            <div class="col-md-9 ftco-animate text-center mb-4">
+                <h1 class="mb-2 bread">Wishlist</h1>
+                <p class="breadcrumbs">
+                    <span class="mr-2">
+                        <a asp-action="Index" asp-controller="Home">
+                            Home <i class="ion-ios-arrow-forward"></i>
+                        </a>
+                    </span>
+                    <span>
+                        Wishlist <i class="ion-ios-arrow-forward"></i>
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ftco-section ftco-no-pt ftco-no-pb wishlist-section">
+    <div class="container">
+        <h2 class="h4 mb-2 mb-md-5 font-weight-bold">Your Wishlist</h2>
+        @if (Model.Count > 0)
+        {
+            <div class="wishlist-header">
+                <button class="delete-all" onclick="clearWishlist()">Delete All</button>
+            </div>
+
+            <div class="wishlist-items">
+                @foreach (var item in Model)
+                {
+                    <div class="wishlist-item">
+                        <div class="item-image-wrapper">
+                            <img src="@item.Banner" alt="@item.Title">
+                            <form asp-action="RemoveFromView" method="post" class="delete-item-form">
+                                <input type="hidden" name="dishId" value="@item.DishId" />
+                                <button type="submit" class="delete-item" title="Remove from Wishlist">✖</button>
+                            </form>
+                        </div>
+                        <div class="item-details">
+                            <h3 class="item-title">@item.Title</h3>
+                            <p class="item-price">@item.Price?.ToString("N0")$</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-wishlist">
+                <img src="~/images/Arona.jpg" alt="Empty Wishlist"
+                    style="max-width: 300px; margin: 10px auto; display: block;" />
+                <p style="text-align: center;">Your wishlist is empty.</p>
+            </div>
+        }
+    </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function clearWishlist() {
+        $.ajax({
+            url: '/Wishlist/ClearWishlist',
+            type: 'POST',
+            success: function () {
+                // Optionally reset the wishlist count in the navbar
+                $('#wishlist-count').text(0); // Reset the wishlist count in the navbar
+
+                // Reload the page to reflect the empty wishlist
+                location.reload(); // This will refresh the page
+            },
+            error: function () {
+                console.error('Error clearing wishlist');
+            }
+        });
+    }
+</script>

@@ -11,6 +11,7 @@ namespace Restaurant.Controllers
     {
         private readonly DataContext _dataContext;
         private const string CartSessionName = "CartSession";
+        private const string WishlistCookieName = "wishlist";
 
         public CartController(DataContext context)
         {
@@ -19,6 +20,8 @@ namespace Restaurant.Controllers
 
         public IActionResult Index()
         {
+            var wishlists = CookieHelper.GetCookie<List<WishlistItemViewModel>>(HttpContext, WishlistCookieName) ?? new List<WishlistItemViewModel>();
+            ViewData["NumberWishList"] = wishlists.Count;
             // Retrieve the cart items from the session
             var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
 
@@ -116,5 +119,39 @@ namespace Restaurant.Controllers
             return Json(new { success = false }); // Item not found
         }
 
+        public IActionResult Checkout(string message)
+        {
+            var wishlists = CookieHelper.GetCookie<List<WishlistItemViewModel>>(HttpContext, WishlistCookieName) ?? new List<WishlistItemViewModel>();
+            ViewData["NumberWishList"] = wishlists.Count;
+
+            // Retrieve the cart items from the session
+            var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
+
+            ViewData["NumberCart"] = carts.Count;
+
+            // Prepare a list to hold the CartItemViewModels
+            var cartItems = new List<CartItemViewModel>();
+
+            foreach (var cart in carts)
+            {
+                // Retrieve the dish details from your database using the cart.DishId
+                var dish = _dataContext.dish.Find(cart.DishId);
+
+                if (dish != null)
+                {
+                    cartItems.Add(new CartItemViewModel
+                    {
+                        DishId = cart.DishId,
+                        Title = dish.title,
+                        Price = dish.price,
+                        Quantity = cart.Quantity,
+                        Banner = dish.banner
+                    });
+                }
+            }
+            // Store the message in ViewData or ViewBag to pass it to the view
+            ViewData["OrderMessage"] = message;
+            return View(cartItems);
+        }
     }
 }

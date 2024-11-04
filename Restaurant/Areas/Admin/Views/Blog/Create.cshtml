@@ -40,7 +40,8 @@
                             <div class="row mb-3">
                                 <label asp-for="content" class="col-sm-2 col-form-label">Content</label>
                                 <div class="col-sm-10">
-                                    <textarea asp-for="content" class="form-control" rows="3" oninput="autoResize(this)"></textarea>
+                                    <textarea asp-for="content" class="form-control" rows="3"
+                                              id="content-editor"></textarea>
                                     <span asp-validation-for="content" class="text-danger"></span>
                                 </div>
                             </div>
@@ -62,15 +63,12 @@
         </div>
     </div>
 </main><!-- End #main -->
+
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-    function autoResize(textarea) {
-        textarea.style.height = 'auto'; // Reset height
-        textarea.style.height = (textarea.scrollHeight) + 'px'; // Adjust based on content
-    }
-    // Optionally, resize all textareas on page load to fit their content
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('textarea').forEach(textarea => {
-            autoResize(textarea);
+    ClassicEditor
+        .create(document.querySelector('#content-editor'))
+        .catch(error => {
+            console.error(error);
         });
-    });
 </script>

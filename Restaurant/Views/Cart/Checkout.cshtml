@@ -1,0 +1,168 @@
+@model List<Restaurant.ViewModels.CartItemViewModel>
+
+<section class="hero-wrap hero-wrap-2" style="background-image: url('/images/bg_3.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-end justify-content-center">
+            <div class="col-md-9 ftco-animate text-center mb-4">
+                <h1 class="mb-2 bread">Checkout</h1>
+                <p class="breadcrumbs">
+                    <span class="mr-2">
+                        <a asp-action="Index" asp-controller="Home">
+                            Home <i class="ion-ios-arrow-forward"></i>
+                        </a>
+                    </span>
+                    <span class="mr-2">
+                        <a asp-action="Index" asp-controller="Cart">
+                            Cart <i class="ion-ios-arrow-forward"></i>
+                        </a>
+                    </span>
+                    <span>
+                        Checkout <i class="ion-ios-arrow-forward"></i>
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@{
+    int index = 0; // Initialize the index variable
+}
+<section class="ftco-section ftco-no-pt ftco-no-pb checkout-section">
+    <div class="container">
+        <h2 class="h4 mb-2 mb-md-5 font-weight-bold text-center">Checkout Details</h2>
+
+        @if (Model.Any())
+        {
+            // Dynamically set the form action based on the logged-in user's role
+            var formAction = User.IsInRole("ADMIN")
+                ? Url.Action("Create", "Order", new { area = "Admin" })
+                : Url.Action("Create", "OrderHistory", new { area = "User" });
+
+            <form method="post" action="@formAction">
+                @Html.AntiForgeryToken()
+                <table class="table table-borderless cart-table">
+                    <thead>
+                        <tr>
+                            <th>Dish Information</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="/Media/@item.Banner" alt="@item.Title" style="width: 80px; height: 80px; object-fit: cover;" />
+                                        <div class="ml-3">
+                                            <p class="mb-1">@item.Title</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
+                                <input type="hidden" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1" data-dishid="@item.DishId" />
+                                <td>@item.Quantity</td>
+                                <input type="hidden" name="OrderDetails[@index].DishId" value="@item.DishId" />
+                                <input type="hidden" name="OrderDetails[@index].DishName" value="@item.Title" />
+                                <input type="hidden" name="OrderDetails[@index].Price" value="@item.Price" />
+                                <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
+                            </tr>
+                            @* Increment the index after each iteration *@
+                            index++;
+                        }
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <h5 class="mb-0">Total Amount:</h5>
+                    <span class="h4">@Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity : 0).ToString("N0")$</span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label hidden for="orderMessage">Message</label>
+                    <textarea id="orderMessage" name="Message" class="form-control" rows="3" placeholder="Your message" style="display: none;">@ViewData["OrderMessage"]</textarea>
+                </div>
+
+                <!-- Divider Line -->
+                <hr class="my-5" />
+
+                <!-- Payment Method Selection -->
+                <h2 class="h4 mb-2 mt-5 font-weight-bold text-center">Payment Method</h2>
+                <div class="d-flex justify-content-center align-items-center">
+                    <!-- COD Button -->
+                    <div>
+                        <button class="btn btn-primary py-2 px-4" type="submit">COD(Cash On Delivery)</button>
+                    </div>
+                    <span class="mx-3 font-weight-bold">or</span>
+
+                    <!-- PayPal Button Container -->
+                    <div id="paypal-button-container" style="width: 400px; margin-top: 10px;"></div>
+                </div>
+            </form>
+        }
+        <!-- End Checkout Form -->
+    </div>
+</section>
+
+<script src="https://sandbox.paypal.com/sdk/js?client-id=ARUor5WTBSXX93aMiH8FdM36qbDZhX5V9aNWARYkujePWzOHu1JD6ez4AXBxCMYHVCQqZuD-eab-CnlN"></script>
+<script>
+    paypal.Buttons({
+        createOrder: function(data, action) {
+            var items = [
+                @foreach (var item in Model)
+                {
+                    <text>{
+                        name: '@item.Title',
+                        sku: '@item.DishId',
+                        unit_amount: {
+                            currency_code: 'USD',
+                            value: '@(item.Price.HasValue ? item.Price.Value.ToString("F2") : "0.00")'
+                        },
+                        quantity: '@item.Quantity'
+                    },</text>
+                }
+            ];
+
+            var totalAmount = @Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity : 0).ToString("F2");
+
+            return action.order.create({
+                purchase_units: [
+                    {
+                        amount: {
+                            currency_code: "USD",
+                            value: totalAmount,
+                            breakdown: {
+                                item_total: {
+                                    currency_code: "USD",
+                                    value: totalAmount
+                                }
+                            }
+                        },
+                        items: items
+                    }
+                ]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function() {
+                // Wait for 2 seconds before submitting the form
+                setTimeout(function() {
+                    document.querySelector('form').submit();
+                }, 2000);
+            });
+        },
+        onError: function(err) {
+            console.error('Payment Error:', err);
+        },
+        style: {
+            layout: 'vertical',
+            color: 'blue',
+            shape: 'rect',
+            label: 'paypal'
+        }
+    }).render('#paypal-button-container');
+</script>

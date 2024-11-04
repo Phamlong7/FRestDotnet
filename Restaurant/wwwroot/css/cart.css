@@ -45,3 +45,15 @@
       -webkit-appearance: none;
       margin: 0;
   }
+
+  .cart-number {
+    background-color: #128AFA;
+    color: white;
+    font-size: 14px;
+    font-weight: light;
+    border-radius: 50%;
+    padding: 4px 8px;
+    position: relative;
+    top: -10px;
+    left: -5px;
+   }
