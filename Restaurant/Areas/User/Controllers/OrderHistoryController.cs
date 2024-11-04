@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.Repository;
+using Restaurant.Utility;
 using Restaurant.ViewModels;
 
 namespace Restaurant.Areas.User.Controllers
@@ -14,12 +15,16 @@ namespace Restaurant.Areas.User.Controllers
     {
         private readonly DataContext _dataContext;
         private readonly UserManager<UserModel> _userManager;
+        private readonly SendMail _sendMail;
+        private readonly ConstantHelper _constantHelper;
         private const string CartSessionName = "CartSession";
 
-        public OrderHistoryController(DataContext context, UserManager<UserModel> userManager)
+        public OrderHistoryController(DataContext context, UserManager<UserModel> userManager, SendMail sendMail, ConstantHelper constantHelper)
         {
             _dataContext = context;
             _userManager = userManager;
+            _sendMail = sendMail;
+            _constantHelper = constantHelper;
         }
         public async Task<IActionResult> Index()
         {
@@ -80,6 +85,20 @@ namespace Restaurant.Areas.User.Controllers
                 // Clear the cart from the session
                 HttpContext.Session.Remove(CartSessionName); // Clear the cart session
 
+                // Get the current user's email
+                var currentUser = await _userManager.GetUserAsync(User);
+                string userEmail = currentUser?.Email;
+
+                // Prepare the email body using the order details
+                string emailBody = GenerateEmailBody(newOrder.orderDetails); // Pass order details
+
+                // Send confirmation email
+                bool emailSent = await _sendMail.SendEmailAsync(
+                    userEmail,
+                    "Order Confirmation",
+                    emailBody
+                );
+
                 TempData["SuccessMessage"] = "Order created successfully!";
                 return RedirectToAction("Index");
             }
@@ -136,6 +155,29 @@ namespace Restaurant.Areas.User.Controllers
 
             TempData["SuccessMessage"] = "Order cancelled successfully!";
             return RedirectToAction("Index");
+        }
+
+        //generate email to send user
+        private string GenerateEmailBody(IEnumerable<OrderDetailModel> orderDetails)
+        {
+            var body = "<h1>Your order has been successfully created!</h1><p>Thank you for your order. Here are the details:</p><table>";
+            body += "<tr><th>Item</th><th>Price</th><th>Quantity</th><th>Image</th></tr>";
+
+            foreach (var item in orderDetails)
+            {
+                var dish = _dataContext.dish.FirstOrDefault(d => d.id == item.dishId);
+
+                body += $"<tr>" +
+                            $"<td>{dish?.title}</td>" +
+                            $"<td>{item.priceAtOrder.Value.ToString("N2")} $</td>" +
+                            $"<td>{item.quantity}</td>" +
+                            $"<td><img src='https://localhost:5246/Media/{dish?.banner}' style='width:100px;'/></td>" +//not work
+                        $"</tr>";
+            }
+
+            body += "</table>";
+            body += "<p>We appreciate your business!</p>";
+            return body;
         }
     }
 }

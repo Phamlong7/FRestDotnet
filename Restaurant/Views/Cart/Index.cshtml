@@ -30,12 +30,7 @@
 
         @if (Model.Any())
         {
-            // Dynamically set the form action based on the logged-in user's role
-            var formAction = User.IsInRole("ADMIN")
-            ? Url.Action("Create", "Order", new { area = "Admin" })
-            : Url.Action("Create", "OrderHistory", new { area = "User" });
-
-            <form method="post" action="@formAction">
+            <form method="post" asp-action="Checkout" asp-controller="Cart">
                 @Html.AntiForgeryToken()
                 <table class="table table-borderless cart-table">
                     <thead>
@@ -97,7 +92,7 @@
                 </div>
 
                 <div class="form-group mt-4 text-right">
-                    <button class="btn btn-primary py-2 px-4" type="submit">Add To Order</button>
+                    <button type="submit" class="btn btn-primary">Proceed to Checkout</button>
                 </div>
             </form>
         }

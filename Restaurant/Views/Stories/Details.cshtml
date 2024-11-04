@@ -26,7 +26,7 @@
                             <div><a href="#">@Model.createdBy</a></div>
                         </div>
                         <h3 class="heading text-break">@Model.title</h3>
-                        <p class="text-break">@Model.content</p>
+                        @Html.Raw(@Model.content)
                     </div>
                 </div>
             </div>
