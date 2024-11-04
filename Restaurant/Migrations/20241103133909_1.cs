@@ -273,6 +273,36 @@ namespace Restaurant.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    CommentId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    BlogId = table.Column<long>(type: "bigint", nullable: false),
+                    ParentCommentId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_Comments_Blogs_BlogId",
+                        column: x => x.BlogId,
+                        principalTable: "Blogs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_Comments_ParentCommentId",
+                        column: x => x.ParentCommentId,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Dish",
                 columns: table => new
                 {
@@ -366,6 +396,16 @@ namespace Restaurant.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_BlogId",
+                table: "Comments",
+                column: "BlogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_ParentCommentId",
+                table: "Comments",
+                column: "ParentCommentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Dish_categoryId",
                 table: "Dish",
                 column: "categoryId");
@@ -403,7 +443,7 @@ namespace Restaurant.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Blogs");
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");
@@ -413,6 +453,9 @@ namespace Restaurant.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Blogs");
 
             migrationBuilder.DropTable(
                 name: "Dish");

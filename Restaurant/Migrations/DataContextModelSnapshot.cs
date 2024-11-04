@@ -293,6 +293,44 @@ namespace Restaurant.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("Restaurant.Models.CommentModel", b =>
+                {
+                    b.Property<long>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CommentId"));
+
+                    b.Property<long>("BlogId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<long?>("ParentCommentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("BlogId");
+
+                    b.HasIndex("ParentCommentId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("Restaurant.Models.DishModel", b =>
                 {
                     b.Property<long>("id")
@@ -594,6 +632,24 @@ namespace Restaurant.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Restaurant.Models.CommentModel", b =>
+                {
+                    b.HasOne("Restaurant.Models.BlogModel", "Blog")
+                        .WithMany("Comments")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Restaurant.Models.CommentModel", "ParentComment")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Blog");
+
+                    b.Navigation("ParentComment");
+                });
+
             modelBuilder.Entity("Restaurant.Models.DishModel", b =>
                 {
                     b.HasOne("Restaurant.Models.CategoryModel", "category")
@@ -633,9 +689,19 @@ namespace Restaurant.Migrations
                     b.Navigation("user");
                 });
 
+            modelBuilder.Entity("Restaurant.Models.BlogModel", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("Restaurant.Models.CategoryModel", b =>
                 {
                     b.Navigation("dish");
+                });
+
+            modelBuilder.Entity("Restaurant.Models.CommentModel", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("Restaurant.Models.DishModel", b =>
