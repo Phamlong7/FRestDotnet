@@ -497,7 +497,7 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme); // Change this line
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme); 
             return RedirectToAction("Index", "Home");
         }
 
