@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Restaurant.Models;
 using Restaurant.Repository;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -18,6 +20,28 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
+            var latestComments = _context.comment
+                .Include(c => c.Blog)  // Ensure Blog is included
+                .Where(c => c.CreatedDate >= DateTime.Now.AddDays(-7))  // Last 7 days filter
+                .OrderByDescending(c => c.CreatedDate)  // Order by newest first
+                .ToList();  // Retrieve all comments within the last 7 days
+
+            var latestOrders = _context.order
+                .Include(o => o.orderDetails)
+                .ThenInclude(od => od.dish)
+                .Where(o => o.createdDate >= DateTime.Now.AddDays(-7))
+                .OrderByDescending(o => o.createdDate)
+                .ToList();
+
+            var combinedNotifications = latestComments.Cast<object>()
+                .Concat(latestOrders.Cast<object>())
+                .OrderByDescending(n => n is CommentModel comment ? comment.CreatedDate : (n is OrderModel order ? order.createdDate : DateTime.MinValue))
+                .ToList();
+
+            ViewData["LatestComments"] = latestComments;
+            ViewData["LatestOrders"] = latestOrders;
+            ViewData["CombinedNotifications"] = combinedNotifications;
+
             var today = DateTime.Today;
             var lastWeek = today.AddDays(-7);
 
@@ -152,6 +176,7 @@ namespace Restaurant.Areas.Admin.Controllers
             // Blog and Updates 
             ViewBag.BlogUpdates = blogupdates;
             return View();
+
         }
 
         private double CalculatePercentageChange(int oldValue, int newValue)

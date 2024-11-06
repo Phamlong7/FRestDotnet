@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models;
+using Restaurant.Repository;
 using Restaurant.Utility;
 using Restaurant.ViewModels;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Restaurant.Controllers
@@ -11,16 +14,18 @@ namespace Restaurant.Controllers
     [Authorize(Roles = "USER, ADMIN")]
     public class ContactController : Controller
     {
+        private readonly DataContext _dataContext;
         private readonly SendMail _sendMail;
         private readonly UserManager<UserModel> _userManager;
         private readonly ConstantHelper _constantHelper;
         private const string CartSessionName = "CartSession";
 
-        public ContactController(SendMail sendMail, UserManager<UserModel> userManager, ConstantHelper constantHelper)
+        public ContactController(SendMail sendMail, UserManager<UserModel> userManager, ConstantHelper constantHelper, DataContext dataContext)
         {
             _sendMail = sendMail;
             _userManager = userManager;
             _constantHelper = constantHelper;
+            _dataContext = dataContext;
         }
 
         public async Task<IActionResult> Index()
@@ -28,12 +33,23 @@ namespace Restaurant.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser != null)
             {
-                ViewBag.UserName = currentUser.UserName; // Assuming UserName contains the user's full name
-                ViewBag.UserEmail = currentUser.Email; // Get the user's email
+                ViewBag.UserName = currentUser.UserName; // Giả sử UserName chứa tên đầy đủ của người dùng
+                ViewBag.UserEmail = currentUser.Email; // Lấy email của người dùng
             }
-            // Retrieve the cart from session or initialize an empty list if none exists
+
+            // Lấy ảnh quảng cáo từ bảng Ads
+            var adImage = _dataContext.ads
+                .Where(ad => ad.status == "active") // Chỉ lấy quảng cáo đang hoạt động
+                .OrderByDescending(ad => ad.createdDate) // Sắp xếp theo ngày tạo giảm dần
+                .Select(ad => ad.url) // Chọn trường URL của ảnh
+                .FirstOrDefault();
+
+            ViewBag.AdImageFileName = adImage; // Truyền ảnh quảng cáo vào ViewBag
+
+            // Lấy giỏ hàng từ session hoặc khởi tạo danh sách trống nếu không tồn tại
             var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
-            // Set the cart count in ViewData
+
+            // Set số lượng giỏ hàng vào ViewData
             ViewData["NumberCart"] = carts.Count;
 
             return View();
@@ -47,17 +63,17 @@ namespace Restaurant.Controllers
                 var currentUser = await _userManager.GetUserAsync(User);
                 if (currentUser != null)
                 {
-                    // Prepare the email body
+                    // Chuẩn bị nội dung email
                     string body = $"<strong>Name:</strong> {name}<br/>" +
                                   $"<strong>Email:</strong> {email}<br/>" +
                                   $"<strong>Message:</strong><br/>{message}";
 
-                    // Get the host email from ConstantHelper
-                    string hostEmail = _constantHelper.emailsender; // Use the sender email
+                    // Lấy email của người gửi từ ConstantHelper
+                    string hostEmail = _constantHelper.emailsender; // Sử dụng email đã cấu hình trong ConstantHelper
 
-                    // Send the email
+                    // Gửi email
                     bool emailSent = await _sendMail.SendEmailAsync(
-                        hostEmail, // Email to send to (configured in ConstantHelper)
+                        hostEmail, // Email gửi đến (được cấu hình trong ConstantHelper)
                         subject,
                         body
                     );
@@ -74,7 +90,7 @@ namespace Restaurant.Controllers
                 }
             }
 
-            return View("Index");
+            return View("Index"); // Trả về view "Index" nếu model không hợp lệ
         }
     }
 }

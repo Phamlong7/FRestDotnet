@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Restaurant.Models
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -35,7 +36,6 @@
 
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-
         <div class="d-flex align-items-center justify-content-between">
             <a asp-action="Index" asp-controller="Dashboard" class="logo d-flex align-items-center">
                 <img src="~/NiceAdmin/assets/img/logo.png" alt="">
@@ -43,6 +43,120 @@
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div><!-- End Logo -->
+
+        <div class="notification-icon d-flex align-items-center justify-content-end position-absolute top-0" style="right: 30px; padding-top: 10px;">
+            <i class="bi bi-bell-fill" style="font-size: 24px; cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false"></i>
+
+            <!-- Notification Dropdown Menu -->
+            <ul class="dropdown-menu dropdown-menu-end" style="max-height: 500px; overflow-y: auto; width: 400px; margin-left: 10px;" data-bs-auto-close="outside" id="notificationDropdown">
+
+                <!-- Tab Navigation -->
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link active" id="nav-all-tab" data-bs-toggle="tab" data-bs-target="#nav-all" type="button" role="tab">All</button>
+                        <button class="nav-link" id="nav-comments-tab" data-bs-toggle="tab" data-bs-target="#nav-comments" type="button" role="tab">Comments</button>
+                        <button class="nav-link" id="nav-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-orders" type="button" role="tab">Orders</button>
+                    </div>
+                </nav>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="nav-tabContent" style="padding-top: 10px;">
+                    <!-- All Notifications Tab -->
+                    <div class="tab-pane fade show active" id="nav-all" role="tabpanel">
+                        @* Display both comments and orders *@
+                        @if (ViewData["CombinedNotifications"] != null)
+                        {
+                            var combinedNotifications = ViewData["CombinedNotifications"] as List<object>;
+
+                            if (combinedNotifications != null && combinedNotifications.Any())
+                            {
+                                @foreach (var notification in combinedNotifications)
+                                {
+                                    if (notification is CommentModel comment)
+                                    {
+                                        <li class="notification-item">
+                                            <a class="dropdown-item" href="@Url.Action("Detail", "Stories", new { id = comment.BlogId, area = "" })" target="_blank">
+                                                <strong>@($"@{comment.UserName}")</strong> commented on
+                                                <em>@(comment.Blog?.title ?? "Unknown Title")</em>:
+                                                <p>@(comment.Content.Length > 35 ? comment.Content.Substring(0, 35) + "..." : comment.Content)</p>
+                                                <small class="text-muted">@comment.CreatedDate.ToString("MMMM dd, yyyy HH:mm")</small>
+                                            </a>
+                                        </li>
+                                    }
+                                    else if (notification is OrderModel order)
+                                    {
+                                        <li class="notification-item">
+                                            <a class="dropdown-item" href="@Url.Action("Detail", "Order", new { id = order.id, area = "Admin" })" target="_blank">
+                                                <strong>Order #@order.id</strong> - Status: @order.status
+                                                <small class="text-muted">@order.createdDate?.ToString("MMMM dd, yyyy HH:mm")</small>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <li><a class="dropdown-item" href="#">No new notifications</a></li>
+                            }
+                        }
+                    </div>
+
+                    <!-- Comments Tab -->
+                    <div class="tab-pane fade" id="nav-comments" role="tabpanel">
+                        @* Display comments only *@
+                        @if (ViewData["LatestComments"] != null)
+                        {
+                            var comments = ViewData["LatestComments"] as List<CommentModel>;
+                            if (comments != null && comments.Any())
+                            {
+                                @foreach (var comment in comments)
+                                {
+                                    <li class="notification-item">
+                                        <a class="dropdown-item" href="@Url.Action("Detail", "Stories", new { id = comment.BlogId, area = "" })" target="_blank">
+                                            <strong>@($"@{comment.UserName}")</strong> commented on 
+                                            <em>@(comment.Blog?.title ?? "Unknown Title")</em>:
+                                            <p>@(comment.Content.Length > 35 ? comment.Content.Substring(0, 35) + "..." : comment.Content)</p>
+                                            <small class="text-muted">@comment.CreatedDate.ToString("MMMM dd, yyyy HH:mm")</small>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li><a class="dropdown-item" href="#">No new comments</a></li>
+                            }
+                        }
+                    </div>
+
+                    <!-- Orders Tab -->
+                    <div class="tab-pane fade" id="nav-orders" role="tabpanel">
+                        @* Display orders only *@
+                        @if (ViewData["LatestOrders"] != null)
+                        {
+                            var orders = ViewData["LatestOrders"] as List<OrderModel>;
+                            if (orders != null && orders.Any())
+                            {
+                                @foreach (var order in orders)
+                                {
+                                    <li class="notification-item">
+                                        <a class="dropdown-item" href="@Url.Action("Detail", "Order", new { id = order.id, area = "Admin" })" target="_blank">
+                                            <strong>Order #@order.id</strong> - Status: @order.status
+                                            <small class="text-muted">@order.createdDate?.ToString("MMMM dd, yyyy HH:mm")</small>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li><a class="dropdown-item" href="#">No new orders</a></li>
+                            }
+                        }
+                    </div>
+                </div>
+            </ul>
+        </div>
+
+
 
     </header><!-- End Header -->
     <!-- ======= Sidebar ======= -->
@@ -160,3 +274,50 @@
 </body>
 
 </html>
+
+<style>
+    .notification-icon {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        right: 30px;
+        padding-top: 10px;
+    }
+
+    .notification-item {
+        transition: background-color 0.3s ease;
+        position: relative;
+        max-width: 100%;
+    }
+
+        .notification-item .dropdown-item {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Style the title and content truncation */
+        .notification-item a {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .notification-item strong,
+        .notification-item em {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+</style>
+
+<script>
+    // Prevent dropdown from closing on clicks within the notification dropdown
+    document.getElementById("notificationDropdown").addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+</script>
