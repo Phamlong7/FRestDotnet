@@ -217,30 +217,26 @@
     <script src="~/js/Language.js"></script>
     <!-- jQuery and Bootstrap Scripts -->
 
-    <script>
+    <script> //script for logo change
         document.addEventListener("DOMContentLoaded", function () {
             const navbar = document.getElementById("ftco-navbar");
             const logo = document.getElementById("navbar-logo");
 
-            // Define the two logo images
             const defaultLogoSrc = "/images/FRest_Logo.png";
-            const scrolledAwakeLogoSrc = "/images/FRest_LogoBlack.png"; // Logo when both classes are applied
-
-            // Function to update the logo based on the presence of both classes
+            const scrolledAwakeLogoSrc = "/images/FRest_LogoBlack.png"; 
+ 
             function updateLogo() {
                 if (navbar.classList.contains("scrolled") && navbar.classList.contains("awake")) {
-                    logo.src = scrolledAwakeLogoSrc; // Change to scrolled-awake logo
+                    logo.src = scrolledAwakeLogoSrc; 
                 } else {
-                    logo.src = defaultLogoSrc; // Change back to default logo
+                    logo.src = defaultLogoSrc; 
                 }
             }
 
-            // Listen for scroll events and update the logo based on both classes
             window.addEventListener("scroll", function () {
                 updateLogo();
             });
 
-            // Initial check in case the page loads with both classes already applied
             updateLogo();
         });
     </script>
