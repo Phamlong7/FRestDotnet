@@ -1,0 +1,42 @@
+@model IEnumerable<Restaurant.ViewModels.CartItemViewModel>
+
+@{
+    decimal totalAmount = 0;
+}
+
+<div class="cart-title" style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333;">
+    Your Cart
+</div>
+<hr style="border-top: 1px solid #ddd; margin-bottom: 15px;" />
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        // Check if Price is null, default to 0 if it is
+        var price = item.Price ?? 0;
+        var quantity = item.Quantity;
+
+        totalAmount += price * quantity;
+
+        <div class="cart-item" data-price="@price" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f1f1; padding: 8px 0;">
+            <img src="/Media/@item.Banner" alt="@item.Title" style="width: 70px; height: 70px; object-fit: cover; margin-right: 10px;" />
+            <div class="cart-item-details" style="flex: 1; display: flex; flex-direction: column;">
+                <span class="cart-item-title" style="font-weight: bold; color: #128AFA;">Title: @item.Title</span>
+                <span class="cart-item-quantity" style="color: #555;">Quantity: @quantity</span>
+                <span class="cart-item-price" style="color: #555;">Price: @price.ToString("C")</span>
+            </div>
+            <span class="remove-item" data-id="@item.DishId" style="color: red; cursor: pointer; font-weight: bold; margin-left: 10px;">X</span>
+        </div>
+    }
+
+    <div class="cart-total" style="text-align: right; font-weight: bold; font-size: 16px; margin-top: 10px;">
+        Total Amount: <span id="total-amount">@totalAmount.ToString("C")</span>
+    </div>
+}
+else
+{
+    <div class="empty-cart-message" style="text-align: center; color: #555; margin-top: 10px;">
+        There are no dishs in your cart.
+    </div>
+}

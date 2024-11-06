@@ -64,3 +64,103 @@ $(document).ready(function () {
         }, 3000); // 3-second delay before fading out
     }
 });
+
+document.getElementById('cart-toggle').addEventListener('click', function (e) {
+    e.preventDefault();
+    const cartDropdown = document.getElementById('cart-dropdown');
+
+    // Toggle visibility of the cart dropdown
+    cartDropdown.style.display = (cartDropdown.style.display === 'block') ? 'none' : 'block';
+    cartDropdown.style.width = '300px';
+    cartDropdown.style.maxHeight = '550px';
+    cartDropdown.style.padding = '20px';
+
+    // Fetch and display cart items from the partial view
+    fetch('/Cart/GetCartItems')
+        .then(response => response.text())
+        .then(html => {
+            const cartItemsContainer = document.querySelector('.cart-items');
+            cartItemsContainer.innerHTML = html;  // Directly insert the HTML from the partial
+
+            // Reattach event listeners for remove buttons after loading items
+            attachRemoveItemEventListeners();
+
+            // Show or hide footer based on cart item count
+            toggleFooterVisibility();
+        })
+        .catch(error => console.error('Error fetching cart items:', error));
+});
+
+// Function to attach the remove item event listeners
+function attachRemoveItemEventListeners() {
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function () {
+            const dishId = this.getAttribute('data-id');
+
+            fetch(`/Cart/Remove?dishId=${dishId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the cart item from the DOM
+                        this.closest('.cart-item').remove();
+
+                        // Update the cart number
+                        document.querySelector('.cart-number').textContent = data.numberCart;
+
+                        // Recalculate the total amount based on remaining items
+                        updateTotalAmount();
+
+                        // Show or hide footer based on cart item count
+                        toggleFooterVisibility();
+
+                        // If the cart is empty, display the empty message
+                        if (data.isEmpty) {
+                            document.querySelector('.cart-items').innerHTML = `
+                            <div class="cart-title" style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333;">
+                             Your Cart
+                            </div>
+<hr style="border-top: 1px solid #ddd; margin-bottom: 15px;" />
+                            <div class="empty-cart-message" style="text-align: center; color: #555; margin-top: 10px;">
+                                There are no items in your cart.
+                            </div>`;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error removing item:', error));
+        });
+    });
+}
+
+// Function to recalculate the total amount and toggle footer visibility
+function updateTotalAmount() {
+    let total = 0;
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const itemPrice = parseFloat(item.getAttribute('data-price'));
+        const itemQuantity = parseInt(item.querySelector('.cart-item-quantity').textContent.replace('Quantity: ', ''));
+        total += itemPrice * itemQuantity;
+    });
+
+    // Format total with comma as thousands separator
+    document.getElementById('total-amount').textContent = `$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    // Show or hide footer based on cart item count
+    toggleFooterVisibility();
+
+    // Reattach the remove event listeners after total update
+    attachRemoveItemEventListeners();
+}
+
+// Function to show/hide footer based on cart item presence
+function toggleFooterVisibility() {
+    const footer = document.getElementById('dropdown-footer');
+    const hasItems = document.querySelectorAll('.cart-item').length > 0;
+    footer.style.display = hasItems ? 'block' : 'none';
+}
+
+// Initial call to attach event listeners when the page loads
+document.addEventListener('DOMContentLoaded', attachRemoveItemEventListeners);

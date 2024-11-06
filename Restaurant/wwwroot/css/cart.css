@@ -39,7 +39,7 @@
       background-color: #007bff !important;
   }
 
-  /* Remove arrows from number input */
+  
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
@@ -57,3 +57,138 @@
     top: -10px;
     left: -5px;
    }
+
+
+.nav-item {
+    position: relative; 
+}
+
+.cart-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f1f1f1; 
+    transition: background-color 0.3s;
+}
+
+   
+    .cart-item:hover {
+        background-color: #f8f9fa;
+    }
+
+
+.cart-item-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+
+.cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.cart-item-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+
+.cart-item-quantity,
+.cart-item-price {
+    font-size: 12px;
+    color: #555;
+}
+
+
+.cart-total {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.remove-item-btn {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: red;
+    margin-left: 10px;
+    transition: color 0.3s;
+}
+
+    .remove-item-btn:hover {
+        color: #c82333;
+    }
+
+
+#cart-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 450px;
+    max-height: 550px;
+    background-color: #fff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto; 
+    z-index: 9999;
+    border-radius: 8px; 
+}
+
+   
+    #cart-dropdown::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #cart-dropdown::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+
+        #cart-dropdown::-webkit-scrollbar-thumb:hover {
+            background-color: #999;
+        }
+
+
+.dropdown-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+    .dropdown-footer a {
+        width: 48%; 
+        text-align: center;
+    }
+
+
+@media (max-width: 500px) {
+    #cart-dropdown {
+        width: 100%; 
+        left: 0;
+        max-height: 300px; 
+        overflow-y: scroll;
+    }
+}
+
+
+

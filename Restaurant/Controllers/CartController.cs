@@ -153,5 +153,32 @@ namespace Restaurant.Controllers
             ViewData["OrderMessage"] = message;
             return View(cartItems);
         }
+
+        [HttpGet]
+        public IActionResult GetCartItems()
+        {
+            var carts = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionName) ?? new List<CartItemViewModel>();
+            var cartItems = new List<CartItemViewModel>();
+
+            foreach (var cart in carts)
+            {
+                var dish = _dataContext.dish.Find(cart.DishId);
+                if (dish != null)
+                {
+                    cartItems.Add(new CartItemViewModel
+                    {
+                        DishId = cart.DishId,
+                        Title = dish.title,
+                        Price = dish.price,
+                        Quantity = cart.Quantity,
+                        Banner = dish.banner
+                    });
+                }
+            }
+
+            return PartialView("_CartItemsPartial", cartItems);
+        }
+
+
     }
 }

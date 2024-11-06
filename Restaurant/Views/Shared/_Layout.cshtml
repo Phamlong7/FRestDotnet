@@ -8,6 +8,7 @@
     <link href="~/https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
     <link href="~/https://fonts.googleapis.com/css?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/images/BlueArchive.png" type="image/png">
 
     <link rel="stylesheet" href="~/css/open-iconic-bootstrap.min.css">
     <link rel="stylesheet" href="~/css/animate.css">
@@ -56,7 +57,9 @@
     </div>
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
         <div class="container">
-            <a class="navbar-brand" asp-action="Index" asp-controller="Home">FRest</a>
+            <a class="navbar-brand" asp-action="Index" asp-controller="Home">
+                <img src="/images/FRest_Logo.png" id="navbar-logo" alt="Logo" style="height: 100px;">
+            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="oi oi-menu"></span> Menu
             </button>
@@ -78,11 +81,23 @@
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active" : "")">
                         <a asp-action="Index" asp-controller="Contact" class="nav-link">Contact</a>
                     </li>
-                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Cart" ? "active" : "")">
-                        <a asp-action="Index" asp-controller="Cart" class="nav-link">
+                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Cart" ? "active" : "")" style="position: relative;">
+                        <a href="#" class="nav-link" id="cart-toggle">
                             Cart <span class="cart-number">@(ViewData["NumberCart"] is null ? 0 : Convert.ToInt32(ViewData["NumberCart"]))</span>
                         </a>
+                        <!-- Cart Dropdown Content -->
+                        <div id="cart-dropdown" class="dropdown-menu">
+                            <div class="cart-items">
+                                <!-- Cart Items will be dynamically inserted here -->
+                            </div>
+                            <div id="dropdown-footer" class="dropdown-footer" style="display: none;">
+                                <!-- Initially hidden -->
+                                <a href="@Url.Action("Index", "Cart")" class="btn btn-primary">View Cart</a>
+                                <a href="@Url.Action("Checkout", "Cart")" class="btn btn-success">Checkout</a>
+                            </div>
+                        </div>
                     </li>
+
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Wishlist" ? "active" : "")">
                         <a asp-action="Index" asp-controller="Wishlist" class="nav-link">
                             Wishlist <span id="wishlist-count">@(ViewData["NumberWishlist"] is null ? 0 : Convert.ToInt32(ViewData["NumberWishlist"]))</span>
@@ -201,5 +216,33 @@
     <script src="~/js/Chatbot.js"></script>
     <script src="~/js/Language.js"></script>
     <!-- jQuery and Bootstrap Scripts -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const navbar = document.getElementById("ftco-navbar");
+            const logo = document.getElementById("navbar-logo");
+
+            // Define the two logo images
+            const defaultLogoSrc = "/images/FRest_Logo.png";
+            const scrolledAwakeLogoSrc = "/images/FRest_LogoBlack.png"; // Logo when both classes are applied
+
+            // Function to update the logo based on the presence of both classes
+            function updateLogo() {
+                if (navbar.classList.contains("scrolled") && navbar.classList.contains("awake")) {
+                    logo.src = scrolledAwakeLogoSrc; // Change to scrolled-awake logo
+                } else {
+                    logo.src = defaultLogoSrc; // Change back to default logo
+                }
+            }
+
+            // Listen for scroll events and update the logo based on both classes
+            window.addEventListener("scroll", function () {
+                updateLogo();
+            });
+
+            // Initial check in case the page loads with both classes already applied
+            updateLogo();
+        });
+    </script>
 </body>
 </html>
