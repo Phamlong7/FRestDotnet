@@ -55,6 +55,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthentication(); // Just call AddAuthentication without parameters
 
 // Configure authentication with cookie scheme
+#pragma warning disable
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -96,6 +97,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Configure routing for controllers and areas
+#pragma warning disable 
 app.UseEndpoints(endpoints =>
 {
     // Route for Admin area

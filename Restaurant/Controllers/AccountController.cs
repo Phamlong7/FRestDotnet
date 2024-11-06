@@ -49,15 +49,13 @@ namespace Restaurant.Controllers
             {
                 UserModel? user;
 
-                // Check if the input is an email or username
+                // Determine if input is email or username
                 if (new EmailAddressAttribute().IsValid(model.EmailOrUsername))
                 {
-                    // Input is an email
                     user = await _userManager.FindByEmailAsync(model.EmailOrUsername);
                 }
                 else
                 {
-                    // Input is a username
                     user = await _userManager.FindByNameAsync(model.EmailOrUsername);
                 }
 
@@ -67,40 +65,44 @@ namespace Restaurant.Controllers
                     return View(model);
                 }
 
-                // Check if the user's account is ACTIVE
                 if (!user.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
                 {
                     ModelState.AddModelError("", "Your account has been banned or deactivated.");
                     return View(model);
                 }
 
+                // Sign in the user
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    // Add role claim
+                    // Fetch roles using UserManager
+                    var roles = await _userManager.GetRolesAsync(user);
+                    string userRole = roles.FirstOrDefault() ?? "USER"; // Default to "USER" if no roles are assigned
+
+                    // Ensure role claim is added for the session
                     var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, userRole) // Role claim from UserManager
             };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var authProperties = new AuthenticationProperties
                     {
                         IsPersistent = model.RememberMe,
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Set cookie expiration to 30 minutes
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                     };
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-                    // Set success notification
-                    TempData["SuccessMessage"] = "Login successful! Welcome " + user.UserName;
+                    TempData["SuccessMessage"] = $"Login successful! Welcome {user.UserName}";
 
-                    if (user.Role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+                    // Role-based redirection
+                    if (userRole.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Dashboard", "Admin");
                     }
-                    else if (user.Role.Equals("USER", StringComparison.OrdinalIgnoreCase))
+                    else if (userRole.Equals("USER", StringComparison.OrdinalIgnoreCase))
                     {
                         return RedirectToAction("Index", "Home");
                     }
@@ -495,7 +497,7 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme); // Change this line
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme); 
             return RedirectToAction("Index", "Home");
         }
 

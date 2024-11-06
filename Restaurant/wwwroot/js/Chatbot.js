@@ -3,11 +3,32 @@
     chatbox.is(':visible') ? chatbox.hide() : chatbox.show();
 }
 
+function addMessageToChatbox(type, message) {
+    const messageDiv = `<div class="message ${type}">${type === 'user' ? 'User' : 'Assistant'}: ${message}</div>`;
+    $('#chatbox-body').append(messageDiv);
+    $('#chatbox-body').scrollTop($('#chatbox-body')[0].scrollHeight);
+
+    // Store the message in localStorage
+    let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    chatHistory.push({ type, message });
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+}
+
+function loadChatHistory() {
+    const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    chatHistory.forEach(item => {
+        const messageDiv = `<div class="message ${item.type}">${item.type === 'user' ? 'User' : 'Assistant'}: ${item.message}</div>`;
+        $('#chatbox-body').append(messageDiv);
+    });
+    $('#chatbox-body').scrollTop($('#chatbox-body')[0].scrollHeight);
+}
+
 async function sendMessage() {
     const message = $('#chat-input').val();
     if (!message) return;
 
-    $('#chatbox-body').append(`<div class="message user">User: ${message}</div>`);
+    // Add user's message to chatbox and localStorage
+    addMessageToChatbox('user', message);
     $('#chat-input').val('');
 
     try {
@@ -23,8 +44,7 @@ async function sendMessage() {
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
-        let assistantResponseDiv = $('<div class="message assistant"></div>');
-        $('#chatbox-body').append(assistantResponseDiv);
+        let assistantResponse = '';
 
         while (true) {
             const { done, value } = await reader.read();
@@ -37,19 +57,22 @@ async function sendMessage() {
                 if (line.startsWith('data:')) {
                     const content = line.slice(6).trim();
                     if (content === '[DONE]') continue;
-                    assistantResponseDiv.append(content + ' ');
+                    assistantResponse += content + ' ';
                 }
             }
-
-            $('#chatbox-body').scrollTop($('#chatbox-body')[0].scrollHeight);
         }
+
+        // Add assistant's response to chatbox and localStorage
+        addMessageToChatbox('assistant', assistantResponse.trim());
     } catch (error) {
         console.error('Error:', error);
-        $('#chatbox-body').append(`<div class="message error">Error: ${error.message}</div>`);
+        addMessageToChatbox('error', `Error: ${error.message}`);
     }
 }
 
 $(document).ready(function () {
+    loadChatHistory(); // Load chat history on page load
+
     $('#send-btn').click(sendMessage);
 
     $('#chat-input').on('keypress', function (e) {

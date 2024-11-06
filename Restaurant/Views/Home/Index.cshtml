@@ -78,75 +78,6 @@
     </div>
 </section>
 
-<section class="ftco-section ftco-wrap-about">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-7 d-flex">
-                <div class="img img-1 mr-md-2" style="background-image: url(images/about.jpg);"></div>
-                <div class="img img-2 ml-md-2" style="background-image: url(images/about-1.jpg);"></div>
-            </div>
-            <div class="col-md-5 wrap-about pt-5 pt-md-5 pb-md-3 ftco-animate">
-                <div class="heading-section mb-4 my-5 my-md-0">
-                    <span class="subheading">About</span>
-                    <h2 class="mb-4">FRest Restaurant</h2>
-                </div>
-                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
-                <pc class="time">
-                    <span>Mon - Fri <strong>8 AM - 11 PM</strong></span>
-                    <span><a href="#">0123456789</a></span>
-                    </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<section class="ftco-section ftco-counter img ftco-no-pt" id="section-counter">
-    <div class="container">
-        <div class="row d-md-flex">
-            <div class="col-md-9">
-                <div class="row d-md-flex align-items-center">
-                    <div class="col-md-6 col-lg-3 mb-4 mb-lg-0 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18">
-                            <div class="text">
-                                <strong class="number" data-number="18">0</strong>
-                                <span>Years of Experienced</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-4 mb-lg-0 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18">
-                            <div class="text">
-                                <strong class="number" data-number="100">0</strong>
-                                <span>Menus/Dish</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-4 mb-lg-0 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18">
-                            <div class="text">
-                                <strong class="number" data-number="50">0</strong>
-                                <span>Staffs</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-4 mb-lg-0 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18">
-                            <div class="text">
-                                <strong class="number" data-number="15000">0</strong>
-                                <span>Happy Customers</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 text-center text-md-left">
-                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
 <section class="ftco-section bg-light">
     <div class="container">
         <div class="row justify-content-center mb-5 pb-2">
@@ -285,7 +216,7 @@
                              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); transition: transform 0.2s;"
                              onmouseover="this.style.transform='translateY(-5px)';"
                              onmouseout="this.style.transform='translateY(0)';">
-                            <a href="@Url.Action("Details", "Stories", new { id = blog.BlogId })"
+                            <a href="@Url.Action("Detail", "Stories", new { id = blog.BlogId })"
                                class="block-20"
                                style="background-image: url('/Media/@blog.BlogBanner');
                                       height: 250px;  /* Increased height for bigger banner */
@@ -298,10 +229,10 @@
                                     <div style="font-size: 0.85rem; color: #888;">@blog.BlogCreatedDate?.ToString("MMM. dd, yyyy")</div>
                                 </div>
                                 <h3 class="heading" style="font-size: 1.25rem; font-weight: bold;">
-                                    <a href="@Url.Action("Details", "Stories", new { id = blog.BlogId })" style="color: #333; text-decoration: none;">@blog.BlogTitle</a>
+                                    <a href="@Url.Action("Detail", "Stories", new { id = blog.BlogId })" style="color: #333; text-decoration: none;">@blog.BlogTitle</a>
                                 </h3>
                                 <p class="clearfix" style="margin-top: 10px;">
-                                    <a href="@Url.Action("Details", "Stories", new { id = blog.BlogId })" class="float-left read" style="color: #007bff; text-decoration: none;">Read more</a>
+                                    <a href="@Url.Action("Detail", "Stories", new { id = blog.BlogId })" class="float-left read" style="color: #007bff; text-decoration: none;">Read more</a>
                                     <a class="float-right meta-chat" style="color: #888;"><span class="icon-chat"></span> 0</a>
                                 </p>
                             </div>
