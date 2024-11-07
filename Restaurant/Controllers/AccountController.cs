@@ -20,6 +20,7 @@ namespace Restaurant.Controllers
         private readonly ConstantHelper _constantHelper;
         private readonly SendMail _sendMail;
         private readonly ILogger<AccountController> _logger;
+        private const string CartSessionName = "CartSession";
 
         public AccountController(
              SignInManager<UserModel> signInManager,
@@ -494,6 +495,8 @@ namespace Restaurant.Controllers
 
         public async Task<IActionResult> Logout()
         {
+            // Clear the cart from the session
+            HttpContext.Session.Remove(CartSessionName); // Clear the cart session
             await _signInManager.SignOutAsync();
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme); // Change this line
             return RedirectToAction("Index", "Home");
