@@ -247,6 +247,35 @@ namespace Restaurant.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Conversation",
+                columns: table => new
+                {
+                    ConversationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    AdminId = table.Column<long>(type: "bigint", nullable: false),
+                    LastMessageTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Conversation", x => x.ConversationId);
+                    table.ForeignKey(
+                        name: "FK_Conversation_AspNetUsers_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Conversation_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Order",
                 columns: table => new
                 {
@@ -331,6 +360,36 @@ namespace Restaurant.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Message",
+                columns: table => new
+                {
+                    MessageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ConversationId = table.Column<int>(type: "int", nullable: false),
+                    SenderId = table.Column<long>(type: "bigint", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsSeen = table.Column<bool>(type: "bit", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Message", x => x.MessageId);
+                    table.ForeignKey(
+                        name: "FK_Message_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Message_Conversation_ConversationId",
+                        column: x => x.ConversationId,
+                        principalTable: "Conversation",
+                        principalColumn: "ConversationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderDetails",
                 columns: table => new
                 {
@@ -406,9 +465,29 @@ namespace Restaurant.Migrations
                 column: "ParentCommentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Conversation_AdminId",
+                table: "Conversation",
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Conversation_UserId",
+                table: "Conversation",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Dish_categoryId",
                 table: "Dish",
                 column: "categoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Message_ConversationId",
+                table: "Message",
+                column: "ConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Message_SenderId",
+                table: "Message",
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_userId",
@@ -446,6 +525,9 @@ namespace Restaurant.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
+                name: "Message");
+
+            migrationBuilder.DropTable(
                 name: "OrderDetails");
 
             migrationBuilder.DropTable(
@@ -456,6 +538,9 @@ namespace Restaurant.Migrations
 
             migrationBuilder.DropTable(
                 name: "Blogs");
+
+            migrationBuilder.DropTable(
+                name: "Conversation");
 
             migrationBuilder.DropTable(
                 name: "Dish");

@@ -331,6 +331,39 @@ namespace Restaurant.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("Restaurant.Models.ConversationModel", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConversationId"));
+
+                    b.Property<long>("AdminId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastMessage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastMessageTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ConversationId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Conversation");
+                });
+
             modelBuilder.Entity("Restaurant.Models.DishModel", b =>
                 {
                     b.Property<long>("id")
@@ -381,6 +414,42 @@ namespace Restaurant.Migrations
                     b.HasIndex("categoryId");
 
                     b.ToTable("Dish");
+                });
+
+            modelBuilder.Entity("Restaurant.Models.MessageModel", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSeen")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("SenderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("Restaurant.Models.OrderDetailModel", b =>
@@ -650,6 +719,25 @@ namespace Restaurant.Migrations
                     b.Navigation("ParentComment");
                 });
 
+            modelBuilder.Entity("Restaurant.Models.ConversationModel", b =>
+                {
+                    b.HasOne("Restaurant.Models.UserModel", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Restaurant.Models.UserModel", "User")
+                        .WithMany("Conversations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Restaurant.Models.DishModel", b =>
                 {
                     b.HasOne("Restaurant.Models.CategoryModel", "category")
@@ -658,6 +746,25 @@ namespace Restaurant.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("category");
+                });
+
+            modelBuilder.Entity("Restaurant.Models.MessageModel", b =>
+                {
+                    b.HasOne("Restaurant.Models.ConversationModel", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Restaurant.Models.UserModel", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Restaurant.Models.OrderDetailModel", b =>
@@ -704,6 +811,11 @@ namespace Restaurant.Migrations
                     b.Navigation("Replies");
                 });
 
+            modelBuilder.Entity("Restaurant.Models.ConversationModel", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("Restaurant.Models.DishModel", b =>
                 {
                     b.Navigation("orderDetails");
@@ -716,6 +828,8 @@ namespace Restaurant.Migrations
 
             modelBuilder.Entity("Restaurant.Models.UserModel", b =>
                 {
+                    b.Navigation("Conversations");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618

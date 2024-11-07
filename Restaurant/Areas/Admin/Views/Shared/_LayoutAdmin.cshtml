@@ -101,6 +101,7 @@
                         }
                     </div>
 
+
                     <!-- Comments Tab -->
                     <div class="tab-pane fade" id="nav-comments" role="tabpanel">
                         @* Display comments only *@
@@ -155,8 +156,6 @@
                 </div>
             </ul>
         </div>
-
-
 
     </header><!-- End Header -->
     <!-- ======= Sidebar ======= -->
@@ -222,6 +221,13 @@
                 </a>
             </li><!-- End Web Setting Nav -->
 
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chat" ? "active" : "collapsed")" asp-action="Index" asp-controller="Chat">
+                    <i class="bi bi-sliders"></i>
+                    <span>Chat</span>
+                </a>
+            </li><!-- End Chat Nav -->
+
             <li class="nav-heading">Account</li>
 
             <li class="nav-item">
@@ -257,6 +263,7 @@
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
+    <script src="~/js/jquery.min.js"></script>
     <script src="~/NiceAdmin/assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="~/NiceAdmin/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/NiceAdmin/assets/vendor/chart.js/chart.umd.js"></script>

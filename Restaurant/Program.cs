@@ -36,7 +36,7 @@ builder.Services.AddIdentity<UserModel, IdentityRole<long>>(options =>
 
 // Add RoleManager explicitly
 builder.Services.AddScoped<RoleManager<IdentityRole<long>>>();
-
+builder.Services.AddSignalR();
 // Add other services
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IFileService, FileService>(); // File service

@@ -1,0 +1,15 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Restaurant.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    [Authorize(Roles = "ADMIN")]
+    public class ChatController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+    }
+}

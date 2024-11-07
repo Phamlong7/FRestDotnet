@@ -18,6 +18,9 @@ namespace Restaurant.Repository
         public DbSet<BlogModel> blog { get; set; }
         public DbSet<UserModel> user { get; set; }
         public DbSet<CommentModel> comment { get; set; }
+        public DbSet<ConversationModel> conversations { get; set; }
+        public DbSet<MessageModel> messages { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,6 +51,30 @@ namespace Restaurant.Repository
                 .HasOne(c => c.ParentComment)
                 .WithMany(c => c.Replies)
                 .HasForeignKey(c => c.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ConversationModel>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Conversations)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ConversationModel>()
+                .HasOne(c => c.Admin)
+                .WithMany()
+                .HasForeignKey(c => c.AdminId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MessageModel>()
+                .HasOne(m => m.Conversation)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MessageModel>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

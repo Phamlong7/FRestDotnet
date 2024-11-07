@@ -33,5 +33,6 @@ namespace Restaurant.Models
         public string Status { get; set; } = "ACTIVE"; 
 
         public ICollection<OrderModel> Orders { get; set; }
+        public ICollection<ConversationModel>? Conversations { get; set; }
     }
 }
