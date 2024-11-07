@@ -64,7 +64,6 @@
                                             <b>Id</b>
                                         </th>
                                         <th>Title</th>
-                                        <th>Content</th>
                                         <th>Banner</th>
                                         <th data-type="date" data-format="YYYY/DD/MM">createdDate</th>
                                         <th data-type="date" data-format="YYYY/DD/MM">updatedDate</th>
@@ -81,16 +80,6 @@
                                                 <td>@item.id</td>
                                                 <td class="text-break" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                                                     @item.title.Substring(0, Math.Min(20, @item.title.Length))@(item.title.Length > 20 ? "..." : "")
-                                                </td>
-                                                <td>
-                                                    <div class="content-container" style="position: relative; padding-right: 20px; visibility: hidden;">
-                                                        <!-- Reduced padding -->
-                                                        <span class="content-preview text-break">@item.content.Substring(0, Math.Min(100, item.content.Length))...</span>
-                                                        @if (item.content.Length > 100)
-                                                        {
-                                                            <span class="content-full text-break" style="display: none;">@item.content</span>
-                                                        }
-                                                    </div>
                                                 </td>
                                                 <td>
                                                     @if (!string.IsNullOrWhiteSpace(item.banner))

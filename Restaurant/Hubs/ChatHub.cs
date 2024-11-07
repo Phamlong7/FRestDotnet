@@ -161,7 +161,6 @@ namespace Restaurant.Hubs
             conversation.LastMessage = content;
 
             await _context.SaveChangesAsync();
-
             var messageResponse = new
             {
                 message.MessageId,
@@ -255,7 +254,8 @@ namespace Restaurant.Hubs
                 {
                     UserId = userId,
                     AdminId = adminId,
-                    LastMessageTime = DateTime.UtcNow
+                    LastMessageTime = DateTime.UtcNow,
+                    LastMessage = string.Empty
                 };
 
                 await _context.conversations.AddAsync(conversation);

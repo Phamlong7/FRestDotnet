@@ -55,8 +55,8 @@
                         </div>
                     </div>
                 </div>`
-                
-            if (!isNewUserMessage){
+
+            if (!isNewUserMessage) {
                 $(".inbox_chat").append(content);
             } else {
                 $(".inbox_chat").prepend(content);
@@ -113,7 +113,7 @@
     async function loadMessages(conversationId) {
         if (isLoadingMessages || !hasMoreMessages) return;
         isLoadingMessages = true;
-        
+
         try {
             await connection.invoke("GetMessages", conversationId, currentPage);
         } catch (err) {
@@ -172,7 +172,7 @@
         let { dateOnly, timeOnly, fullDateTime } = formatDate(msg.timestamp);
         let conversationId = msg.conversationId;
 
-        if (isNewUserMessage){
+        if (isNewUserMessage) {
             let conversation = $(`.chat_list[data-conversation-id=${conversationId}]`);
             if (conversation.length > 0) {
                 let lastMessage = msg.content;
@@ -211,12 +211,17 @@
         if (isNewUserMessage) {
             $(".msg_history").append(messageHtml);
 
-            // nếu thanh scroll không ở cuối thì hiển thị một nút để cuộn xuống
-            if ($(".msg_history").scrollTop() + $(".msg_history").innerHeight() < $(".msg_history")[0].scrollHeight) {
+            const msgHistory = $(".msg_history");
+            const hasScroll = msgHistory[0].scrollHeight > msgHistory.outerHeight();
+
+            if (hasScroll && msgHistory.scrollTop() + msgHistory.innerHeight() < msgHistory[0].scrollHeight) {
                 setTimeout(function () {
                     $(".scroll-down-container").show();
                 }, 1100);
+            } else {
+                $(".scroll-down-container").hide();
             }
+
         } else {
             $(".msg_history").prepend(messageHtml);
         }
