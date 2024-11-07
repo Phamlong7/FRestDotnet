@@ -1,95 +1,115 @@
-﻿@using Restaurant.Models
-@model AdsModel
-
+﻿@model Restaurant.Models.AdsModel
 @{
-    ViewData["Title"] = "Create New Ad";
+    ViewData["Title"] = "Create An Ad";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <main id="content" class="content-area">
     <div class="pagetitle">
-        <h1>Create New Ad</h1>
+        <h1>Create An Ad</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Ads", new { area = "Admin" })">Home</a></li>
+                <li class="breadcrumb-item"><a asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item">Ads</li>
                 <li class="breadcrumb-item active">Create</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
 
-    <section class="section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Add An Ad</h5>
-                            <form asp-action="Create" method="post" enctype="multipart/form-data">
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                <div class="row mb-3">
-                                    <label asp-for="imageUpload" class="col-sm-2 col-form-label">Image</label>
-                                    <div class="col-sm-10">
-                                        <input asp-for="imageUpload" class="form-control" type="file" accept="image/*" required />
-                                        <span asp-validation-for="imageUpload" class="text-danger"></span>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Create An Ad</h5>
+
+                        <form asp-action="Create" method="post" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="id" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row mb-3">
+                                <label asp-for="imageUpload" class="col-sm-2 col-form-label">Upload Image</label>
+                                <div class="col-sm-10">
+                                    <input asp-for="imageUpload" class="form-control" type="file" onchange="previewImage(event)" />
+                                    <span asp-validation-for="imageUpload" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Image Preview Section, displayed directly below the upload form -->
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label">Preview</label>
+                                <div class="col-sm-10">
+                                    <div id="imagePreviewContainer" style="display: block; margin-top: 10px; border: 1px solid #ccc; width: 640px; height: 400px; overflow: hidden;">
+                                        <img id="imagePreview" alt="Image Preview" style="width: 100%; height: 100%; object-fit: cover;"
+                                             src="@(!string.IsNullOrWhiteSpace(Model.url) ? Url.Content("~/Media/" + Model.url) : "")" />
                                     </div>
                                 </div>
+                            </div>
 
-
-                                <div class="row mb-3">
-                                    <label asp-for="status" class="col-sm-2 col-form-label">Status</label>
-                                    <div class="col-sm-10">
-                                        <select asp-for="status" class="form-select" required>
-                                            <option value="">Select Status</option>
-                                            <option value="ACTIVE">Active</option>
-                                            <option value="INACTIVE">Inactive</option>
-                                        </select>
-                                        <span asp-validation-for="status" class="text-danger"></span>
-                                    </div>
+                            <!-- Status Selection -->
+                            <div class="row mb-3">
+                                <label asp-for="status" class="col-sm-2 col-form-label">Status</label>
+                                <div class="col-sm-10">
+                                    <select asp-for="status" class="form-select" required>
+                                        <option value="">Select Status</option>
+                                        <option value="ACTIVE" selected=@(Model.status == "ACTIVE")>Active</option>
+                                        <option value="INACTIVE" selected=@(Model.status == "INACTIVE")>Inactive</option>
+                                    </select>
+                                    <span asp-validation-for="status" class="text-danger"></span>
                                 </div>
+                            </div>
 
-
-                                <div class="row mb-3">
-                                    <label asp-for="width" class="col-sm-2 col-form-label">Width</label>
-                                    <div class="col-sm-10">
-                                        <input asp-for="width" class="form-control" type="number" required />
-                                        <span asp-validation-for="width" class="text-danger"></span>
-                                    </div>
+                            <!-- Position Selection -->
+                            <div class="row mb-3">
+                                <label asp-for="position" class="col-sm-2 col-form-label">Position</label>
+                                <div class="col-sm-10">
+                                    <select asp-for="position" class="form-select" required>
+                                        <option value="">Select Position</option>
+                                        <option value="Top" selected=@(Model.position == "Top")>Top</option>
+                                        <option value="Bottom" selected=@(Model.position == "Bottom")>Bottom</option>
+                                        <option value="Left" selected=@(Model.position == "Left")>Left</option>
+                                        <option value="Right" selected=@(Model.position == "Right")>Right</option>
+                                    </select>
+                                    <span asp-validation-for="position" class="text-danger"></span>
                                 </div>
+                            </div>
 
-                                <div class="row mb-3">
-                                    <label asp-for="height" class="col-sm-2 col-form-label">Height</label>
-                                    <div class="col-sm-10">
-                                        <input asp-for="height" class="form-control" type="number" required />
-                                        <span asp-validation-for="height" class="text-danger"></span>
-                                    </div>
+                            <!-- Submit and Cancel Buttons -->
+                            <div class="row mb-4">
+                                <div class="col-sm-6 text-end">
+                                    <a asp-controller="Ads" asp-action="Index" class="btn btn-secondary">Cancel</a>
                                 </div>
-
-                                <div class="row mb-3">
-                                    <label asp-for="position" class="col-sm-2 col-form-label">Position</label>
-                                    <div class="col-sm-10">
-                                        <input asp-for="position" class="form-control" required />
-                                        <span asp-validation-for="position" class="text-danger"></span>
-                                    </div>
+                                <div class="col-sm-6">
+                                    <button type="submit" class="btn btn-primary">Create</button>
                                 </div>
-                                <!-- The hidden URL field is not needed anymore -->
-                                @*<input type="hidden" asp-for="url" />*@
-
-                                <div class="row mb-4">
-                                    <div class="col-sm-6 text-end">
-                                        <a asp-controller="Ads" asp-action="Index" class="btn btn-secondary">Cancel</a>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <!-- Create and Cancel buttons -->
-                                        <button type="submit" class="btn btn-primary">Create</button>
-                                    </div>
-
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                            </div>
+                        </form>
+                    </div> <!-- Close card body -->
                 </div>
             </div>
         </div>
-    </section>
-
+    </div>
 </main><!-- End #main -->
+@section Scripts {
+    <script>
+        // Display preview of the uploaded image, capped at 640x400
+        function previewImage(event) {
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreviewContainer.style.display = 'none';
+            }
+        }
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

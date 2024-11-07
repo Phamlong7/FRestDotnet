@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Restaurant.Models; // Include your models and data context
 using Restaurant.Repository;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Restaurant.Areas.Admin.Controllers
 {
@@ -25,6 +26,28 @@ namespace Restaurant.Areas.Admin.Controllers
             var users = _dataContext.Users
                 .Where(u => u.Role.ToLower() == "user") // Case-insensitive comparison
                 .ToList();
+
+            var latestComments = _dataContext.comment
+                .Include(c => c.Blog)  // Ensure Blog is included
+                .Where(c => c.CreatedDate >= DateTime.Now.AddDays(-7))  // Last 7 days filter
+                .OrderByDescending(c => c.CreatedDate)  // Order by newest first
+                .ToList();  // Retrieve all comments within the last 7 days
+
+            var latestOrders = _dataContext.order
+                .Include(o => o.orderDetails)
+                .ThenInclude(od => od.dish)
+                .Where(o => o.createdDate >= DateTime.Now.AddDays(-7))
+                .OrderByDescending(o => o.createdDate)
+                .ToList();
+
+            var combinedNotifications = latestComments.Cast<object>()
+                .Concat(latestOrders.Cast<object>())
+                .OrderByDescending(n => n is CommentModel comment ? comment.CreatedDate : (n is OrderModel order ? order.createdDate : DateTime.MinValue))
+                .ToList();
+
+            ViewData["LatestComments"] = latestComments;
+            ViewData["LatestOrders"] = latestOrders;
+            ViewData["CombinedNotifications"] = combinedNotifications;
 
             // Pass the list of users to the view
             return View(users);

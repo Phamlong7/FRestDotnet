@@ -24,6 +24,7 @@
 <section class="ftco-section ftco-no-pt ftco-no-pb contact-section">
     <div class="container">
         <div class="row d-flex align-items-stretch no-gutters">
+            <!-- Contact Form Section -->
             <div class="col-md-6 pt-5 px-2 pb-2 p-md-5 order-md-last">
                 <h2 class="h4 mb-2 mb-md-5 font-weight-bold">Contact Us</h2>
                 <form method="post" asp-action="SendContactMessage">
@@ -44,9 +45,18 @@
                     </div>
                 </form>
             </div>
-            <div class="col-md-6 d-flex align-items-stretch">
-                <div id="map" style="height: 600px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #aaa; margin-top: 40px">
-                    Placeholder for the ads. Height 600px
+
+            <!-- Ad Image Section -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                <div id="ad-placeholder" class="ad-container" style="width: 100%; max-width: 550px; position: relative; overflow: hidden; height: 600px;">
+                    @if (!string.IsNullOrEmpty(ViewBag.AdImageFileName))
+                    {
+                        <img src="@Url.Content($"~/Media/{ViewBag.AdImageFileName}")" alt="Ad Image" class="ad-image" style="height: 100%; width: 100%; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="" alt="Ad Placeholder" class="ad-image" style="height: 100%; width: 100%; object-fit: cover;" />
+                    }
                 </div>
             </div>
         </div>
@@ -76,12 +86,35 @@
             </div>
             <div class="col-md-5 d-flex">
                 <div class="dbox">
-                    <p><span>Leader:</span>LongPND</p>
+                    <p><span>Leader:</span>LongPND</a></p>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<style>
+    .ad-container {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        height: 580px;
+        width: 550px;
+    }
+
+    .ad-image {
+        max-width: 100%;
+        height: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
 <script>
     // Initialize toast notification with extended display time
     document.addEventListener('DOMContentLoaded', function () {

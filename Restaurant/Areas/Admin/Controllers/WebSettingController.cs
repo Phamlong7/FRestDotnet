@@ -25,6 +25,28 @@ namespace Restaurant.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var latestComments = _dataContext.comment
+                .Include(c => c.Blog)  // Ensure Blog is included
+                .Where(c => c.CreatedDate >= DateTime.Now.AddDays(-7))  // Last 7 days filter
+                .OrderByDescending(c => c.CreatedDate)  // Order by newest first
+                .ToList();  // Retrieve all comments within the last 7 days
+
+            var latestOrders = _dataContext.order
+                .Include(o => o.orderDetails)
+                .ThenInclude(od => od.dish)
+                .Where(o => o.createdDate >= DateTime.Now.AddDays(-7))
+                .OrderByDescending(o => o.createdDate)
+                .ToList();
+
+            var combinedNotifications = latestComments.Cast<object>()
+                .Concat(latestOrders.Cast<object>())
+                .OrderByDescending(n => n is CommentModel comment ? comment.CreatedDate : (n is OrderModel order ? order.createdDate : DateTime.MinValue))
+                .ToList();
+
+            ViewData["LatestComments"] = latestComments;
+            ViewData["LatestOrders"] = latestOrders;
+            ViewData["CombinedNotifications"] = combinedNotifications;
+
             return View(await _dataContext.web_setting.OrderBy(a => a.id).ToListAsync());
         }
 

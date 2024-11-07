@@ -15,6 +15,7 @@
             </ol>
         </nav>
     </div><!-- End Page Title -->
+
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -26,17 +27,24 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                             <div class="row mb-3">
-                                <label asp-for="imageUpload" class="col-sm-2 col-form-label">Upload New Image</label>
+                                <label asp-for="imageUpload" class="col-sm-2 col-form-label">Image</label>
                                 <div class="col-sm-10">
-                                    <div class="d-flex align-items-center">
-                                        @if (!string.IsNullOrWhiteSpace(Model.url))
-                                        {
-                                            <img alt="Current Image" style="width: 150px; margin-right: 15px;"
-                                                 src="@Url.Content("~/Media/" + Model.url)" />
-                                        }
-                                        <input asp-for="imageUpload" class="form-control" type="file" />
-                                    </div>
+                                    <input asp-for="imageUpload" class="form-control" type="file" />
                                     <span asp-validation-for="imageUpload" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Image Preview Section -->
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label">Current Image</label>
+                                <div class="col-sm-10">
+                                    @if (!string.IsNullOrWhiteSpace(Model.url))
+                                    {
+                                        <div style="margin-top: 10px; position: relative; width: 530px; height: 325px; overflow: hidden; border: 1px solid #ccc;">
+                                            <img id="currentImage" alt="Current Image" src="@Url.Content("~/Media/" + Model.url)"
+                                                 style="width: 530px; height: 325px; object-fit: cover;" />
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -55,7 +63,7 @@
                             <div class="row mb-3">
                                 <label asp-for="width" class="col-sm-2 col-form-label">Width</label>
                                 <div class="col-sm-10">
-                                    <input asp-for="width" class="form-control" />
+                                    <input asp-for="width" class="form-control" readonly />
                                     <span asp-validation-for="width" class="text-danger"></span>
                                 </div>
                             </div>
@@ -63,7 +71,7 @@
                             <div class="row mb-3">
                                 <label asp-for="height" class="col-sm-2 col-form-label">Height</label>
                                 <div class="col-sm-10">
-                                    <input asp-for="height" class="form-control" />
+                                    <input asp-for="height" class="form-control" readonly />
                                     <span asp-validation-for="height" class="text-danger"></span>
                                 </div>
                             </div>
@@ -71,18 +79,26 @@
                             <div class="row mb-3">
                                 <label asp-for="position" class="col-sm-2 col-form-label">Position</label>
                                 <div class="col-sm-10">
-                                    <input asp-for="position" class="form-control" />
+                                    <select asp-for="position" class="form-select" required>
+                                        <option value="">Select Position</option>
+                                        <option value="Top" selected=@(Model.position == "Top")>Top</option>
+                                        <option value="Bottom" selected=@(Model.position == "Bottom")>Bottom</option>
+                                        <option value="Left" selected=@(Model.position == "Left")>Left</option>
+                                        <option value="Right" selected=@(Model.position == "Right")>Right</option>
+                                    </select>
                                     <span asp-validation-for="position" class="text-danger"></span>
                                 </div>
                             </div>
 
-                            <!-- Buttons Row -->
-                            <div class="row mb-4">
-                                <div class="col-sm-6 text-end">
+                            <!-- Buttons Row moved here -->
+                            <div class="row mb-4 justify-content-between">
+                                <div class="col-auto">
                                     <a asp-controller="Ads" asp-action="Index" class="btn btn-secondary">Cancel</a>
                                 </div>
-                                <div class="col-sm-6">
-                                    <button type="submit" class="btn btn-primary">Update</button>
+                                <div class="col-auto">
+                                    <button type="button" id="cropButton" class="btn btn-warning me-2">Crop</button>
+                                    <button type="button" id="resetButton" class="btn btn-danger me-2">Reset</button>
+                                    <button type="submit" id="submitButton" class="btn btn-primary" disabled>Update</button>
                                 </div>
                             </div>
                         </form>
@@ -93,5 +109,99 @@
     </div>
 </main><!-- End #main -->
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+    <script>
+        let cropper;
+        const currentImage = document.getElementById('currentImage');
+        const submitButton = document.getElementById('submitButton');
+
+        // Initialize Cropper.js on the existing image
+        window.addEventListener('load', function () {
+            if (currentImage) {
+                cropper = new Cropper(currentImage, {
+                    aspectRatio: NaN, // Free aspect ratio
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    minCropBoxWidth: 150, // Minimum width for crop box
+                    minCropBoxHeight: 150, // Minimum height for crop box
+                    crop(event) {
+                        // Update width and height inputs based on crop box dimensions
+                        const widthInput = document.querySelector('input[name="width"]');
+                        const heightInput = document.querySelector('input[name="height"]');
+                        if (widthInput && heightInput) {
+                            widthInput.value = Math.round(event.width);
+                            heightInput.value = Math.round(event.height);
+                        }
+                    }
+                });
+
+                // Optionally, set initial values from the model if available
+                const widthInput = document.querySelector('input[name="width"]');
+                const heightInput = document.querySelector('input[name="height"]');
+                if (widthInput && heightInput) {
+                    widthInput.value = '@Model.width'; // Assuming Model.width has the initial width
+                    heightInput.value = '@Model.height'; // Assuming Model.height has the initial height
+                }
+            }
+        });
+
+        // Capture the cropped image dimensions on Crop button click
+        document.getElementById('cropButton').addEventListener('click', function () {
+            if (cropper) {
+                // Get cropped image data
+                const cropData = cropper.getData();
+
+                // Update width and height inputs based on the cropper dimensions
+                const widthInput = document.querySelector('input[name="width"]');
+                const heightInput = document.querySelector('input[name="height"]');
+                if (widthInput && heightInput) {
+                    widthInput.value = Math.round(cropData.width);
+                    heightInput.value = Math.round(cropData.height);
+                }
+
+                // Enable the submit button since cropping is done
+                submitButton.disabled = false;
+            }
+        });
+
+        // Reset the cropper
+        document.getElementById('resetButton').addEventListener('click', function () {
+            if (cropper) {
+                cropper.reset(); // Reset the cropper to the original image
+                // Disable the submit button again
+                submitButton.disabled = true;
+            }
+        });
+
+        // Capture the cropped image data on form submit
+        document.querySelector('form').addEventListener('submit', function (e) {
+            if (cropper) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Get cropped image data as a Blob
+                cropper.getCroppedCanvas().toBlob(function (blob) {
+                    // Create a FormData object to append the cropped image Blob
+                    const formData = new FormData(e.target);
+                    formData.append('imageUpload', blob, 'croppedImage.jpg');
+
+                    // Submit the form data using fetch
+                    fetch('@Url.Action("Edit", "Ads")', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Redirect to the Index view on success
+                                window.location.href = '@Url.Action("Index", "Ads")';
+                            } else {
+                                alert('An error occurred while updating the ad.');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }, 'image/jpeg');
+            }
+        });
+    </script>
 }

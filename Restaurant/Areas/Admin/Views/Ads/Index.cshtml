@@ -5,6 +5,7 @@
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
+
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true"
@@ -20,6 +21,59 @@
 }
 
 <main id="content" class="content-area">
+    <div class="notification-icon d-flex align-items-center justify-content-end position-absolute top-0" style="right: 30px; padding-top: 10px;">
+        <i class="bi bi-bell-fill" style="font-size: 24px; cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false"></i>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationIcon" style="max-height: 300px; overflow-y: auto; width: 300px;">
+            @if (ViewData["LatestComments"] != null)
+            {
+                var comments = ViewData["LatestComments"] as List<CommentModel>;
+                if (comments != null && comments.Any())
+                {
+                    @foreach (var comment in comments)
+                    {
+                        @if (comment.Blog != null)
+                        {
+                            <li class="notification-item">
+                                <a class="dropdown-item" href="@Url.Action("Detail", "Stories", new { id = comment.BlogId, area = "" })">
+                                    <strong class="text-break" style="display: inline; text-overflow: ellipsis; max-width: 100%; margin-right: 2px;">
+                                        @($"@{comment.UserName}")
+                                    </strong>
+                                    <span style="display: inline; padding: 0 0px;">on</span>
+                                    <em class="text-break" style="display: inline; text-overflow: ellipsis; max-width: 100%; margin-left: 2px;">
+                                        @{
+                                            var title = comment.Blog.title;
+                                            var shortenedTitle = title.Length > 20 ? title.Substring(0, 20) + "..." : title;
+                                            @shortenedTitle
+                                        }
+                                    </em>:
+                                    <p class="text-break" style="overflow-wrap: break-word; max-width: 100%;">
+                                        @{
+                                            var content = comment.Content;
+                                            var shortenedContent = content.Length > 35 ? content.Substring(0, 20) + "..." : content;
+                                            @shortenedContent
+                                        }
+                                    </p>
+                                    <small class="text-muted">@comment.CreatedDate.ToString("MMMM dd, yyyy HH:mm")</small>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li><a class="dropdown-item" href="#">No blog linked to comment</a></li>
+                        }
+                    }
+                }
+                else
+                {
+                    <li><a class="dropdown-item" href="#">No new comments</a></li>
+                }
+            }
+            else
+            {
+                <li><a class="dropdown-item" href="#">No new comments</a></li>
+            }
+        </ul>
+    </div>
 
     <div class="pagetitle">
         <h1>Ads Management</h1>
@@ -102,9 +156,9 @@
                                                         <i class="bi bi-pencil"></i> Update
                                                     </a>
                                                     <!-- Delete Button -->
-                                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
+                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id">
                                                         <i class="bi bi-trash"></i> Delete
-                                                    </a>
+                                                    </button>
 
                                                     <!-- Delete Confirmation Modal -->
                                                     <div class="modal fade" id="deleteModal-@item.id" tabindex="-1" aria-labelledby="deleteModalLabel-@item.id" aria-hidden="true">
@@ -119,7 +173,11 @@
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                    <a href="@Url.Action("Delete", "Ads", new { area = "Admin", id = item.id })" class="btn btn-danger">Confirm Delete</a>
+                                                                    <!-- Delete Form -->
+                                                                    <form asp-area="Admin" asp-controller="Ads" asp-action="DeleteConfirmed" method="post" style="display:inline;">
+                                                                        <input type="hidden" name="id" value="@item.id" />
+                                                                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                                    </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -154,6 +212,45 @@
         })
         toastList.forEach(toast => toast.show());
     });
+
+    <style>
+        .notification-item {
+            transition: background-color 0.3s ease;
+        position: relative;
+        max-width: 100%;
+        }
+
+        .notification-item .dropdown-item {
+            display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+            }
+
+        .notification-item .dropdown-item p {
+            word - wrap: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+                }
+
+        /* Style the title and content truncation */
+        .notification-item a {
+            display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+            }
+
+        .notification-item strong,
+        .notification-item em {
+            overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+            }
+    </style>
 </script>
 
 @section Scripts {
