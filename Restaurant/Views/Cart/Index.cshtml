@@ -44,28 +44,21 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr class="cart-item" data-dishid="@item.DishId">
-                                <!-- Product Information (Image + Title + Remove link) -->
+                            <tr id="cart-index-page" class="cart-item-index" data-dishid="@item.DishId">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="/Media/@item.Banner" alt="@item.Title"
-                                             style=" width: 80px; height: 80px; object-fit: cover;" />
+                                        <img src="/Media/@item.Banner" alt="@item.Title" style="width: 80px; height: 80px; object-fit: cover;" />
                                         <div class="ml-3">
                                             <p class="mb-1">@item.Title</p>
-                                            <a href="javascript:void(0);" onclick="removeItem(@item.DishId)"
-                                               class="text-primary">Remove</a>
+                                            <a href="javascript:void(0);" onclick="removeItem(@item.DishId)" class="text-primary">Remove</a>
                                         </div>
                                     </div>
                                 </td>
-
                                 <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
                                 <td class="quantity-control">
                                     <button type="button" onclick="decrementQty(@item.DishId)">-</button>
-                                    <input type="number" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1"
-                                           data-dishid="@item.DishId" />
+                                    <input type="number" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1" data-dishid="@item.DishId" oninput="onQuantityChange(@item.DishId, this.value)" />
                                     <input type="hidden" name="OrderDetails[@index].DishId" value="@item.DishId" />
-                                    <input type="hidden" name="OrderDetails[@index].DishName" value="@item.Title" />
-                                    <input type="hidden" name="OrderDetails[@index].Price" value="@item.Price" />
                                     <button type="button" onclick="incrementQty(@item.DishId)">+</button>
                                 </td>
                                 <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
@@ -196,7 +189,7 @@
         var grandTotal = 0;
 
         // Loop through all items and sum up the totals
-        document.querySelectorAll('.cart-item').forEach(function (itemRow) {
+        document.querySelectorAll('.cart-item-index').forEach(function (itemRow) {
             var itemTotalText = itemRow.querySelector('td:nth-child(4)').innerText;
             var itemTotal = parseFloat(itemTotalText.replace('$', '').replace(',', ''));
             grandTotal += itemTotal;
@@ -204,6 +197,19 @@
 
         // Update the grand total field
         document.getElementById('grand-total').innerText = grandTotal.toLocaleString() + '$';
+    }
+
+    function onQuantityChange(dishId, newQuantity) {
+        newQuantity = parseInt(newQuantity);
+
+        // Check if the new quantity is a valid positive integer
+        if (newQuantity > 0) {
+            updateCartQuantity(dishId, newQuantity);  // Save the new quantity to the session
+        } else {
+            // Reset to 1 if invalid input is entered
+            document.querySelector('input[data-dishid="' + dishId + '"]').value = 1;
+            updateCartQuantity(dishId, 1);
+        }
     }
 
     // Function to save the message to session storage

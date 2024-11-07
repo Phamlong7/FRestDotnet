@@ -68,8 +68,15 @@ $(document).ready(function () {
 document.getElementById('cart-toggle').addEventListener('click', function (e) {
     e.preventDefault();
     const cartDropdown = document.getElementById('cart-dropdown');
+    const isLoggedIn = document.body.getAttribute('data-logged-in') === "True"; // Check login status
 
-    // Toggle visibility of the cart dropdown
+    if (!isLoggedIn) {
+        // If the user is not logged in, redirect to login page with ReturnUrl set to /Cart
+        window.location.href = "/Account/Login?ReturnUrl=%2FCart";
+        return;
+    }
+
+    // Toggle visibility of the cart dropdown if the user is logged in
     cartDropdown.style.display = (cartDropdown.style.display === 'block') ? 'none' : 'block';
     cartDropdown.style.width = '300px';
     cartDropdown.style.maxHeight = '550px';
