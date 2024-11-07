@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Areas.Admin;
 using Restaurant.Models;
+using Restaurant.Hubs;
 using Restaurant.Repository;
 using Restaurant.Utility;
 using Restaurant.ViewModels;
@@ -121,6 +122,8 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
+    // Map the chat hub
+    endpoints.MapHub<ChatHub>("/chatHub");
 });
 
 // Map controllers
