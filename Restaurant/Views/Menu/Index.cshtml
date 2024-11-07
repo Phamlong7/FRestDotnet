@@ -15,6 +15,22 @@
     }
 }
 
+<div class="home-popup__background" onclick="closePopup()" style="display: none;">
+    <div class="home-popup__content">
+        <!-- Ad image will be dynamically loaded here -->
+        <div id="adImageContainer"></div>
+
+        <div class="home-popup__close-area">
+            <div class="home-popup__close-btn" role="button" tabindex="0" aria-label="Close" onclick="closePopup(event)">
+                <svg viewBox="0 0 16 16" stroke="#EE4D2D" class="home-popup__close-button">
+                    <path stroke-linecap="round" d="M1.1,1.1L15.2,15.2"></path>
+                    <path stroke-linecap="round" d="M15,1L0.9,15.1"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
 <section class="hero-wrap hero-wrap-2" style="background-image: url('/images/bg_3.jpg');" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
