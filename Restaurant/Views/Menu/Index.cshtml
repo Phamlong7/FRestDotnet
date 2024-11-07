@@ -122,6 +122,46 @@
     </div>
 </section>
 
+<!-- CSS for Transparent Background and Popup Styling -->
+<style>
+    /* Style for the Popup Background */
+    .home-popup__background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Transparent dark background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        cursor: pointer; /* Make the background clickable */
+    }
+    /* Container for Ad Image */
+    #adImageContainer {
+        position: relative;
+        width: 100%; /* Adjust this to make the image a medium size */
+        max-width: 600px; /* Optional: Set a max width */
+        margin: 0 auto;
+        box-sizing: border-box; /* Ensure the border doesn't affect the width */
+        overflow: hidden; /* Hide any overflow if necessary */
+    }
+        /* Image Styling */
+        #adImageContainer img {
+            width: 100%; /* Make the image responsive */
+            height: auto; /* Maintain aspect ratio */
+            object-fit: cover; /* Ensures the image fills the container without distortion */
+        }
+    /* Close button styles */
+    .home-popup__close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+    }
+</style>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function toggleWishlist(button) {
@@ -182,4 +222,50 @@
             });
         }
     }
+    // Initialize toast notification with extended display time
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                delay: 10000,  // Display for 10 seconds (10000 milliseconds)
+                autohide: true // Set to true for auto-hiding the toast
+            })
+        })
+        toastList.forEach(toast => toast.show());
+    });
+    async function openPopup() {
+        try {
+            // Fetch ad data
+            const response = await fetch('/Admin/Ads/RandomAd');
+            const ad = await response.json();
+
+            console.log("Fetched Ad:", ad);  // Log ad data to verify response
+            // Check if ad is valid and ACTIVE
+            if (ad && ad.url && ad.status === 'ACTIVE') {
+                const popup = document.querySelector('.home-popup__background');
+                const container = document.getElementById("adImageContainer");
+
+                // Prepare the popup display
+                container.innerHTML = '';  // Clear previous image content
+                const img = document.createElement("img");
+                img.src = '/Media/' + ad.url;
+                img.alt = "Random Ad";
+                container.appendChild(img);
+                popup.style.display = 'flex';  // Show the popup
+                document.body.style.overflow = 'hidden';  // Disable scrolling
+            } else {
+                console.log("No active ad to display.");
+                closePopup();  // Ensure popup stays hidden if no ad or inactive ad
+            }
+        } catch (error) {
+            console.error('Error fetching ad:', error);
+        }
+    }
+    function closePopup() {
+        const popup = document.querySelector('.home-popup__background');
+        popup.style.display = 'none';
+        document.body.style.overflow = 'auto';  // Re-enable scrolling
+    }
+    // Run openPopup on page load to check for active ad
+    openPopup();
 </script>
