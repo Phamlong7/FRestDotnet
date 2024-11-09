@@ -56,8 +56,8 @@
         </div>
     </div>
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-        <div id="content-area" class="container">
-            <a class="navbar-brand" href="#" data-url="@Url.Action("Index", "Home")">
+        <div class="container">
+            <a class="navbar-brand" asp-action="Index" asp-controller="Home">
                 <img src="/images/FRest_Logo.png" id="navbar-logo" alt="Logo" style="height: 100px;">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,21 +67,43 @@
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
-                        <a href="#" data-url="@Url.Action("Index", "Home")" class="nav-link ajax-link">Home</a>
+                        <a asp-action="Index" asp-controller="Home" class="nav-link">Home</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "About" ? "active" : "")">
-                        <a href="#" data-url="@Url.Action("Index", "About")" class="nav-link ajax-link">About</a>
+                        <a asp-action="Index" asp-controller="About" class="nav-link">About</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stories" ? "active" : "")">
-                        <a href="#" data-url="@Url.Action("Index", "Stories")" class="nav-link ajax-link">Stories</a>
+                        <a asp-action="Index" asp-controller="Stories" class="nav-link">Stories</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Menu" ? "active" : "")">
-                        <a href="#" data-url="@Url.Action("Index", "Menu")" class="nav-link ajax-link">Menu</a>
+                        <a asp-action="Index" asp-controller="Menu" class="nav-link">Menu</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active" : "")">
-                        <a href="#" data-url="@Url.Action("Index", "Contact")" class="nav-link ajax-link">Contact</a>
+                        <a asp-action="Index" asp-controller="Contact" class="nav-link">Contact</a>
                     </li>
-                    <!-- Continue with other links and partial login view -->
+                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Cart" ? "active" : "")" style="position: relative;">
+                        <a href="#" class="nav-link" id="cart-toggle">
+                            Cart <span class="cart-number">@(ViewData["NumberCart"] is null ? 0 : Convert.ToInt32(ViewData["NumberCart"]))</span>
+                        </a>
+                        <!-- Cart Dropdown Content -->
+                        <div id="cart-dropdown" class="dropdown-menu">
+                            <div class="cart-items">
+                                <!-- Cart Items will be dynamically inserted here -->
+                            </div>
+                            <div id="dropdown-footer" class="dropdown-footer" style="display: none;">
+                                <!-- Initially hidden -->
+                                <a href="@Url.Action("Index", "Cart")" class="btn btn-primary">View Cart</a>
+                                <a href="@Url.Action("Checkout", "Cart")" class="btn btn-success">Checkout</a>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Wishlist" ? "active" : "")">
+                        <a asp-action="Index" asp-controller="Wishlist" class="nav-link">
+                            Wishlist <span id="wishlist-count">@(ViewData["NumberWishlist"] is null ? 0 : Convert.ToInt32(ViewData["NumberWishlist"]))</span>
+                        </a>
+                    </li>
+                    <partial name="_LoginPartial" />
                 </ul>
             </div>
         </div>
@@ -121,9 +143,9 @@
                             creativity into every plate, using only the freshest ingredients to create unforgettable dishes that reflect the rich tapestry of 
                             flavors from around the world.</p>
                         <ul class="ftco-footer-social list-unstyled mt-3">
-                            <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                            <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                            <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+                            <li class="ftco-animate"><a><span class="icon-twitter"></span></a></li>
+                            <li class="ftco-animate"><a><span class="icon-facebook"></span></a></li>
+                            <li class="ftco-animate"><a><span class="icon-instagram"></span></a></li>
                         </ul>
                     </div>
                 </div>
@@ -216,31 +238,6 @@
             });
 
             updateLogo();
-        });
-        $(document).ready(function () {
-            // Click event for links with ajax-link class
-            $('.ajax-link').on('click', function (event) {
-                event.preventDefault(); // Prevent default navigation
-
-                // Retrieve the URL from data-url attribute
-                var url = $(this).data('url');
-
-                // Load the URL content into #content-area using AJAX
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#content-area').html(data); // Display content in the specified area
-                    },
-                    error: function () {
-                        $('#content-area').html('<p>Error loading content. Please try again later.</p>');
-                    }
-                });
-
-                // Update active state for navigation links
-                $('.nav-item').removeClass('active');
-                $(this).closest('.nav-item').addClass('active');
-            });
         });
     </script>
 </body>
