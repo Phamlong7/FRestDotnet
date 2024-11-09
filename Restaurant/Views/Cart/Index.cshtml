@@ -54,14 +54,14 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
+                                <td>@(item.Price.HasValue ? item.Price.Value.ToString("F2") : "N/A")$</td>
                                 <td class="quantity-control">
                                     <button type="button" onclick="decrementQty(@item.DishId)">-</button>
                                     <input type="number" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1" data-dishid="@item.DishId" oninput="onQuantityChange(@item.DishId, this.value)" />
                                     <input type="hidden" name="OrderDetails[@index].DishId" value="@item.DishId" />
                                     <button type="button" onclick="incrementQty(@item.DishId)">+</button>
                                 </td>
-                                <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
+                                <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("F2"))$</td>
                             </tr>
                             @* Increment the index after each iteration *@
                             index++;
@@ -74,7 +74,7 @@
                     <h5 class="mb-0">Total Amount:</h5>
                     <span id="grand-total" class="h4">
                         @Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity :
-                                 0).ToString("N0")$
+                                 0).ToString("F2")$
                     </span>
                 </div>
 
@@ -149,7 +149,7 @@
 
                         // Update the total price for this item
                         var totalPriceField = itemRow.querySelector('td:nth-child(4)');
-                        totalPriceField.innerText = (price * newQuantity).toLocaleString() + '$';
+                        totalPriceField.innerText = (price * newQuantity).toFixed(2) + '$';
 
                         // Update the grand total
                         updateGrandTotal();
@@ -196,7 +196,7 @@
         });
 
         // Update the grand total field
-        document.getElementById('grand-total').innerText = grandTotal.toLocaleString() + '$';
+        document.getElementById('grand-total').innerText = grandTotal.toFixed(2) + '$';
     }
 
     function onQuantityChange(dishId, newQuantity) {

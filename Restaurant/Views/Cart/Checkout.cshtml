@@ -63,13 +63,13 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "N/A")$</td>
+                                <td>@(item.Price.HasValue ? item.Price.Value.ToString("F2") : "N/A")$</td>
                                 <input type="hidden" name="OrderDetails[@index].Quantity" value="@item.Quantity" min="1" data-dishid="@item.DishId" />
                                 <td>@item.Quantity</td>
                                 <input type="hidden" name="OrderDetails[@index].DishId" value="@item.DishId" />
                                 <input type="hidden" name="OrderDetails[@index].DishName" value="@item.Title" />
                                 <input type="hidden" name="OrderDetails[@index].Price" value="@item.Price" />
-                                <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("N0"))$</td>
+                                <td>@((item.Price.HasValue ? item.Price.Value * item.Quantity : 0).ToString("F2"))$</td>
                             </tr>
                             @* Increment the index after each iteration *@
                             index++;
@@ -79,7 +79,7 @@
 
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <h5 class="mb-0">Total Amount:</h5>
-                    <span class="h4">@Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity : 0).ToString("N0")$</span>
+                    <span class="h4">@Model.Sum(i => i.Price.HasValue ? i.Price.Value * i.Quantity : 0).ToString("F2")$</span>
                 </div>
 
                 <div class="form-group mt-4">
