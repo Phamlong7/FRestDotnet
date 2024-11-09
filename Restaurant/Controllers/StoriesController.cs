@@ -127,7 +127,7 @@ namespace Restaurant.Controllers
                 return RedirectToAction("Index");
             }
 
-            if (comment.UserName != User.Identity.Name && !User.IsInRole("Admin"))
+            if (comment.UserName != User.Identity.Name && !User.IsInRole("ADMIN"))
             {
                 return Unauthorized();
             }

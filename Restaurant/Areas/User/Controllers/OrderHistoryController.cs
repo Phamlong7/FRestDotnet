@@ -171,7 +171,7 @@ namespace Restaurant.Areas.User.Controllers
                             $"<td>{dish?.title}</td>" +
                             $"<td>{item.priceAtOrder.Value.ToString("N2")} $</td>" +
                             $"<td>{item.quantity}</td>" +
-                            $"<td><img src='https://localhost:5246/Media/{dish?.banner}' style='width:100px;'/></td>" +//not work
+                            $"<td><img src='https://frestrestaurant-hwfdfnh9fzeke3fn.southeastasia-01.azurewebsites.net/Media/{dish?.banner}' style='width:100px;'/></td>" +//not work
                         $"</tr>";
             }
 

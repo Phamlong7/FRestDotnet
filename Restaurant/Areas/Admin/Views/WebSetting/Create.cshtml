@@ -58,11 +58,17 @@
                                 <div class="row mb-3">
                                     <label asp-for="type" class="col-sm-2 col-form-label">Type</label>
                                     <div class="col-sm-10">
-                                        <input asp-for="type" class="form-control" required />
+                                        <select asp-for="type" class="form-select" required>
+                                            <option value="">Select Type</option>
+                                            <option value="Welcome To Our Restaurant">Welcome To Our Restaurant</option>
+                                            <option value="Chef Home Page">Chef Home Page</option>
+                                            <option value="Catering Services">Catering Services</option>
+                                            <option value="About Page">About Page</option>
+                                            <option value="Happy Customer">Happy Customer</option>
+                                        </select>
                                         <span asp-validation-for="type" class="text-danger"></span>
                                     </div>
                                 </div>
-
 
                                 <div class="row mb-4">
                                     <div class="col-sm-6 text-end">
@@ -74,8 +80,10 @@
                                     </div>
 
                                 </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
+
                 </div>
 
             </div>
