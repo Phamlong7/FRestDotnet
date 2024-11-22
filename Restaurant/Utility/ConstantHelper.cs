@@ -4,8 +4,8 @@
     {
         public string hostemail { get; } = "smtp.gmail.com";
         public int port { get; } = 587;
-        public string emailsender { get; } = "longps704@gmail.com";
-        public string paswordsender { get; } = "coqdualrvdophife";
+        public string emailsender { get; } = "";
+        public string paswordsender { get; } = "";
 
         public string GenerateOTP()
         {
