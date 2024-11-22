@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Project README</title>
 </head>
 <body>
   <h1 align="center">🚀 .NET Project Setup Guide</h1>
