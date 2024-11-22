@@ -22,7 +22,7 @@
   <h2>📂 Project Setup</h2>
   <ol>
     <li>Clone the repository to your local machine:
-      <pre><code>git clone https://github.com/yourusername/your-repository.git</code></pre>
+      <pre><code>git clone https://github.com/Phamlong7/FRestDotnet.git</code></pre>
     </li>
     <li>Open the project in your preferred editor.</li>
     <li>Go to the <code>appsettings.json</code> file:
@@ -38,6 +38,7 @@
     "JWTSecret": "your_jwt_secret_key",
     "AnotherSecret": "your_other_secret"
   }
+            .......
 }
           </code></pre>
         </li>
@@ -58,8 +59,8 @@
         <li>Example:
           <pre><code>
 public static class ConstantHelper {
-    public const string DevEmail = "youremail@example.com";
-    public const string DevPassword = "yourpassword";
+    public const string Email = "youremail@example.com";
+    public const string Password = "yourpassword";
 }
           </code></pre>
         </li>
