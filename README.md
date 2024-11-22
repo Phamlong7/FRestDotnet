@@ -4,9 +4,6 @@
 </head>
 <body>
   <h1 align="center">🚀 .NET Project Setup Guide</h1>
-  <p align="center">
-    A modern and streamlined guide to set up and run your .NET application with ease.
-  </p>
 
   <hr>
 
