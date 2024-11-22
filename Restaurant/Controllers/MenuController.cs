@@ -55,26 +55,26 @@ namespace Restaurant.Controllers
         // GET: Menu/DishesByCategory
         public IActionResult DishesByCategory(long categoryId, int? page)
         {
-            int pageSize = 9; // Number of dishes per page
-            int pageNumber = page ?? 1; // Current page, default is page 1
+            int pageSize = 9; // Số món ăn mỗi trang
+            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1
 
-            // Get list of dishes by category with status "ACTIVE"
             var viewModel = new MenuViewModel
             {
-                // Get categories with status "ACTIVE"
                 category = _dataContext.category
                     .Where(c => c.status == "ACTIVE")
                     .OrderBy(c => c.id)
                     .ToList(),
 
-                // Get dishes by category with status "ACTIVE"
                 dish = _dataContext.dish
                     .Where(d => d.categoryId == categoryId && d.status == "ACTIVE")
                     .OrderBy(d => d.title)
-                    .ToPagedList(pageNumber, pageSize)  // Using ToPagedList()
+                    .ToPagedList(pageNumber, pageSize)
             };
+
+            ViewData["CurrentCategoryId"] = categoryId; // Lưu categoryId để dùng trong view
 
             return View("Index", viewModel);
         }
+
     }
 }

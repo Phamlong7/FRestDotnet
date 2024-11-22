@@ -88,7 +88,7 @@
 
                 <!-- Paged -->
                 <div class="d-flex justify-content-center">
-                    @Html.PagedListPager(Model.dish, page => Url.Action("Index", new { page }),
+                    @Html.PagedListPager(Model.dish, page => Url.Action("DishesByCategory", new { categoryId = ViewData["CurrentCategoryId"], page }),
                              new PagedListRenderOptions
                     {
                         DisplayLinkToFirstPage = PagedListDisplayMode.Always,
@@ -101,6 +101,7 @@
                         PageClasses = new[] { "page-link" }
                     })
                 </div>
+
             </div>
         </div>
     </div>
